@@ -1,0 +1,70 @@
+/* Clay Tiffin: Soft Clay shapes and motion with Pop Tiffin colours. Nomi's design tokens and base classes. */
+:root{
+  --bg:#FFF4D6; --card:#FFFFFF; --ink:#1B1B3A; --ink2:#4A4A6A;
+  --saffron:#FFB627; --saffron-soft:#FFE7B0; --saffron-ink:#6E4A00;
+  --tomato:#D93A2E; --tomato-soft:#FDE2DF; --tomato-ink:#8F1D1D;
+  --mint:#3BB273; --mint-soft:#DDF5E6; --mint-ink:#14532D;
+  --sky:#4D9DE0; --sky-soft:#DDEEFB; --sky-ink:#1D4E7A;
+  --pink:#FF7AB6; --pink-soft:#FFE1EF;
+  --shadow:0 12px 28px rgba(27,27,58,.10); --puff:inset 0 -4px 0 rgba(27,27,58,.05);
+}
+.scr{width:390px;height:844px;box-sizing:border-box;background:var(--bg);color:var(--ink);font-family:'Nunito',system-ui,sans-serif;display:flex;flex-direction:column;gap:14px;padding:22px 20px;overflow:hidden;position:relative}
+.tab{width:1024px;height:640px;box-sizing:border-box;background:var(--ink);color:#FFF4D6;font-family:'Nunito',system-ui,sans-serif;display:flex;gap:20px;padding:24px;overflow:hidden;position:relative}
+.h1{font-family:'Fredoka',sans-serif;font-weight:600;font-size:28px;line-height:1.1;margin:0}
+.h2{font-family:'Fredoka',sans-serif;font-weight:600;font-size:20px;line-height:1.15;margin:0}
+.num{font-family:'Fredoka',sans-serif;font-weight:700}
+.sub{font-size:15px;color:var(--ink2);line-height:1.4}
+.lab{font-size:12px;font-weight:800;letter-spacing:1.1px;text-transform:uppercase;color:var(--ink2)}
+.card{background:var(--card);border-radius:26px;padding:16px;box-shadow:var(--shadow),var(--puff)}
+.soft{border-radius:22px;padding:14px}
+.row{display:flex;gap:10px;align-items:center}
+.col{display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.grow{flex-grow:1}
+.ib{width:44px;height:44px;flex-shrink:0;border-radius:16px;background:#fff;border:0;box-shadow:0 6px 14px rgba(27,27,58,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn{font:inherit;font-family:'Fredoka',sans-serif;font-weight:600;font-size:18px;min-height:60px;padding:0 20px;border-radius:24px;border:0;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;cursor:pointer;box-sizing:border-box}
+.b-ink{background:var(--ink);color:#FFF4D6;box-shadow:0 12px 24px rgba(27,27,58,.25),inset 0 -5px 0 rgba(0,0,0,.25)}
+.b-tom{background:var(--tomato);color:#fff;box-shadow:0 12px 24px rgba(217,58,46,.35),inset 0 -5px 0 rgba(0,0,0,.15)}
+.b-sa{background:var(--saffron);color:var(--ink);box-shadow:0 12px 24px rgba(255,182,39,.4),inset 0 -5px 0 rgba(0,0,0,.1)}
+.b-wh{background:#fff;color:var(--ink);box-shadow:var(--shadow),var(--puff)}
+.sm{min-height:44px;font-size:15px;border-radius:18px;padding:0 14px}
+.chip{font-size:13px;font-weight:800;padding:7px 12px;border-radius:16px;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.c-sa{background:var(--saffron-soft);color:var(--saffron-ink)}
+.c-to{background:var(--tomato-soft);color:var(--tomato-ink)}
+.c-mi{background:var(--mint-soft);color:var(--mint-ink)}
+.c-sk{background:var(--sky-soft);color:var(--sky-ink)}
+.c-pk{background:var(--pink-soft);color:#7A1F4C}
+.c-wh{background:#fff;color:var(--ink);box-shadow:0 4px 10px rgba(27,27,58,.08)}
+.c-ink{background:var(--ink);color:#FFF4D6}
+.wrap{display:flex;flex-wrap:wrap;gap:6px}
+.dot{width:12px;height:12px;border-radius:5px;flex-shrink:0}
+.photo{background:#2A2433;border-radius:26px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.bar{height:10px;border-radius:6px;background:var(--saffron-soft);overflow:hidden}
+.bar>span{display:block;height:100%;border-radius:6px;background:var(--ink);transform-origin:left;animation:fillx 1s cubic-bezier(.3,1.3,.5,1) .3s both}
+.nav{position:absolute;left:16px;right:16px;bottom:16px;background:var(--ink);border-radius:30px;padding:8px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;box-shadow:0 14px 30px rgba(27,27,58,.35)}
+.nav.n2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.nav a{text-decoration:none;color:#FFE7B0;border-radius:22px;min-height:52px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:12px;font-weight:800}
+.nav a.on{background:var(--saffron);color:var(--ink)}
+.draft{position:absolute;top:14px;left:14px;font-size:12px;font-weight:800;padding:6px 10px;border-radius:12px;background:var(--saffron);color:var(--ink)}
+.face{width:58px;height:58px;padding:0;border:0;border-radius:22px;background:#fff;box-shadow:0 6px 14px rgba(27,27,58,.1);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+input.field{font:inherit;font-size:17px;min-height:56px;border-radius:20px;border:2px solid var(--saffron-soft);background:#fff;padding:0 16px;color:var(--ink);box-sizing:border-box;width:100%}
+label.fl{font-size:14px;font-weight:800;color:var(--ink2)}
+/* motion: squishy entrances, gentle loops */
+@keyframes squish{0%{opacity:0;transform:scale(.85)}55%{opacity:1;transform:scale(1.04,.97)}80%{transform:scale(.99,1.01)}100%{transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes ripple{from{transform:scale(1);opacity:.5}to{transform:scale(1.7);opacity:0}}
+@keyframes scan{0%{transform:translateY(0)}100%{transform:translateY(290px)}}
+@keyframes blob{0%{opacity:0;transform:scale(.4)}60%{opacity:1;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+@keyframes fillx{from{transform:scaleX(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes wave{0%,100%{transform:scaleY(.3)}50%{transform:scaleY(1)}}
+.sq{animation:squish .65s cubic-bezier(.3,1.4,.5,1) both}
+.fl8{animation:float 3s ease-in-out infinite}
+.rip{animation:ripple 1.5s ease-out infinite}
+.scan{animation:scan 2.2s cubic-bezier(.5,0,.5,1) infinite alternate}
+.m{transform-box:fill-box;transform-origin:center;animation:blob .7s cubic-bezier(.3,1.5,.5,1) both}
+.spin{animation:spin 1.2s linear infinite}
+.blink{animation:blink 1.4s ease-in-out infinite}
+.wave{transform-origin:center;animation:wave .9s ease-in-out infinite}
+.d1{animation-delay:.08s}.d2{animation-delay:.16s}.d3{animation-delay:.24s}.d4{animation-delay:.32s}.d5{animation-delay:.4s}.d6{animation-delay:.48s}

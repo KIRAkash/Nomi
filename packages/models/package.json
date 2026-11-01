@@ -1,0 +1,20 @@
+{
+  "name": "@nomi/models",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "smoke": "node --env-file=../../.env --experimental-strip-types src/smoke.ts"
+  },
+  "dependencies": {
+    "@nomi/shared": "*",
+    "openai": "^5.20.0",
+    "zod": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.0",
+    "typescript": "~6.0.3"
+  }
+}

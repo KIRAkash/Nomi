@@ -1,0 +1,17 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+__pycache__/
+.venv/
+android/
+ios/
+supabase/.temp/
+
+# Local editor and agent tooling
+.claude/
