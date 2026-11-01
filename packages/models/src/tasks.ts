@@ -15,7 +15,9 @@ export const extractMenu = (ctx: Ctx, menuImage: string) =>
 /** Dish enrichment: description → components that become SAM prompts. */
 export const proposeComponents = (ctx: Ctx, dish: { name: string; description: string | null }) =>
   structured(MODELS.spark, ctx, 'components', ComponentProposal,
-    'List the separately visible parts of this plated dish as seen from above. sam_prompt is a short noun phrase a segmentation model can find ("fried onion garnish"). role: main for the base, count for pieces worth counting, placement for garnish whose position matters, side for bowls and accompaniments.',
+    // SAM 3.1 finds plain everyday nouns ("fried onions", "bowl", "lemon wedge") and misses dish words or
+    // descriptive phrases ("raita", "fried onion garnish"): checked on a real biryani photo, Nov 2.
+    'List the separately visible parts of this plated dish as seen from above. sam_prompt must be 1–2 plain everyday English words describing what the part looks like, not its dish name: "fried onions" not "birista garnish", "bowl" not "raita", "lemon wedge", "chicken pieces". role: main for the base, count for pieces worth counting, placement for garnish whose position matters, side for bowls and accompaniments.',
     [text(`${dish.name}\n${dish.description ?? ''}`)]);
 
 /** Chef voice spec: transcript → plating rules, each read back to the chef before it is saved. */
@@ -54,35 +56,50 @@ export const checkClosingPhoto = (ctx: Ctx, photo: string, spot: string, items: 
     `${FACTS_ONLY} This is the "${spot}" at closing time. Count whole, separately visible items among: ${items.join(', ')}. Flag only things you can see: containers without lids, spills, clutter, items left out, open doors. A partly used container counts as 1; never say how full it is.`,
     [image(photo)]);
 
-/** Audio → transcript, using Muse Voice Transcribe (Muse Spark's own audio input is not fully supported). */
-export async function transcribe(ctx: Ctx, audio: Blob, opts: { diarize?: boolean } = {}) {
+export type Transcript = { transcript: string; audioDurationMs: number; turns: { speaker?: string; text: string }[] };
+
+/**
+ * Audio → transcript with Muse Voice Transcribe. Multipart with a JSON `request` part and an `audio` part.
+ * Only WAV is accepted (checked Nov 2: M4A, AAC and WebM/Opus are rejected), so the API converts phone
+ * and browser recordings to 16 kHz mono WAV before calling this.
+ */
+export async function transcribe(ctx: Ctx, wav: Blob, opts: { diarize?: boolean } = {}) {
   return call(MODELS.voice, ctx, async () => {
     const form = new FormData();
-    form.append('model', MODELS.voice);
-    form.append('file', audio, 'audio.m4a');
-    if (opts.diarize) form.append('diarization', 'true');
-    const res = await fetch(`${BASE_URL}/asr/transcribe`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${process.env.MODEL_API_KEY}` },
-      body: form,
-    });
-    if (!res.ok) throw new Error(`transcribe ${res.status}: ${await res.text()}`);
-    return { value: (await res.json()) as { text: string; language?: string; segments?: { speaker?: string; text: string }[] } };
+    const request = { model: MODELS.voice, audioEncoding: 'WAV', ...(opts.diarize ? { diarization: true } : {}) };
+    form.append('request', new Blob([JSON.stringify(request)], { type: 'application/json' }));
+    form.append('audio', wav, 'audio.wav');
+    const res = await fetch(`${BASE_URL}/asr/transcribe`, { method: 'POST', headers: { Authorization: `Bearer ${process.env.MODEL_API_KEY}` }, body: form });
+    const body = await res.json();
+    if (!res.ok || body.error) throw new Error(`transcribe ${res.status}: ${body.error?.message ?? 'failed'}`);
+    return { value: body as Transcript };
   });
 }
 
+export type SamBox = { x1: number; y1: number; x2: number; y2: number; w: number; h: number; c?: number };
+export type SamObject = { box: SamBox; mask: string };
+
 /**
- * SAM 3.1 segmentation for one component prompt (text) or a tap (point) on one photo.
- * The mask encoding is still an open question in the spec: this returns the raw response for the
- * vision worker to parse until it is confirmed against the media segmentation docs.
+ * SAM 3.1 returns compact text, one record per object:
+ *   <|box;x1=..;y1=..;x2=..;y2=..;w=1600;h=1600[;c=..]|><|mask;x=0;y=0;data=H,W,<enc><payload>|>
+ * Box coordinates are on the w×h grid given in the record. The mask payload is decoded by the vision
+ * worker with Meta's meta-sam-parser; here we keep boxes (enough for presence and position) and the raw mask token.
  */
-export async function segment(ctx: Ctx, photo: string, prompt: { text: string } | { point: [number, number] }) {
+export function parseSam(outputText: string): SamObject[] {
+  const objects: SamObject[] = [];
+  const re = /<\|box;([^|]*)\|>\s*(<\|mask;[^|]*\|>)?/g;
+  for (const m of outputText.matchAll(re)) {
+    const f = Object.fromEntries(m[1].split(';').map((kv) => kv.split('=')).map(([k, v]) => [k, Number(v)]));
+    objects.push({ box: f as SamBox, mask: m[2] ?? '' });
+  }
+  return objects;
+}
+
+/** SAM 3.1 segmentation of one component prompt on one photo. The Model API takes text prompts only. */
+export async function segment(ctx: Ctx, photo: string, prompt: string) {
   return call(MODELS.sam, ctx, async () => {
-    const res = await metaClient().responses.create({
-      model: MODELS.sam,
-      input: [{ role: 'user', content: [image(photo), text('text' in prompt ? prompt.text : `point:${prompt.point.join(',')}`)] }],
-    });
-    return { value: res, usage: res.usage };
+    const res = await metaClient().responses.create({ model: MODELS.sam, input: [{ role: 'user', content: [image(photo), text(prompt)] }] });
+    return { value: { objects: parseSam(res.output_text), raw: res.output_text }, usage: null };
   });
 }
 

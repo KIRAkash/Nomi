@@ -6,7 +6,8 @@
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "smoke": "node --env-file=../../.env --experimental-strip-types src/smoke.ts"
+    "smoke": "node --env-file=../../.env --experimental-strip-types src/smoke.ts",
+    "probe": "node --env-file=../../.env --experimental-strip-types src/probe.ts"
   },
   "dependencies": {
     "@nomi/shared": "*",
@@ -16,5 +17,6 @@
   "devDependencies": {
     "@types/node": "^22.18.0",
     "typescript": "~6.0.3"
-  }
+  },
+  "type": "module"
 }

@@ -28,11 +28,11 @@ async function currentShift(restaurantId: string, timezone = 'Asia/Kolkata') {
 }
 
 const FeedbackBody = z.object({
-  dish_ids: z.array(z.string().uuid()).max(12),
+  dish_ids: z.array(z.guid()).max(12),
   ratings: z.record(z.string(), z.number().int().min(1).max(5)),
   answers: z.record(z.string(), z.enum(['yes', 'no'])),
   text: z.string().max(2000).optional(),
-  photo_dish_id: z.string().uuid().nullable().optional(),
+  photo_dish_id: z.guid().nullable().optional(),
   language: z.string().max(12).optional(),
 });
 

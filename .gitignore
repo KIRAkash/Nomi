@@ -12,6 +12,3 @@ __pycache__/
 android/
 ios/
 supabase/.temp/
-
-# Local editor and agent tooling
-.claude/
