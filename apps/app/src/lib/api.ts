@@ -25,3 +25,19 @@ export const sendFeedback = (token: string, body: Omit<GuestFeedbackInput, 'audi
 
 export const recognise = (token: string, photoDataUrl: string) =>
   json<DishRecognition>(`/t/${encodeURIComponent(token)}/recognise`, { method: 'POST', body: JSON.stringify({ photo: photoDataUrl }) });
+
+/** One part as SAM 3.1 found it. Coordinates and outlines (SVG path data) are in the photo's w×h pixel grid. */
+export type GoldenPart = {
+  name: string; colour: string; found: boolean; count: number; share: number; where: string | null;
+  centre: [number, number] | null; paths: string[]; boxes: number[][];
+};
+export type PlateRim = { cx: number; cy: number; r: number; path: string };
+export type GoldenRead = { id: string; ok: boolean; error?: string; size: { w: number; h: number }; plate: PlateRim | null; parts: GoldenPart[] };
+
+/** SAM 3.1 finds each part on the chef's photos; the vision worker measures them and draws the overlay. */
+export const readGolden = (photos: string[], parts: { name: string; prompt: string; colour: string }[]) =>
+  json<{ photos: GoldenRead[] }>('/golden/read', { method: 'POST', body: JSON.stringify({ photos, parts }) });
+
+/** Re-asks SAM for one part around the spot the chef tapped (x, y are 0–1 across the photo). */
+export const tapGolden = (id: string, part: string, x: number, y: number) =>
+  json<GoldenRead>('/golden/tap', { method: 'POST', body: JSON.stringify({ id, part, x, y }) });

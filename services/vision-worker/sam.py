@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 import numpy as np
-from meta_sam_parser import CompletedOutcome, decode_mask_to_raster, image_segmentation_format
+from meta_sam_parser import CompletedOutcome, decode_mask_to_raster, decode_mask_to_svg_path, image_segmentation_format
 
 
 @dataclass
@@ -20,6 +20,41 @@ class SamObject:
     box: tuple  # (left, top, right, bottom), right/bottom exclusive
     confidence: Optional[float]
     mask: np.ndarray  # bool, full media size (height, width)
+    path: str  # simplified outline in media pixels, SVG path data (fill-rule evenodd)
+
+
+def _rdp(points: np.ndarray, eps: float) -> np.ndarray:
+    """Ramer-Douglas-Peucker: keeps the corners of a pixel-step outline and drops the stairs."""
+    if len(points) < 3:
+        return points
+    start, end = points[0], points[-1]
+    d = end - start
+    norm = np.hypot(*d)
+    rel = points - start
+    dist = np.abs(d[0] * rel[:, 1] - d[1] * rel[:, 0]) / norm if norm else np.hypot(rel[:, 0], rel[:, 1])
+    i = int(np.argmax(dist))
+    if dist[i] <= eps:
+        return np.array([start, end])
+    return np.vstack([_rdp(points[: i + 1], eps)[:-1], _rdp(points[i:], eps)])
+
+
+def outline(record, eps: float = 2.0) -> str:
+    """The mask as compact SVG path data in media pixels: placed at its bounds, stretched if SAM sent it smaller."""
+    raw = decode_mask_to_svg_path(record.mask)
+    b = record.bounds
+    sx = (b.right - b.left) / record.mask.width
+    sy = (b.bottom - b.top) / record.mask.height
+    out = []
+    for sub in raw.split("M")[1:]:
+        nums = [float(v) for v in sub.replace("L", " ").replace("Z", " ").split()]
+        pts = np.array(nums, dtype=np.float64).reshape(-1, 2)
+        pts = pts * [sx, sy] + [b.left, b.top]
+        # Specks smaller than a few pixels are noise in the outline, not part of the dish.
+        if np.ptp(pts[:, 0]) < 4 and np.ptp(pts[:, 1]) < 4:
+            continue
+        keep = _rdp(pts, eps)
+        out.append("M" + "L".join(f"{x:.0f} {y:.0f}" for x, y in keep) + "Z")
+    return "".join(out)
 
 
 def parse(output_text: str, media_size: tuple) -> List[SamObject]:
@@ -49,6 +84,7 @@ def parse(output_text: str, media_size: tuple) -> List[SamObject]:
             box=(b.left, b.top, b.right, b.bottom),
             confidence=(box.confidence if box is not None else None) or r.confidence,
             mask=full,
+            path=outline(r),
         ))
     return objects
 

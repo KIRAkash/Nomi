@@ -59,8 +59,11 @@ const buttonColours: Record<ButtonKind, { bg: string; fg: string }> = {
 };
 export function Button({ title, kind = 'ink', small = false, icon, style, ...p }: PressableProps & { title: string; kind?: ButtonKind; small?: boolean; icon?: ReactNode; style?: StyleProp<ViewStyle> }) {
   const c = buttonColours[kind];
+  // flex and alignSelf size the touch area in the parent row, so they belong on the Pressable, not the inner view.
+  const flat = StyleSheet.flatten(style) ?? {};
+  const outer = flat.flex !== undefined || flat.alignSelf !== undefined ? { flex: flat.flex, alignSelf: flat.alignSelf } : undefined;
   return (
-    <Squishy accessibilityRole="button" {...p} style={[s.button, small && s.buttonSmall, { backgroundColor: c.bg }, kind !== 'white' ? shadow(2) : shadow(1), p.disabled && { opacity: 0.45 }, style]}>
+    <Squishy accessibilityRole="button" {...p} containerStyle={outer} style={[s.button, small && s.buttonSmall, { backgroundColor: c.bg }, kind !== 'white' ? shadow(2) : shadow(1), p.disabled && { opacity: 0.45 }, style]}>
       {icon}
       <Text style={[s.buttonText, small && { fontSize: 15 }, { color: c.fg }]}>{title}</Text>
     </Squishy>

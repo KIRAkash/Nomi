@@ -34,7 +34,16 @@
           "imageWidth": 76
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Nomi uses the camera to photograph plates, shelves and the menu.",
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": false
+        }
+      ],
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true,

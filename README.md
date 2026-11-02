@@ -26,7 +26,9 @@ npm install
 npm run app:web               # http://localhost:8081, guest page at /t/demo-table-7
 ```
 
-The guest page and chef home render from seed data without the API. To run the full stack:
+The guest page and every staff screen render from seed data without the API. Sign in with any 10-digit number and the code shown on screen, then pick a role (Head Chef, Owner, Manager, Staff); tap the avatar at the top right to switch roles. Model calls on staff screens are timed mocks until their API routes land, and each is labelled with the model that will make it. [docs/experience-map.md](docs/experience-map.md) lists every journey, AI feature and UI rule.
+
+To run the full stack:
 
 ```bash
 supabase start                # needs Docker; copy the service_role and anon keys into .env
@@ -37,11 +39,20 @@ npm run smoke -w @nomi/models # one cheap call to prove the model key works
 
 Android: `npm run app:android` with a device or emulator connected.
 
-Vision worker tests:
+Vision worker (decodes and measures SAM 3.1 masks for the Golden Plate masks step; the API calls it on port 8001):
 
 ```bash
-cd services/vision-worker && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt && .venv/bin/python -m pytest
+cd services/vision-worker && python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+.venv/bin/uvicorn app:app --port 8001   # run it
+.venv/bin/python -m pytest              # test it
 ```
+
+Without the API or the worker, the masks step says so and offers a recorded sample plate instead.
+
+Demo photos for a mock run (Golden Plates, good and off-standard plates, guest photos, shelves, the closing round, the menu)
+are listed with their prompts in [docs/demo-images.md](docs/demo-images.md). `npm run demo:media -w @nomi/models` makes the
+missing ones with Muse Image and saves a real SAM 3.1 run next to each. Turn on **Demo camera** in the role picker (tap your
+avatar) and every camera in the app plays them instead of the device camera.
 
 ## Rules
 

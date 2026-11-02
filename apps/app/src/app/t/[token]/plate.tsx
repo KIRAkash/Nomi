@@ -1,15 +1,17 @@
-// G2 · Show your plate: the guest photographs the dish, Muse Spark names it, the guest confirms.
+// G2 · Show your plate: the guest lines the plate up in the live camera, Muse Spark names it, the guest confirms.
 import { Button, Card, H1, H2, Row, Screen, SquishIn, Sub, color, font } from '@nomi/ui';
-import { Image } from 'expo-image';
-import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
 
+import { LiveCamera, Shutter, type CameraHandle } from '@/components/camera';
 import { DishIcon } from '@/components/dish-icon';
 import { GuestHeader } from '@/components/guest';
 import { recognise } from '@/lib/api';
 import { useGuest } from '@/lib/guest-store';
+import { shotsUnder } from '@/lib/shots';
+
+const FEED = [...shotsUnder('').filter((k) => k.includes('/guest-')), ...shotsUnder('').filter((k) => k.endsWith('/golden-1'))];
 
 type State =
   | { kind: 'idle' }
@@ -22,16 +24,15 @@ export default function Plate() {
   const [s, setS] = useState<State>({ kind: 'idle' });
   const toPick = () => router.replace({ pathname: '/t/[token]/pick', params: { token: g.token } });
 
+  const cam = useRef<CameraHandle>(null);
+  const [ready, setReady] = useState(false);
+
   const snap = async () => {
-    const perm = await ImagePicker.requestCameraPermissionsAsync();
-    if (!perm.granted && perm.canAskAgain === false) return setS({ kind: 'unsure', uri: '', reason: 'Camera access is off. You can pick your dish from the menu instead.' });
-    const res = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], base64: true, quality: 0.6 });
-    if (res.canceled || !res.assets?.[0]) return;
-    const a = res.assets[0];
+    const a = await cam.current?.snap();
+    if (!a) return;
     setS({ kind: 'looking', uri: a.uri });
     try {
-      const dataUrl = a.uri.startsWith('data:') ? a.uri : `data:${a.mimeType ?? 'image/jpeg'};base64,${a.base64}`;
-      const r = await recognise(g.token, dataUrl);
+      const r = await recognise(g.token, a.dataUrl);
       if (!r.is_food) setS({ kind: 'unsure', uri: a.uri, reason: "That doesn't look like a dish. Try again, or pick from the menu." });
       else if (r.dish_id && r.confidence >= 0.6) setS({ kind: 'found', uri: a.uri, dishId: r.dish_id });
       else setS({ kind: 'unsure', uri: a.uri, reason: "We couldn't tell which dish this is. Pick it from the menu." });
@@ -47,20 +48,17 @@ export default function Plate() {
       <GuestHeader />
       <View>
         <H1>Show us your plate</H1>
-        <Sub>Fit the whole plate in the photo.</Sub>
+        <Sub>Fit the whole plate inside the circle.</Sub>
       </View>
 
-      <View style={{ height: 360, borderRadius: 26, backgroundColor: color.photo, overflow: 'hidden', alignItems: 'center', justifyContent: 'center' }}>
-        {s.kind !== 'idle' && s.uri ? <Image source={s.uri} style={{ width: '100%', height: '100%' }} contentFit="cover" /> : (
-          <View style={{ width: 260, height: 260, borderRadius: 130, borderWidth: 4, borderStyle: 'dashed', borderColor: color.saffron }} />
-        )}
+      <LiveCamera ref={cam} height={360} guide="plate" still={s.kind === 'idle' ? null : s.uri || null} onReady={setReady} demo={FEED}>
         {s.kind === 'looking' && (
           <View style={{ position: 'absolute', bottom: 14, left: 14, right: 14, backgroundColor: color.card, borderRadius: 22, padding: 14, flexDirection: 'row', gap: 10, alignItems: 'center' }}>
             <ActivityIndicator color={color.ink} />
             <Text style={{ fontFamily: font.bodyBold, color: color.ink }}>Looking at your plate…</Text>
           </View>
         )}
-      </View>
+      </LiveCamera>
 
       {found && (
         <SquishIn>
@@ -86,7 +84,9 @@ export default function Plate() {
         </Card>
       )}
 
-      {(s.kind === 'idle' || s.kind === 'unsure') && <Button kind="saffron" title={s.kind === 'idle' ? 'Take the photo' : 'Try another photo'} onPress={snap} />}
+      {s.kind === 'idle' && <Shutter onPress={snap} disabled={!ready} label="Take the photo of your plate" />}
+      {s.kind === 'idle' && <Button small kind="white" title="Pick from the menu instead" onPress={toPick} />}
+      {s.kind === 'unsure' && <Button kind="saffron" title="Try another photo" onPress={() => setS({ kind: 'idle' })} />}
     </Screen>
   );
 }

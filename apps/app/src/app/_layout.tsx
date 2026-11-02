@@ -6,6 +6,8 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
+import { SessionProvider } from '@/lib/session';
+
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -18,9 +20,9 @@ export default function RootLayout() {
   if (!loaded && !error) return null;
 
   return (
-    <>
+    <SessionProvider>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.bg }, animation: 'slide_from_right' }} />
-    </>
+    </SessionProvider>
   );
 }
