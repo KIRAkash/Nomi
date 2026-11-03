@@ -1,0 +1,20 @@
+node_modules/
+.expo/
+dist/
+web-build/
+*.log
+.env
+.env.*
+!.env.example
+.DS_Store
+__pycache__/
+.venv/
+android/
+ios/
+supabase/.temp/
+
+# Not needed to build the app
+/design
+/docs
+/services
+/supabase

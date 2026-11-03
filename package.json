@@ -6,6 +6,7 @@
     "app": "npm run start -w @nomi/app",
     "app:web": "npm run web -w @nomi/app",
     "app:android": "npm run android -w @nomi/app",
+    "app:apk": "npm run build:apk -w @nomi/app",
     "api": "npm run dev -w @nomi/api",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "db:start": "supabase start",

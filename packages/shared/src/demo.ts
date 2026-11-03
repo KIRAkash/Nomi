@@ -1,5 +1,5 @@
-// Mirrors supabase/seed.sql so the guest page and chef home render before the API is running.
-import type { GuestPage } from '@nomi/shared';
+// Mirrors supabase/seed.sql: the app renders it before the API is running, and the API serves it when no database is set.
+import type { GuestPage } from './types';
 
 export const DEMO_GUEST_PAGE: GuestPage = {
   restaurant: { id: '00000000-0000-0000-0000-00000000a001', name: 'Saffron House', logo_url: null },

@@ -1,6 +1,4 @@
-import type { DishRecognition, GuestFeedbackInput, GuestPage } from '@nomi/shared';
-
-import { DEMO_GUEST_PAGE } from './demo';
+import { DEMO_GUEST_PAGE, type DishRecognition, type GuestFeedbackInput, type GuestPage } from '@nomi/shared';
 
 const API = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:8787';
 

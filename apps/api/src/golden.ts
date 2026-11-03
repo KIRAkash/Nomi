@@ -5,6 +5,8 @@ import { segment } from '@nomi/models';
 import { Hono } from 'hono';
 import { z } from 'zod';
 
+import { limited } from './limit';
+
 const WORKER = process.env.VISION_WORKER_URL ?? 'http://localhost:8001';
 
 type Part = { name: string; prompt: string; colour: string };
@@ -35,10 +37,19 @@ async function pool<T>(tasks: (() => Promise<T>)[], n = 9): Promise<T[]> {
   return out;
 }
 
+/** On Cloud Run the worker is private: the API signs each call with its own identity token. Locally there is no token. */
+async function workerAuth(): Promise<Record<string, string>> {
+  if (!WORKER.startsWith('https://')) return {};
+  const url = `http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=${WORKER}`;
+  const res = await fetch(url, { headers: { 'Metadata-Flavor': 'Google' } });
+  if (!res.ok) throw new Error(`identity token ${res.status}`);
+  return { authorization: `Bearer ${await res.text()}` };
+}
+
 async function read(s: Session): Promise<Read> {
   const res = await fetch(`${WORKER}/sam/read`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...(await workerAuth()) },
     body: JSON.stringify({ plate_output: s.plate || null, parts: s.parts.map((p) => ({ name: p.name, colour: p.colour, output: s.outputs[p.name] ?? '' })) }),
   });
   if (!res.ok) throw new Error(`vision worker ${res.status}`);
@@ -48,9 +59,12 @@ async function read(s: Session): Promise<Read> {
 const Photo = z.string().startsWith('data:image/').max(8_000_000);
 const PartIn = z.object({ name: z.string().max(60), prompt: z.string().max(60), colour: z.string().regex(/^#[0-9a-fA-F]{6}$/) });
 const ctx = { purpose: 'golden_masks' };
+// Each read is up to 27 SAM calls, so the hosted demo caps how often one device can run them.
+const ip = (c: { req: { header: (k: string) => string | undefined } }) => c.req.header('x-forwarded-for')?.split(',')[0] ?? 'local';
 
 export const golden = new Hono()
   .post('/read', async (c) => {
+    if (limited(`read:${ip(c)}`, 30, 60 * 60_000)) return c.json({ error: 'slow down' }, 429);
     const body = z.object({ photos: z.array(Photo).min(1).max(3), parts: z.array(PartIn).max(8), plate: z.boolean().default(true) }).safeParse(await c.req.json());
     if (!body.success) return c.json({ error: 'bad request', issues: body.error.issues }, 400);
     const { photos, parts, plate } = body.data;
@@ -71,6 +85,7 @@ export const golden = new Hono()
     return c.json({ photos: results });
   })
   .post('/tap', async (c) => {
+    if (limited(`tap:${ip(c)}`, 60, 60 * 60_000)) return c.json({ error: 'slow down' }, 429);
     const body = z.object({ id: z.guid(), part: z.string().max(60), x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).safeParse(await c.req.json());
     if (!body.success) return c.json({ error: 'bad request' }, 400);
     const s = sessions.get(body.data.id);

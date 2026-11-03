@@ -39,6 +39,24 @@ npm run smoke -w @nomi/models # one cheap call to prove the model key works
 
 Android: `npm run app:android` with a device or emulator connected.
 
+Hosted backend for remote testers: `deploy/gcp.sh` builds the API and vision worker with Cloud Build and runs them on Cloud
+Run (project `genai-hack-project-nexus`, region `asia-south1`; override with `GCP_PROJECT` and `GCP_REGION`). The model key
+goes from `.env` into Secret Manager. The API is public and rate limited per device; the worker only accepts the API. With no
+database configured, demo table tokens serve the seed restaurant and feedback is not saved. Both keep one warm instance, so
+scale them to zero after judging.
+
+Android APK to install on any phone (built in the cloud with EAS, no Android Studio needed):
+
+```bash
+cd apps/app && npx eas-cli@latest login     # once, with a free Expo account
+npx eas-cli@latest env:set --environment preview --name EXPO_PUBLIC_API_URL --value <hosted API URL> --visibility plaintext
+npm run app:apk                             # from the repo root; first run links the project and creates the signing key
+```
+
+Open the link or QR code it prints on the phone to install. The API address is baked in at build time; it is set to the
+hosted API, so the APK works anywhere. Change it with `env:set` and build again.
+`.easignore` keeps `design/`, `docs/`, `services/` and `supabase/` out of the upload.
+
 Vision worker (decodes and measures SAM 3.1 masks for the Golden Plate masks step; the API calls it on port 8001):
 
 ```bash

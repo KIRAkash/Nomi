@@ -1,0 +1,12 @@
+# What `gcloud builds submit` uploads from the repo root for the API image
+.git
+node_modules/
+**/node_modules/
+apps/app/
+design/
+docs/
+services/
+supabase/
+.env
+.env.*
+*.log

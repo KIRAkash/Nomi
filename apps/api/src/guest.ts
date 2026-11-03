@@ -1,22 +1,19 @@
 // Public guest routes, scoped by table token and rate limited. No sign-in, no cookies.
 import { recogniseDish } from '@nomi/models';
-import type { GuestPage } from '@nomi/shared';
+import { DEMO_GUEST_PAGE, type GuestPage } from '@nomi/shared';
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { db } from './db';
+import { db, hasDb } from './db';
+import { limited } from './limit';
 
-const hits = new Map<string, number[]>();
-/** At most `max` requests per key in the last `windowMs`. */
-function limited(key: string, max = 20, windowMs = 10 * 60_000) {
-  const now = Date.now();
-  const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
-  recent.push(now);
-  hits.set(key, recent);
-  return recent.length > max;
-}
+const demo = DEMO_GUEST_PAGE;
+const DEMO_TABLE = { id: demo.table.id, label: demo.table.label, restaurant_id: demo.restaurant.id, restaurants: { id: demo.restaurant.id, name: demo.restaurant.name, brand_kit: {} } };
+/** Without a database, demo tokens are the seed restaurant's table and nothing else exists. */
+const offline = (token: string) => !hasDb && token.startsWith('demo');
 
 async function tableFor(token: string) {
+  if (!hasDb) return offline(token) ? DEMO_TABLE : null;
   const { data } = await db.from('tables').select('id, label, restaurant_id, restaurants(id, name, brand_kit)').eq('qr_token', token).eq('active', true).maybeSingle();
   return data;
 }
@@ -40,6 +37,7 @@ export const guest = new Hono()
   .get('/:token', async (c) => {
     const t = await tableFor(c.req.param('token'));
     if (!t) return c.json({ error: 'unknown table' }, 404);
+    if (!hasDb) return c.json(demo);
     const r = t.restaurants as unknown as { id: string; name: string; brand_kit: { logo_url?: string } };
     const [{ data: dishes }, shift] = await Promise.all([
       db.from('dishes').select('id, name, category, icon_url, guest_questions').eq('restaurant_id', r.id).eq('active', true).order('category'),
@@ -61,6 +59,7 @@ export const guest = new Hono()
     if (!t) return c.json({ error: 'unknown table' }, 404);
     const body = FeedbackBody.safeParse(await c.req.json());
     if (!body.success) return c.json({ error: 'bad feedback', issues: body.error.issues }, 400);
+    if (!hasDb) return c.json({ id: crypto.randomUUID() });
     const shift = await currentShift(t.restaurant_id);
     const { data, error } = await db.from('feedback').insert({
       restaurant_id: t.restaurant_id, table_id: t.id, shift_id: shift?.id ?? null, ...body.data,
@@ -75,7 +74,9 @@ export const guest = new Hono()
     const t = await tableFor(token);
     if (!t) return c.json({ error: 'unknown table' }, 404);
     const { photo } = z.object({ photo: z.string().startsWith('data:image/').max(8_000_000) }).parse(await c.req.json());
-    const { data: menu } = await db.from('dishes').select('id, name').eq('restaurant_id', t.restaurant_id).eq('active', true);
-    const result = await recogniseDish({ restaurant_id: t.restaurant_id, purpose: 'guest_dish_recognition' }, photo, menu ?? []);
+    const menu = hasDb
+      ? (await db.from('dishes').select('id, name').eq('restaurant_id', t.restaurant_id).eq('active', true)).data ?? []
+      : demo.dishes.map(({ id, name }) => ({ id, name }));
+    const result = await recogniseDish({ restaurant_id: t.restaurant_id, purpose: 'guest_dish_recognition' }, photo, menu);
     return c.json(result);
   });
