@@ -7,7 +7,7 @@ export const ROLE_TABS: Record<Role, readonly string[]> = {
   head_chef: ['dishes', 'pass', 'feedback', 'kitchen'],
   owner: ['today', 'dishes', 'feedback', 'insights'],
   manager: ['today', 'feedback', 'larder', 'team'],
-  staff: ['cards', 'handover'],
+  staff: ['check', 'cards', 'handover'],
 };
 
 export const ROLE_LABEL: Record<Role, string> = { head_chef: 'Head Chef', owner: 'Owner', manager: 'Manager', staff: 'Kitchen staff' };

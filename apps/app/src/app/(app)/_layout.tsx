@@ -14,6 +14,7 @@ export default function StaffTabs() {
       <Tabs.Screen name="insights" options={{ title: 'Insights' }} />
       <Tabs.Screen name="larder" options={{ title: 'Larder' }} />
       <Tabs.Screen name="team" options={{ title: 'Team' }} />
+      <Tabs.Screen name="check" options={{ title: 'Check' }} />
       <Tabs.Screen name="cards" options={{ title: 'Cards' }} />
       <Tabs.Screen name="handover" options={{ title: 'Handover' }} />
     </Tabs>

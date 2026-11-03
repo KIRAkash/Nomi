@@ -3,9 +3,9 @@
 // drag-to-compare view against the Golden Plate. Everything drawn comes from SAM output; nothing is invented.
 import { color, font } from '@nomi/ui';
 import { Image, type ImageSource } from 'expo-image';
-import { useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
+import { memo, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from 'react';
 import { PanResponder, Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming, type SharedValue } from 'react-native-reanimated';
+import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Svg, { Circle, G, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
 
 import type { GoldenPart, GoldenRead } from '@/lib/api';
@@ -18,30 +18,32 @@ const ANGLE = (p: GoldenPart, plate: NonNullable<SamRead['plate']>) =>
   p.centre ? ((Math.atan2(p.centre[0] - plate.cx, -(p.centre[1] - plate.cy)) * 180) / Math.PI + 360) % 360 : 0;
 const clock = (deg: number) => `${Math.round(deg / 30) % 12 || 12} o’clock`;
 
-/** Counted boxes for shelves and closing spots: each item gets its number as the count runs. */
-function Boxes({ parts, progress, size }: { parts: GoldenPart[]; progress: SharedValue<number>; size: SamRead['size'] }) {
-  const items = parts.flatMap((p) => p.boxes.map((b, k) => ({ p, b, k })));
-  return (
-    <>
-      {items.map(({ p, b, k }, i) => <Counted key={`${p.name}-${k}`} i={i} progress={progress} size={size} box={b} colour={p.colour} n={k + 1} />)}
-    </>
-  );
+/** Reveals n items one after another on a timer; remount (key) to start again. Plain state, so it costs one render a step. */
+function useReveal(n: number, ms: number, instant: boolean) {
+  const [shown, setShown] = useState(instant ? n : 0);
+  useEffect(() => {
+    if (shown >= n) return;
+    const t = setTimeout(() => setShown((x) => x + 1), ms);
+    return () => clearTimeout(t);
+  }, [shown, n, ms]);
+  return shown;
 }
-function Counted({ i, progress, size, box, colour, n }: { i: number; progress: SharedValue<number>; size: SamRead['size']; box: number[]; colour: string; n: number }) {
-  const style = useAnimatedStyle(() => {
-    const t = Math.min(1, Math.max(0, (progress.value - i * 0.35) * 2));
-    return { opacity: t, transform: [{ scale: 0.8 + 0.2 * t }] };
-  });
-  const [l, t, r, b] = box;
+
+/** Counted boxes for shelves and closing spots: each item gets its number as the count runs. One SVG for all of them. */
+function Boxes({ parts, size, instant }: { parts: GoldenPart[]; size: SamRead['size']; instant: boolean }) {
+  const items = parts.flatMap((p) => p.boxes.map((b, k) => ({ p, b, k })));
+  const shown = useReveal(items.length, STEP_MS * 0.35, instant);
   const sw = size.w / 260;
   return (
-    <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, style]}>
-      <Svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid slice">
-        <Rect x={l} y={t} width={r - l} height={b - t} rx={sw * 3} fill={`${colour}33`} stroke={colour} strokeWidth={sw} />
-        <Circle cx={l + sw * 8} cy={t + sw * 8} r={sw * 7} fill={colour} stroke="#FFFFFF" strokeWidth={sw * 0.8} />
-        <SvgText x={l + sw * 8} y={t + sw * 10.6} fontSize={sw * 8} fontFamily={font.displayBold} fill="#1B1B3A" textAnchor="middle">{n}</SvgText>
-      </Svg>
-    </Animated.View>
+    <Svg pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid slice">
+      {items.slice(0, shown).map(({ p, b: [l, t, r, b], k }) => (
+        <G key={`${p.name}-${k}`}>
+          <Rect x={l} y={t} width={r - l} height={b - t} rx={sw * 3} fill={`${p.colour}33`} stroke={p.colour} strokeWidth={sw} />
+          <Circle cx={l + sw * 8} cy={t + sw * 8} r={sw * 7} fill={p.colour} stroke="#FFFFFF" strokeWidth={sw * 0.8} />
+          <SvgText x={l + sw * 8} y={t + sw * 10.6} fontSize={sw * 8} fontFamily={font.displayBold} fill="#1B1B3A" textAnchor="middle">{k + 1}</SvgText>
+        </G>
+      ))}
+    </Svg>
   );
 }
 
@@ -129,26 +131,19 @@ function Pins({ read, focus, box }: { read: SamRead; focus: string | null; box: 
  * while SAM works. `ghost` draws the Golden Plate's outline of each part this plate is missing, placed by aligning the
  * two plates' rims. `onTap` gets the tap as 0–1 across the photo (tap-to-fix).
  */
-export function MaskView({ image, read, mode = 'masks', scanning = false, focus = null, ghost, onTap, fill = false, style, children }: {
+export const MaskView = memo(function MaskView({ image, read, mode = 'masks', scanning = false, focus = null, ghost, onTap, fill = false, style, children }: {
   image: ImageSource | string | number; read?: SamRead | null; mode?: Mode; scanning?: boolean; focus?: string | null;
   /** Fill the parent (cropping like a cover photo) instead of sizing to the photo's own shape. */
   fill?: boolean;
   ghost?: { read: SamRead; names: string[] }; onTap?: (x: number, y: number) => void; style?: StyleProp<ViewStyle>; children?: ReactNode;
 }) {
   const reduce = useReducedMotion();
-  const progress = useSharedValue(0);
   const [box, setBox] = useState({ w: 0, h: 0 });
   const frame = useRef<ComponentRef<typeof View>>(null);
   const parts = read?.parts.filter((p) => p.found) ?? [];
   const counting = !!read && !read.plate;
-  const total = counting ? parts.reduce((n, p) => n + p.boxes.length, 0) * 0.35 + 1 : parts.length + 1;
-  const key = read ? read.parts.map((p) => `${p.name}${p.found}${p.count}`).join() : '';
-
-  useEffect(() => {
-    if (!read) return;
-    progress.value = 0;
-    progress.value = reduce ? total : withTiming(total, { duration: total * STEP_MS, easing: Easing.out(Easing.quad) });
-  }, [key, read, total, reduce, progress]);
+  // A new read (or a tap-to-fix) remounts the reveal so it plays again.
+  const key = read ? read.parts.map((p) => `${p.name}${p.found}${p.count}${p.paths.length}`).join() : '';
 
   const tap = (pageX: number, pageY: number) => frame.current?.measure((_x, _y, w, h, left, top) => {
     const x = (pageX - left) / w;
@@ -172,10 +167,8 @@ export function MaskView({ image, read, mode = 'masks', scanning = false, focus 
         : { width: '100%', aspectRatio: read ? size.w / size.h : 4 / 3, borderRadius: 26, overflow: 'hidden', backgroundColor: color.photo }, style]}>
       <Image source={image} style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} contentFit="cover" pointerEvents="none" />
       {read && mode !== 'photo' && (counting
-        ? <Boxes parts={parts} progress={progress} size={size} />
-        : parts.map((p, i) => (
-          <PartLayer key={p.name} part={p} i={i} progress={progress} dim={!!focus && focus !== p.name} size={size} />
-        )))}
+        ? <Boxes key={key} parts={parts} size={size} instant={reduce} />
+        : <Parts key={key} parts={parts} focus={focus} size={size} instant={reduce} />)}
       {align && ghost && (
         <Svg pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid slice">
           <G transform={`translate(${align.tx} ${align.ty}) scale(${align.s}) translate(${-align.gx} ${-align.gy})`}>
@@ -198,21 +191,21 @@ export function MaskView({ image, read, mode = 'masks', scanning = false, focus 
       {children}
     </Pressable>
   );
-}
+});
 
 /** One part's outlines, fading and settling in when the reveal reaches it. */
-function PartLayer({ part, i, progress, dim, size }: { part: GoldenPart; i: number; progress: SharedValue<number>; dim: boolean; size: SamRead['size'] }) {
-  const style = useAnimatedStyle(() => {
-    const t = Math.min(1, Math.max(0, progress.value - i));
-    return { opacity: t * (dim ? 0.12 : 1), transform: [{ scale: 0.97 + 0.03 * t }] };
-  });
+/** Every part's outline in one SVG, revealed one part at a time. */
+function Parts({ parts, focus, size, instant }: { parts: GoldenPart[]; focus: string | null; size: SamRead['size']; instant: boolean }) {
+  const shown = useReveal(parts.length, STEP_MS, instant);
   const sw = size.w / 260;
   return (
-    <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, style]}>
-      <Svg width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid slice">
-        {part.paths.map((d, k) => <Path key={k} d={d} fill={`${part.colour}70`} stroke={part.colour} strokeWidth={sw} strokeLinejoin="round" fillRule="evenodd" />)}
-      </Svg>
-    </Animated.View>
+    <Svg pointerEvents="none" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }} width="100%" height="100%" viewBox={`0 0 ${size.w} ${size.h}`} preserveAspectRatio="xMidYMid slice">
+      {parts.slice(0, shown).map((part) => (
+        <G key={part.name} opacity={focus && focus !== part.name ? 0.12 : 1}>
+          {part.paths.map((d, k) => <Path key={k} d={d} fill={`${part.colour}70`} stroke={part.colour} strokeWidth={sw} strokeLinejoin="round" fillRule="evenodd" />)}
+        </G>
+      ))}
+    </Svg>
   );
 }
 
@@ -261,9 +254,13 @@ export function CompareSlider({ golden, plate, height = 300, ghost = true }: {
   const posRef = useRef(pos);
   const widthRef = useRef(width);
   useEffect(() => { posRef.current = pos; widthRef.current = width; }, [pos, width]);
-  const missing = golden.read && plate.read
-    ? golden.read.parts.filter((g) => g.found && !plate.read!.parts.find((p) => p.name === g.name)?.found).map((g) => g.name)
-    : [];
+  // Memoised so dragging the handle moves only the clip, never redraws the two photos.
+  const ghostOf = useMemo(() => {
+    const missing = golden.read && plate.read
+      ? golden.read.parts.filter((g) => g.found && !plate.read!.parts.find((p) => p.name === g.name)?.found).map((g) => g.name)
+      : [];
+    return ghost && golden.read && missing.length ? { read: golden.read, names: missing } : undefined;
+  }, [ghost, golden.read, plate.read]);
   // The refs are read inside the gesture callbacks, not during render.
   // eslint-disable-next-line react-hooks/refs
   const [pan] = useState(() => PanResponder.create({
@@ -276,8 +273,7 @@ export function CompareSlider({ golden, plate, height = 300, ghost = true }: {
   return (
     <View onLayout={(e) => setWidth(e.nativeEvent.layout.width)} style={{ height, borderRadius: 26, overflow: 'hidden', backgroundColor: color.photo, userSelect: 'none' }}
       accessibilityLabel={`Golden Plate compared with ${plate.label}. Drag to compare.`}>
-      <MaskView image={plate.image} read={plate.read} fill
-        ghost={ghost && golden.read && missing.length ? { read: golden.read, names: missing } : undefined} />
+      <MaskView image={plate.image} read={plate.read} fill ghost={ghostOf} />
       <View pointerEvents="none" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, width: width * pos, overflow: 'hidden' }}>
         <View style={{ width, height }}>
           <MaskView image={golden.image} read={golden.read} fill />
@@ -303,41 +299,53 @@ function Tag({ text, style }: { text: string; style: StyleProp<ViewStyle> }) {
   );
 }
 
+export type PlateCheck = {
+  part: string; colour: string; check: 'On the plate' | 'Pieces' | 'Position' | 'Portion';
+  golden: string; plate: string; ok: boolean; penalty: number; reason?: string;
+};
+
 /**
- * This plate against its Golden Plate, from SAM measurements only, with the same rules and weights as the vision
- * worker's score_plate: missing part 30, each missing piece 10, moved 12, area share off by more than 10% up to 25.
+ * Every check run on this plate, part by part, with what the Golden Plate has and what this plate has. Same rules and
+ * weights as the vision worker's score_plate: missing part 30, each missing piece 10, moved 12, area share off by more
+ * than 10% up to 25.
  */
-export function comparePlates(golden: SamRead, plate: SamRead, roles: Record<string, string>) {
-  let penalty = 0;
-  const reasons: string[] = [];
+export function plateChecks(golden: SamRead, plate: SamRead, roles: Record<string, string>): PlateCheck[] {
+  const out: PlateCheck[] = [];
   for (const g of golden.parts) {
     if (!g.found) continue;
     const m = plate.parts.find((p) => p.name === g.name);
+    const row = (c: Omit<PlateCheck, 'part' | 'colour'>) => out.push({ part: g.name, colour: g.colour, ...c });
     if (!m?.found) {
-      penalty += 30;
-      reasons.push(`${g.name} missing`);
+      row({ check: 'On the plate', golden: 'there', plate: 'missing', ok: false, penalty: 30, reason: `${g.name} missing` });
       continue;
     }
-    if (roles[g.name] === 'count' && m.count < g.count) {
-      penalty += 10 * (g.count - m.count);
-      reasons.push(`${m.count} ${g.name.toLowerCase()}, reference is ${g.count}`);
+    row({ check: 'On the plate', golden: 'there', plate: 'there', ok: true, penalty: 0 });
+    if (roles[g.name] === 'count') {
+      const short = Math.max(0, g.count - m.count);
+      row({ check: 'Pieces', golden: `${g.count}`, plate: `${m.count}`, ok: !short, penalty: 10 * short,
+        reason: short ? `${m.count} ${g.name.toLowerCase()}, reference is ${g.count}` : undefined });
     }
     if (roles[g.name] === 'placement' && golden.plate && plate.plate) {
       const a = ANGLE(m, plate.plate);
       const b = ANGLE(g, golden.plate);
       const off = Math.min(Math.abs(a - b) % 360, 360 - (Math.abs(a - b) % 360));
-      if (off > 30) {
-        penalty += 12;
-        reasons.push(`${g.name} at ${clock(a)}, reference ${clock(b)}`);
-      }
+      row({ check: 'Position', golden: clock(b), plate: clock(a), ok: off <= 30, penalty: off > 30 ? 12 : 0,
+        reason: off > 30 ? `${g.name} at ${clock(a)}, reference ${clock(b)}` : undefined });
     }
     if (g.share > 0.04 && m.share > 0) {
       const pct = Math.round((100 * (m.share - g.share)) / g.share);
-      if (Math.abs(pct) > 10) {
-        penalty += Math.min(25, Math.abs(pct) * 0.8);
-        reasons.push(`${g.name} share ${Math.abs(pct)}% ${pct > 0 ? 'over' : 'under'} reference`);
-      }
+      const off = Math.abs(pct) > 10;
+      row({ check: 'Portion', golden: `${Math.round(g.share * 100)}% of plate`, plate: `${Math.round(m.share * 100)}% of plate`, ok: !off,
+        penalty: off ? Math.min(25, Math.abs(pct) * 0.8) : 0,
+        reason: off ? `${g.name} share ${Math.abs(pct)}% ${pct > 0 ? 'over' : 'under'} reference` : undefined });
     }
   }
-  return { score: Math.max(0, Math.round(100 - penalty)), reasons };
+  return out;
+}
+
+export function comparePlates(golden: SamRead, plate: SamRead, roles: Record<string, string>) {
+  const checks = plateChecks(golden, plate, roles);
+  const penalty = checks.reduce((n, c) => n + c.penalty, 0);
+  const reasons = checks.flatMap((c) => (c.reason ? [c.reason] : []));
+  return { score: Math.max(0, Math.round(100 - penalty)), reasons, checks };
 }

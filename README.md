@@ -39,6 +39,10 @@ npm run smoke -w @nomi/models # one cheap call to prove the model key works
 
 Android: `npm run app:android` with a device or emulator connected.
 
+Photos for judges to scan from a laptop (menu, Golden Plates, off-standard plates, guest photos, shelves) are in
+[demo-assets/](demo-assets/README.md); open `demo-assets/index.html` for a full-screen viewer that says which screen to use.
+**Under the hood** (role picker) lists the six Meta models, where each one runs and every live call the phone made.
+
 Hosted backend for remote testers: `deploy/gcp.sh` builds the API and vision worker with Cloud Build and runs them on Cloud
 Run (project `genai-hack-project-nexus`, region `asia-south1`; override with `GCP_PROJECT` and `GCP_REGION`). The model key
 goes from `.env` into Secret Manager. The API is public and rate limited per device; the worker only accepts the API. With no

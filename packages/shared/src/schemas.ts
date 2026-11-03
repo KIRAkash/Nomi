@@ -41,7 +41,8 @@ export const GuestQuestion = z.object({
   no_label: z.string(),
   checks: z.string().describe('what in the Golden Plate this answer relates to'),
 });
-export const GuestQuestionProposal = z.object({ questions: z.array(GuestQuestion).max(5) });
+// No maxItems: in strict mode Muse Spark stalls on it for minutes (checked Nov 3); the task keeps the first 5.
+export const GuestQuestionProposal = z.object({ questions: z.array(GuestQuestion) });
 
 // Guest plate photo → which dish it is (Muse Spark image understanding)
 export const DishRecognition = z.object({
@@ -85,6 +86,24 @@ export const Briefing = z.object({
   wins: z.array(z.object({ title: z.string(), evidence_ids: z.array(z.string()) })),
 });
 
+// Shift handover voice note → done / pending / problems (Muse Voice Transcribe with speakers, then Muse Spark)
+export const HandoverSummary = z.object({
+  done: z.array(z.string()),
+  pending: z.array(z.string()),
+  problems: z.array(z.string()).describe('only problems someone actually said out loud'),
+  language: z.string(),
+});
+
+// Plating card in a staff member's language (Muse Spark)
+export const CardTranslation = z.object({ title: z.string(), steps: z.array(z.string()), watch: z.array(z.string()) });
+
+// Ask Nomi: answers only from the facts it is given, and says so when it cannot (Muse Wonder)
+export const AskAnswer = z.object({
+  answer: z.string(),
+  facts: z.array(z.object({ text: z.string(), source: z.string().describe('which fact id or screen this came from') })),
+  refused: z.boolean().describe('true when the question asks for a prediction, money estimate or anything not in the facts'),
+});
+
 export type MenuExtraction = z.infer<typeof MenuExtraction>;
 export type ComponentProposal = z.infer<typeof ComponentProposal>;
 export type PlatingRules = z.infer<typeof PlatingRules>;
@@ -95,3 +114,6 @@ export type FeedbackTags = z.infer<typeof FeedbackTags>;
 export type ReplyDraft = z.infer<typeof ReplyDraft>;
 export type ClosingCheck = z.infer<typeof ClosingCheck>;
 export type Briefing = z.infer<typeof Briefing>;
+export type HandoverSummary = z.infer<typeof HandoverSummary>;
+export type CardTranslation = z.infer<typeof CardTranslation>;
+export type AskAnswer = z.infer<typeof AskAnswer>;

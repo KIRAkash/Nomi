@@ -6,6 +6,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 
 import { MODELS, metaClient } from './client.ts';
+import { generateDishIcon } from './tasks.ts';
 
 const ROOT = new URL('../../../', import.meta.url).pathname;
 const DOC = join(ROOT, 'docs/demo-images.md');
@@ -84,6 +85,7 @@ async function make(s: Shot) {
 async function sam(s: Shot) {
   const file = join(OUT, s.path);
   if (!s.sam || !existsSync(file)) return false;
+  if (existsSync(file.replace(/\.\w+$/, '.sam.json')) && !force && !samOnly) return false;
   const photo = `data:image/jpeg;base64,${readFileSync(file).toString('base64')}`;
   const res = await fetch(`${API}/golden/read`, {
     method: 'POST',
@@ -107,6 +109,28 @@ for (const s of todo) {
   }
 }
 
+// ---------- dish icons ----------
+// Muse Image draws each dish's icon from its Golden Plate photo in the house style, as the Golden Plate flow does live.
+const slugOf = (dish: string) => dish.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const iconDishes = Object.keys(dishParts).filter((d) => existsSync(join(OUT, slugOf(d), 'golden-1.jpg')));
+await Promise.all(iconDishes.filter((d) => !only || slugOf(d).includes(only)).map(async (d) => {
+  const file = join(OUT, 'icons', `${slugOf(d)}.png`);
+  if (existsSync(file) && !force) return;
+  try {
+    const img = await generateDishIcon({ purpose: 'demo_icon' }, new Blob([readFileSync(join(OUT, slugOf(d), 'golden-1.jpg'))], { type: 'image/jpeg' }));
+    if (!img?.b64_json) throw new Error('no image returned');
+    mkdirSync(dirname(file), { recursive: true });
+    const tmp = `${file}.src`;
+    writeFileSync(tmp, Buffer.from(img.b64_json, 'base64'));
+    // Muse Image returns WebP; ffmpeg makes a small PNG for the app bundle.
+    execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', tmp, '-vf', 'scale=384:384', file]);
+    execFileSync('rm', [tmp]);
+    console.log(`✓ icon ${d}`);
+  } catch (err) {
+    console.log(`✗ icon ${d}: ${(err as Error).message}`);
+  }
+}));
+
 // ---------- manifest ----------
 const rel = (p: string) => `../../assets/images/demo/${p}`;
 const lines = shots.filter((s) => existsSync(join(OUT, s.path))).map((s) => {
@@ -125,5 +149,10 @@ ${lines.join('\n')}
 };
 
 export const DISH_PARTS: Record<string, DemoPart[]> = ${JSON.stringify(dishParts, null, 2).replace(/"(\w+)":/g, '$1:')};
+
+/** Each dish's icon, drawn by Muse Image from its Golden Plate photo. */
+export const DISH_ICONS: Record<string, number> = {
+${iconDishes.filter((d) => existsSync(join(OUT, 'icons', `${slugOf(d)}.png`))).map((d) => `  ${JSON.stringify(d)}: require('${rel(`icons/${slugOf(d)}.png`)}'),`).join('\n')}
+};
 `);
 console.log(`manifest: ${lines.length} images in apps/app/src/lib/demo-media.ts`);

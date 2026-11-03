@@ -13,7 +13,7 @@ const ROLE_BLURB: Record<Role, string> = {
   head_chef: 'Golden Plates, the pass and how every dish is doing',
   owner: 'The morning briefing, approvals and Ask Nomi',
   manager: 'Guest notes, replies, stock and the closing round',
-  staff: 'Plating cards in your language and the shift handover',
+  staff: 'Check a plate before it leaves, cards in your language, voice handover',
 };
 const ROLE_BG: Record<Role, string> = { head_chef: color.saffron, owner: color.skySoft, manager: color.mintSoft, staff: color.pinkSoft };
 
@@ -93,6 +93,14 @@ export default function SignIn() {
             <View style={{ width: 52, height: 30, borderRadius: 15, padding: 3, backgroundColor: demoCamera ? color.mint : color.saffronSoft, alignItems: demoCamera ? 'flex-end' : 'flex-start' }}>
               <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: color.card, ...shadow(1) }} />
             </View>
+          </Squishy>
+          <Squishy accessibilityRole="button" onPress={() => router.push('/models')}
+            style={{ backgroundColor: color.ink, borderRadius: 22, padding: 14, flexDirection: 'row', alignItems: 'center', gap: 12, ...shadow(1) }}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.saffron }}>Under the hood</Text>
+              <Sub style={{ fontSize: 13, color: color.saffronSoft }}>The six Meta models inside Nomi, where to try each one, and every live call this phone makes.</Sub>
+            </View>
+            <Text style={{ fontFamily: font.bodyBold, fontSize: 22, color: color.saffron }}>›</Text>
           </Squishy>
         </SquishIn>
       )}

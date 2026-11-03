@@ -16,6 +16,7 @@ const ICONS: Record<string, (c: string) => React.ReactNode> = {
   insights: (c) => <Path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke={c} />,
   larder: (c) => <><Rect x={4} y={3} width={16} height={18} rx={2} stroke={c} /><Path d="M4 9h16M4 15h16" stroke={c} /></>,
   team: (c) => <><Circle cx={9} cy={8} r={3.5} stroke={c} /><Path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2 .7 3 2.8 3 6" stroke={c} /></>,
+  check: (c) => <><Circle cx={12} cy={12} r={9} stroke={c} /><Path d="M8 12.5l2.7 2.7L16 9.5" stroke={c} /></>,
   cards: (c) => <><Rect x={3} y={6} width={14} height={15} rx={2} stroke={c} /><Path d="M7 3h12a2 2 0 0 1 2 2v12" stroke={c} /></>,
   handover: (c) => <><Rect x={9} y={3} width={6} height={11} rx={3} stroke={c} /><Path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke={c} /></>,
 };

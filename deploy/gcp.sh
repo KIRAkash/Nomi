@@ -33,7 +33,7 @@ if [ "$only" != api ]; then
   g builds submit services/vision-worker --tag "$REPO/vision-worker"
   # Private: only the API's service account may call it.
   g run deploy nomi-vision --image "$REPO/vision-worker" --region "$REGION" --no-allow-unauthenticated \
-    --memory 1Gi --cpu 1 --min-instances 1 --max-instances 3
+    --memory 2Gi --cpu 2 --min-instances 1 --max-instances 3
   g run services add-iam-policy-binding nomi-vision --region "$REGION" --member "serviceAccount:$runner" --role roles/run.invoker >/dev/null
 fi
 worker=$(g run services describe nomi-vision --region "$REGION" --format 'value(status.url)')

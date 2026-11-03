@@ -7,11 +7,34 @@ covers only its bounds, so it is placed into a full w×h canvas here.
 """
 from __future__ import annotations
 
+from collections import OrderedDict
 from dataclasses import dataclass
 from typing import List, Optional
 
+import meta_sam_parser._segmentation as _segmentation
 import numpy as np
-from meta_sam_parser import CompletedOutcome, decode_mask_to_raster, decode_mask_to_svg_path, image_segmentation_format
+from meta_sam_parser import CompletedOutcome, image_segmentation_format
+from meta_sam_parser import decode_mask_to_raster as _decode_once
+from meta_sam_parser._mask_conversion import _trace_contours
+
+# Meta's decoder is pure Python and was the slowest step: the parser decodes every mask to validate it, then we decoded
+# it again for the raster and a third time for the outline. One decode per mask now, shared through this cache.
+_decoded: "OrderedDict[tuple, bytes]" = OrderedDict()
+
+
+def decode_mask_to_raster(mask) -> bytes:
+    key = (mask.encoding, mask.width, mask.height, mask.payload)
+    if key in _decoded:
+        _decoded.move_to_end(key)
+        return _decoded[key]
+    out = _decode_once(mask)
+    _decoded[key] = out
+    while len(_decoded) > 64:
+        _decoded.popitem(last=False)
+    return out
+
+
+_segmentation.decode_mask_to_raster = decode_mask_to_raster
 
 
 @dataclass
@@ -38,12 +61,17 @@ def _rdp(points: np.ndarray, eps: float) -> np.ndarray:
     return np.vstack([_rdp(points[: i + 1], eps)[:-1], _rdp(points[i:], eps)])
 
 
-def outline(record, eps: float = 2.0) -> str:
-    """The mask as compact SVG path data in media pixels: placed at its bounds, stretched if SAM sent it smaller."""
-    raw = decode_mask_to_svg_path(record.mask)
+def outline(record, raster: np.ndarray, eps: float = 2.0, grid: int = 200) -> str:
+    """The mask as compact SVG path data in media pixels. Traced on a copy no larger than `grid` px (enough for a phone
+    screen), then placed at the mask's bounds; the raster used for measuring stays full resolution."""
+    h, w = raster.shape
+    step = max(1, int(np.ceil(max(h, w) / grid)))
+    small = raster[::step, ::step]
+    sh, sw = small.shape
+    raw = _trace_contours(small.T.astype(np.uint8).tobytes(), sh, sw)  # the tracer reads column-major
     b = record.bounds
-    sx = (b.right - b.left) / record.mask.width
-    sy = (b.bottom - b.top) / record.mask.height
+    sx = (b.right - b.left) / sw
+    sy = (b.bottom - b.top) / sh
     out = []
     for sub in raw.split("M")[1:]:
         nums = [float(v) for v in sub.replace("L", " ").replace("Z", " ").split()]
@@ -52,7 +80,7 @@ def outline(record, eps: float = 2.0) -> str:
         # Specks smaller than a few pixels are noise in the outline, not part of the dish.
         if np.ptp(pts[:, 0]) < 4 and np.ptp(pts[:, 1]) < 4:
             continue
-        keep = _rdp(pts, eps)
+        keep = _rdp(pts, eps * max(1, step / 2))
         out.append("M" + "L".join(f"{x:.0f} {y:.0f}" for x, y in keep) + "Z")
     return "".join(out)
 
@@ -70,6 +98,7 @@ def parse(output_text: str, media_size: tuple) -> List[SamObject]:
             continue
         b = r.bounds
         raster = np.frombuffer(decode_mask_to_raster(r.mask), dtype=np.uint8).reshape(r.mask.height, r.mask.width).astype(bool)
+        path = outline(r, raster)
         bh, bw = b.bottom - b.top, b.right - b.left
         if raster.shape != (bh, bw):
             # Large objects come back at reduced resolution: stretch to the bounds (nearest neighbour).
@@ -84,7 +113,7 @@ def parse(output_text: str, media_size: tuple) -> List[SamObject]:
             box=(b.left, b.top, b.right, b.bottom),
             confidence=(box.confidence if box is not None else None) or r.confidence,
             mask=full,
-            path=outline(r),
+            path=path,
         ))
     return objects
 

@@ -61,6 +61,25 @@ Photorealistic photo of a printed restaurant menu card lying flat on a wooden ta
 phone. The whole card is in frame with all four corners visible. Text is crisp and readable.
 ```
 
+## Brand
+
+### brand/logo.jpg
+
+- **Make:** generate
+- **Size:** 1024x1024
+- **Style:** none
+- **Shows:** The demo restaurant's logo at the top of the guest page and staff screens, as a restaurant gives it at onboarding.
+- **SAM parts:** none
+
+```prompt
+A modern restaurant logo for "Saffron House", an Indian restaurant. Flat vector emblem centred on a plain warm cream
+background (#FFF4D6): a stylised saffron crocus flower whose three red stigmas curl like steam rising from a small round
+copper handi pot, drawn in deep saffron orange (#E8890C), deep red (#B3261E) and ink navy (#1B1B3A), thick clean lines.
+Below the emblem the words "SAFFRON HOUSE" in a bold, friendly rounded serif in ink navy, perfectly spelled, and under it
+"INDIAN KITCHEN" in small spaced capitals. Lots of empty margin around everything. No gradients, no shadows, no mockup,
+no other text.
+```
+
 ## Kitchen setup
 
 ### kitchen/calibration-empty-plate.jpg
@@ -84,10 +103,11 @@ One empty, clean plain round white dinner plate, perfectly centred on the counte
 
 ```prompt
 A cream-coloured A4 menu card titled "Saffron House" in a simple serif font, with a small saffron-coloured line under the
-title. Three sections with headings and prices in Indian rupees on the right:
-Starters: Paneer Tikka ₹289, Hara Bhara Kebab ₹199.
-Mains: Chicken Biryani ₹349, Mutton Biryani ₹449, Butter Chicken ₹379, Dal Makhani ₹259.
-Breads and desserts: Garlic Naan ₹69, Gulab Jamun ₹129, Rasmalai (2 pc) ₹149.
+title. Four sections with headings and prices in Indian rupees on the right:
+Starters: Paneer Tikka ₹289, Tandoori Prawns ₹549, Burrata Mango Chaat ₹429, Hara Bhara Kebab ₹199.
+Mains: Chicken Biryani ₹349, Mutton Biryani ₹449, Lamb Shank Rogan Josh ₹699, Butter Chicken ₹379, Dal Makhani ₹259.
+Breads: Garlic Naan ₹69.
+Desserts: Gulab Jamun ₹129, Kesar Pista Kulfi ₹219, Rasmalai (2 pc) ₹149.
 A small green square next to veg dishes and a small red square next to non-veg dishes.
 A round curry stain covers the price of Hara Bhara Kebab so it cannot be read. The bottom right corner is folded over,
 hiding the first half of the word "Rasmalai".
@@ -444,6 +464,152 @@ Pistachio | pistachio | #3BB273 | placement
 ```prompt
 Gulab jamun served in a small plain round white ceramic bowl, centred on the counter (no plate). Exactly 2 glossy
 dark-brown gulab jamun balls sitting in light golden sugar syrup. A few slivers of green pistachio on top of each ball.
+```
+
+## Tandoori Prawns
+
+A showpiece starter: big, glossy and easy to count.
+
+```parts
+Prawns | seafood | #FF7A3D | count
+Onion salad | sliced onions | #C77DFF | placement
+Mint chutney | green sauce | #3BB273 | side
+Lemon wedge | lemon wedge | #FFE34D | placement
+```
+
+### tandoori-prawns/golden-1.jpg
+
+- **Make:** generate
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** Golden Plate v1 for Tandoori Prawns.
+
+```prompt
+Tandoori prawns. Exactly 5 large tiger prawns with shells on and tails attached, deep orange-red tandoori marinade with
+charred edges, fanned in a neat arc across the centre of the plate, tails pointing outwards. A small neat heap of thinly
+sliced red onion with a little chopped coriander at 9 o'clock. A small round white dish of bright green mint chutney on
+the plate at 3 o'clock. One lemon wedge on the rim at 6 o'clock. A light brush of melted butter making the prawns glossy.
+```
+
+### tandoori-prawns/pass-four-prawns.jpg
+
+- **Make:** edit tandoori-prawns/golden-1.jpg
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** The pass, "4 prawns, 5 expected".
+
+```prompt
+Remove exactly one prawn from the arc so only 4 prawns remain, closing the gap naturally. Change nothing else.
+```
+
+### tandoori-prawns/guest-table-4.jpg
+
+- **Make:** generate
+- **Size:** 1024x1536
+- **Style:** guest
+- **Shows:** "Show us your plate" recognition for a fancy starter; a judge's sample guest photo.
+
+```prompt
+A plate of tandoori prawns served at the table: 5 large orange-red charred prawns with tails in an arc, sliced red onion,
+a small dish of green mint chutney and a lemon wedge on a plain round white plate.
+```
+
+## Lamb Shank Rogan Josh
+
+The most photogenic main: one slow-cooked lamb shank standing on its bone.
+
+```parts
+Lamb shank | meat | #8E3B2F | main
+Rogan josh sauce | sauce | #D93A2E | main
+Saffron rice | rice | #FFB627 | side
+Cream drizzle | cream drizzle | #F5F0E6 | placement
+Coriander | green herbs | #3BB273 | placement
+```
+
+### lamb-shank-rogan-josh/golden-1.jpg
+
+- **Make:** generate
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** Golden Plate v1 for Lamb Shank Rogan Josh.
+
+```prompt
+Lamb shank rogan josh in a wide shallow white bowl-plate. One large slow-cooked lamb shank in the centre, the clean white
+bone end pointing to 1 o'clock, sitting in a pool of glossy deep red rogan josh gravy. A neat oval mound of yellow saffron
+rice on the left side of the plate, at 9 o'clock. A thin zig-zag of white cream drizzled over the gravy at 5 o'clock. A
+pinch of fresh green coriander leaves on top of the lamb.
+```
+
+### lamb-shank-rogan-josh/pass-no-rice.jpg
+
+- **Make:** edit lamb-shank-rogan-josh/golden-1.jpg
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** The pass, "Saffron rice missing".
+
+```prompt
+Remove the mound of saffron rice completely, leaving the gravy and empty plate where it was. Change nothing else.
+```
+
+## Burrata Mango Chaat
+
+A modern veg starter in bright colours.
+
+```parts
+Burrata | white cheese ball | #F5F0E6 | main
+Mango cubes | mango cubes | #FFB627 | count
+Salad leaves | salad leaves | #3BB273 | side
+Tamarind chutney | brown sauce | #8E5B2F | placement
+Pomegranate | pomegranate seeds | #D93A2E | placement
+```
+
+### burrata-mango-chaat/golden-1.jpg
+
+- **Make:** generate
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** Golden Plate v1 for Burrata Mango Chaat.
+
+```prompt
+Burrata mango chaat. One whole round white burrata ball in the centre of the plate, slightly torn open on top. Exactly 8
+neat cubes of ripe yellow mango placed around it. A small handful of fresh green rocket salad leaves at 11 o'clock. A thin
+swirl of dark brown tamarind chutney on the plate at 5 o'clock. A scatter of bright red pomegranate seeds over the mango.
+A few crunchy sev noodles on the burrata.
+```
+
+## Kesar Pista Kulfi
+
+A plated dessert with pieces to count.
+
+```parts
+Kulfi slices | kulfi | #F7E3A1 | count
+Pistachios | pistachio | #9BC53D | placement
+Rose petals | rose petals | #FF7AB6 | placement
+Falooda | noodles | #F5F0E6 | side
+```
+
+### kesar-pista-kulfi/golden-1.jpg
+
+- **Make:** generate
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** Golden Plate v1 for Kesar Pista Kulfi.
+
+```prompt
+Kesar pista kulfi plated as a fine-dining dessert. Exactly 3 thick round slices of pale saffron-yellow kulfi ice cream
+laid in a row across the centre of the plate. Chopped green pistachios sprinkled over the slices. A few dried pink rose
+petals at 2 o'clock. A small nest of thin white falooda noodles at 8 o'clock.
+```
+
+### kesar-pista-kulfi/pass-no-petals.jpg
+
+- **Make:** edit kesar-pista-kulfi/golden-1.jpg
+- **Size:** 1536x1024
+- **Style:** pass
+- **Shows:** The pass, "Rose petals missing".
+
+```prompt
+Remove the pink rose petals completely, leaving empty plate where they were. Change nothing else.
 ```
 
 ## Larder

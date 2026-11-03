@@ -4,25 +4,32 @@ import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
 
 import { AiTag } from '@/components/kit';
-import { GOLDEN_PHOTO, SOP_CARDS, WATCH_LIST } from '@/lib/mock';
+import { GOLDEN_PHOTO, WATCH_LIST } from '@/lib/mock';
+import { goldenShot } from '@/lib/shots';
 
-export function SopCard({ card, lang }: { card: (typeof SOP_CARDS)[number]; lang: 'en' | 'hi' }) {
+export type SopCardData = { dishId: string; dish: string; version: number; approvedBy: string; approvedAt: string; rules: { en: string; hi?: string }[] };
+
+/** One plating card: the dish's Golden Plate photo and its numbered rules, in English, saved Hindi, or a live translation. */
+export function SopCard({ card, lang, lines, ms }: { card: SopCardData; lang: 'en' | 'hi' | string; lines?: string[] | null; ms?: number }) {
+  const photo = goldenShot(card.dish)?.image ?? (card.dish === 'Chicken Biryani' ? GOLDEN_PHOTO : null);
+  const text = (i: number) => lines?.[i] ?? (lang === 'hi' ? card.rules[i].hi : undefined) ?? card.rules[i].en;
+  const translated = lang !== 'en' && (lines || card.rules.every((r) => r.hi));
   return (
     <Card style={{ gap: 10, padding: 12 }}>
-      {card.dish === 'Chicken Biryani' && <Image source={GOLDEN_PHOTO} style={{ width: '100%', height: 170, borderRadius: 18 }} contentFit="cover" accessibilityLabel="Golden Plate photo" />}
+      {photo && <Image source={photo} style={{ width: '100%', height: 170, borderRadius: 18 }} contentFit="cover" accessibilityLabel={`Golden Plate photo of ${card.dish}`} />}
       <Row style={{ justifyContent: 'space-between' }}>
-        <H2 style={{ fontSize: 18 }}>{card.dish}</H2>
+        <H2 style={{ fontSize: 18, flex: 1 }}>{card.dish}</H2>
         <Chip tone="mint" label={`v${card.version}`} />
       </Row>
-      {card.rules.map((r, i) => (
+      {card.rules.map((_, i) => (
         <Row key={i} gap={10} style={{ alignItems: 'flex-start' }}>
           <View style={{ width: 28, height: 28, borderRadius: 10, backgroundColor: color.saffron, alignItems: 'center', justifyContent: 'center' }}><Num style={{ fontSize: 15 }}>{i + 1}</Num></View>
-          <Text style={{ flex: 1, fontFamily: font.bodySemi, fontSize: 16, lineHeight: 22, color: color.ink }}>{lang === 'hi' ? r.hi : r.en}</Text>
+          <Text style={{ flex: 1, fontFamily: font.bodySemi, fontSize: 17, lineHeight: 24, color: color.ink }}>{text(i)}</Text>
         </Row>
       ))}
       <Row style={{ justifyContent: 'space-between' }}>
         <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: color.ink2 }}>Approved {card.approvedAt} · {card.approvedBy}</Text>
-        {lang === 'hi' && <AiTag model="Muse Spark" />}
+        {translated && <AiTag model="Muse Spark" ms={ms} />}
       </Row>
     </Card>
   );

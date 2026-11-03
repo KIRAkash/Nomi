@@ -1,5 +1,5 @@
-// A2–A4 · Set up a restaurant: the basics, Menu Snap (Muse Wonder reads a photo of the printed menu), a review where unclear
-// fields are amber, and components per dish proposed by Muse Spark. Then on to the first Golden Plate.
+// A2–A4 · Set up a restaurant: the basics, Menu Snap (Muse Wonder reads a photo of the printed menu, live), a review where
+// unclear fields are amber, and components per dish proposed live by Muse Spark. Then on to the first Golden Plate.
 import { Button, Card, Chip, H1, H2, Label, Row, Screen, SquishIn, Squishy, Sub, color, font, shadow } from '@nomi/ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
@@ -7,7 +7,8 @@ import { Text, TextInput, View } from 'react-native';
 
 import { LiveCamera, Shutter, type CameraHandle } from '@/components/camera';
 import { DishIcon } from '@/components/dish-icon';
-import { AiTag, TopBar, WorkLine, useSteps } from '@/components/kit';
+import { AiTag, LiveWait, TopBar, WorkLine } from '@/components/kit';
+import { proposeParts, readMenu } from '@/lib/api';
 import { DISH_STATS, MENU_SNAP } from '@/lib/mock';
 import { useSession } from '@/lib/session';
 
@@ -43,83 +44,111 @@ function Basics({ next }: { next: () => void }) {
   );
 }
 
-function Snap({ next }: { next: () => void }) {
-  const s = useSteps(3, 900);
+type MenuRow = { name: string; category: string; price: number | null; veg: boolean | null; unclear: string[] };
+
+/** Muse Wonder reads the photographed menu, live. Anything it could not read comes back amber for the owner to fix. */
+function Snap({ next }: { next: (dishes: MenuRow[]) => void }) {
   const [shown, setShown] = useState(0);
   const cam = useRef<CameraHandle>(null);
   const [ready, setReady] = useState(false);
   const [page, setPage] = useState<string | null>(null);
+  const [menu, setMenu] = useState<{ dishes: MenuRow[]; ms?: number; offline?: boolean } | null>(null);
   const snap = async () => {
     const p = await cam.current?.snap();
     if (!p) return;
     setPage(p.uri);
-    s.start();
+    try {
+      const r = await readMenu(p.dataUrl);
+      setMenu({ dishes: r.dishes.map((d) => ({ ...d, category: d.category[0] + d.category.slice(1).toLowerCase() })), ms: r.ms });
+    } catch {
+      setMenu({ dishes: MENU_SNAP, offline: true });
+    }
   };
+  const total = menu?.dishes.length ?? 0;
   useEffect(() => {
-    if (!s.done || shown >= MENU_SNAP.length) return;
-    const t = setTimeout(() => setShown((n) => n + 1), 160);
+    if (!menu || shown >= total) return;
+    const t = setTimeout(() => setShown((n) => n + 1), 120);
     return () => clearTimeout(t);
-  }, [s.done, shown]);
+  }, [menu, shown, total]);
+  const unclear = menu?.dishes.filter((d) => d.unclear.length || d.price === null).length ?? 0;
   return (
     <View style={{ gap: 12 }}>
       <H1>Snap your menu</H1>
       <Sub>Hold the phone over the printed menu. Nomi types it up; you fix anything it is unsure about.</Sub>
-      <LiveCamera ref={cam} height={s.done ? 180 : 380} guide="menu" still={page} onReady={setReady} demo={['kitchen/menu-printed']} />
+      <LiveCamera ref={cam} height={menu ? 180 : 380} guide="menu" still={page} onReady={setReady} demo={['kitchen/menu-printed']} />
       {!page && (
         <>
           <Shutter onPress={snap} disabled={!ready} label="Photograph the menu" />
           <Sub style={{ fontSize: 13, textAlign: 'center' }}>Flat, well lit, all four corners inside the frame</Sub>
         </>
       )}
-      {(s.running || s.done) && (
+      {page && !menu && (
         <Card style={{ gap: 8 }}>
-          <WorkLine state={s.state(0)} text="Checking the photo is readable" />
-          <WorkLine state={s.state(1)} text="Reading every dish, price and section" model="Muse Wonder" />
-          <WorkLine state={s.state(2)} text="Marking anything it could not read" />
+          <LiveWait text="Reading every dish and price, marking anything it can't read" model="Muse Wonder" typical="20 s" />
         </Card>
       )}
-      {MENU_SNAP.slice(0, shown).map((d) => (
-        <SquishIn key={d.name}>
-          <Card soft style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: d.unclear.length ? color.saffronSoft : color.card }}>
-            <View style={{ width: 12, height: 12, borderRadius: 3, borderWidth: 2, borderColor: d.veg ? color.mint : color.tomato }} accessibilityLabel={d.veg ? 'Veg' : 'Non-veg'} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{d.name}</Text>
-              <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: d.unclear.length ? color.saffronInk : color.ink2 }}>{d.category}{d.unclear.length ? ` · check the ${d.unclear.join(', ')}` : ''}</Text>
-            </View>
-            <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: d.price === null ? color.saffronInk : color.ink }}>{d.price === null ? '₹ ?' : `₹${d.price}`}</Text>
-          </Card>
-        </SquishIn>
-      ))}
-      {shown >= MENU_SNAP.length && (
+      {menu?.dishes.slice(0, shown).map((d) => {
+        const unsure = d.unclear.length > 0 || d.price === null;
+        return (
+          <SquishIn key={d.name}>
+            <Card soft style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: unsure ? color.saffronSoft : color.card }}>
+              <View style={{ width: 12, height: 12, borderRadius: 3, borderWidth: 2, borderColor: d.veg === null ? color.ink2 : d.veg ? color.mint : color.tomato }} accessibilityLabel={d.veg === null ? 'Veg or not unclear' : d.veg ? 'Veg' : 'Non-veg'} />
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{d.name}</Text>
+                <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: unsure ? color.saffronInk : color.ink2 }}>{d.category}{unsure ? ` · check the ${(d.unclear.length ? d.unclear : ['price']).join(', ')}` : ''}</Text>
+              </View>
+              <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: d.price === null ? color.saffronInk : color.ink }}>{d.price === null ? '₹ ?' : `₹${d.price}`}</Text>
+            </Card>
+          </SquishIn>
+        );
+      })}
+      {menu && shown >= total && (
         <SquishIn style={{ gap: 10 }}>
-          <Row gap={6}><AiTag model="Muse Wonder" /><Text style={{ fontFamily: font.bodySemi, fontSize: 13, color: color.ink2 }}>{MENU_SNAP.length} dishes · 2 to check</Text></Row>
-          <Button title="Next: what's on each plate" onPress={next} />
+          <Row gap={6}>
+            <AiTag model="Muse Wonder" ms={menu.ms} />
+            <Text style={{ fontFamily: font.bodySemi, fontSize: 13, color: color.ink2 }}>{total} dishes · {unclear} to check{menu.offline ? ' · offline sample' : ''}</Text>
+          </Row>
+          <Button title="Next: what's on each plate" onPress={() => next(menu.dishes)} />
         </SquishIn>
       )}
     </View>
   );
 }
 
-function Components({ next }: { next: () => void }) {
-  const [parts, setParts] = useState(PROPOSED);
+/** Muse Spark proposes the separately visible parts of each dish as plain nouns SAM 3.1 can find, live. */
+function Components({ dishes, next }: { dishes: MenuRow[]; next: () => void }) {
+  const pick = dishes.slice(0, 4).map((d) => d.name);
+  const [parts, setParts] = useState<Record<string, string[] | null>>(() => Object.fromEntries(pick.map((d) => [d, null])));
+  const [ms, setMs] = useState<number | undefined>();
+  useEffect(() => {
+    let on = true;
+    for (const d of pick) {
+      proposeParts(d, null)
+        .then((r) => { if (on) { setParts((s) => ({ ...s, [d]: r.components.map((c) => c.sam_prompt) })); setMs(r.ms); } })
+        .catch(() => on && setParts((s) => ({ ...s, [d]: PROPOSED[d] ?? [] })));
+    }
+    return () => { on = false; };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <View style={{ gap: 12 }}>
       <H1>What’s on each plate</H1>
       <Sub>Nomi suggested the parts it will look for. Tap one to remove it. Plain words work best: “fried onions”, not “birista”.</Sub>
-      <AiTag model="Muse Spark" />
+      <AiTag model="Muse Spark" ms={ms} />
       {Object.entries(parts).map(([dish, xs], i) => (
         <SquishIn key={dish} index={i}>
           <Card style={{ gap: 10 }}>
-            <Row><DishIcon name={dish} url={null} size={44} /><H2 style={{ fontSize: 17 }}>{dish}</H2></Row>
-            <Row gap={8} style={{ flexWrap: 'wrap' }}>
-              {xs.map((p) => (
-                <Squishy key={p} accessibilityRole="button" accessibilityLabel={`Remove ${p}`} onPress={() => setParts((s) => ({ ...s, [dish]: s[dish].filter((x) => x !== p) }))}
-                  style={{ minHeight: 40, paddingHorizontal: 12, borderRadius: 14, backgroundColor: color.skySoft, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                  <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk }}>{p}</Text>
-                  <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk }}>×</Text>
-                </Squishy>
-              ))}
-            </Row>
+            <Row><DishIcon name={dish} url={null} size={44} /><H2 style={{ fontSize: 17, flex: 1 }}>{dish}</H2></Row>
+            {!xs ? <WorkLine state="run" text="Listing the parts SAM 3.1 will look for" model="Muse Spark" /> : (
+              <Row gap={8} style={{ flexWrap: 'wrap' }}>
+                {xs.map((p) => (
+                  <Squishy key={p} accessibilityRole="button" accessibilityLabel={`Remove ${p}`} onPress={() => setParts((s) => ({ ...s, [dish]: (s[dish] ?? []).filter((x) => x !== p) }))}
+                    style={{ minHeight: 40, paddingHorizontal: 12, borderRadius: 14, backgroundColor: color.skySoft, flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                    <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk }}>{p}</Text>
+                    <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk }}>×</Text>
+                  </Squishy>
+                ))}
+              </Row>
+            )}
           </Card>
         </SquishIn>
       ))}
@@ -147,6 +176,7 @@ function Done() {
 export default function Setup() {
   const params = useLocalSearchParams<{ step?: string }>();
   const [step, setStep] = useState(params.step === 'menu' ? 1 : 0);
+  const [dishes, setDishes] = useState<MenuRow[]>(MENU_SNAP);
   const next = () => setStep((x) => x + 1);
   return (
     <Screen scroll style={{ paddingBottom: 40 }}>
@@ -156,8 +186,8 @@ export default function Setup() {
       </View>
       <SquishIn key={step}>
         {step === 0 && <Basics next={next} />}
-        {step === 1 && <Snap next={next} />}
-        {step === 2 && <Components next={next} />}
+        {step === 1 && <Snap next={(d) => { setDishes(d); next(); }} />}
+        {step === 2 && <Components dishes={dishes} next={next} />}
         {step === 3 && <Done />}
       </SquishIn>
     </Screen>

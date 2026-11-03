@@ -25,7 +25,7 @@ function keep(id: string, s: Session) {
 }
 
 /** Runs tasks at most `n` at a time, keeping their order. */
-async function pool<T>(tasks: (() => Promise<T>)[], n = 9): Promise<T[]> {
+async function pool<T>(tasks: (() => Promise<T>)[], n = 18): Promise<T[]> {
   const out: T[] = new Array(tasks.length);
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, async () => {
@@ -72,7 +72,9 @@ export const golden = new Hono()
     // One SAM call per prompt per photo, plus "plate" so every part on a dish is measured against the plate.
     // Shelves and closing spots have no plate: parts are found and counted only.
     const prompts = [...(plate ? ['plate'] : []), ...parts.map((p) => p.prompt)];
+    const t0 = Date.now();
     const raw = await pool(photos.flatMap((photo) => prompts.map((prompt) => async () => (await segment(ctx, photo, prompt)).raw)));
+    const t1 = Date.now();
     const results = await Promise.all(photos.map(async (photo, k) => {
       const row = raw.slice(k * prompts.length, (k + 1) * prompts.length);
       const skip = plate ? 1 : 0;
@@ -82,6 +84,7 @@ export const golden = new Hono()
       keep(id, { ...s, size: r.size ?? null });
       return { id, ...r };
     }));
+    console.log(`golden/read ${photos.length} photo(s) × ${prompts.length} prompts: SAM ${t1 - t0} ms, worker ${Date.now() - t1} ms`);
     return c.json({ photos: results });
   })
   .post('/tap', async (c) => {

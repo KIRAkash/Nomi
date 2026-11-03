@@ -1,6 +1,6 @@
 // One typed function per row of the spec's model usage map (section 8). Screens never call the API directly.
 import {
-  ClosingCheck, ComponentProposal, DishRecognition, FeedbackTags, GuestQuestionProposal, MenuExtraction, PlatingRules, ReplyDraft,
+  AskAnswer, CardTranslation, ClosingCheck, HandoverSummary, ComponentProposal, DishRecognition, FeedbackTags, GuestQuestionProposal, MenuExtraction, PlatingRules, ReplyDraft,
 } from '@nomi/shared';
 import { BASE_URL, MODELS, call, glimmerClient, image, metaClient, structured, text, type Ctx } from './client';
 
@@ -27,10 +27,12 @@ export const parseRules = (ctx: Ctx, transcript: string, components: string[]) =
     [text(transcript)]);
 
 /** Guest questions: components + rules → up to 5 suggestions; the chef keeps up to 3. */
-export const proposeGuestQuestions = (ctx: Ctx, dish: { name: string; components: string[]; rules: string[]; counts: Record<string, number> }) =>
-  structured(MODELS.spark, ctx, 'questions', GuestQuestionProposal,
-    'Suggest short yes/no questions a diner can answer in one tap about this dish, each tied to something the Golden Plate checks (portion, piece counts, temperature, a key component). No more than 8 words each. Friendly tone.',
+export const proposeGuestQuestions = async (ctx: Ctx, dish: { name: string; components: string[]; rules: string[]; counts: Record<string, number> }) => {
+  const r = await structured(MODELS.spark, ctx, 'questions', GuestQuestionProposal,
+    'Suggest short yes/no questions a diner can answer in one tap from their own experience of this dish: was the portion enough, were there enough pieces, was it hot, was a key side or garnish there, was it tasty. Never ask about plating positions or anything only a chef would judge. Each question ties to one thing the Golden Plate checks; say which in "checks" in a few plain words. No more than 7 words each. no_label is the short negative answer a guest would tap ("Too little", "Fewer", "Lukewarm", "Missing"), never just "No". Friendly tone.',
     [text(JSON.stringify(dish))]);
+  return { questions: r.questions.slice(0, 5) };
+};
 
 /** Guest photo → which menu dish it is. */
 export const recogniseDish = (ctx: Ctx, photo: string, menu: { id: string; name: string }[]) =>
@@ -55,6 +57,24 @@ export const checkClosingPhoto = (ctx: Ctx, photo: string, spot: string, items: 
   structured(MODELS.spark, ctx, 'closing', ClosingCheck,
     `${FACTS_ONLY} This is the "${spot}" at closing time. Count whole, separately visible items among: ${items.join(', ')}. Flag only things you can see: containers without lids, spills, clutter, items left out, open doors. A partly used container counts as 1; never say how full it is.`,
     [image(photo)]);
+
+/** Shift handover transcript → what is done, what is pending and what went wrong, in the words people used. */
+export const summariseHandover = (ctx: Ctx, transcript: string) =>
+  structured(MODELS.spark, ctx, 'handover', HandoverSummary,
+    `${FACTS_ONLY} This is a restaurant kitchen shift handover, spoken aloud, possibly in Hindi or Hinglish. Split it into short English lines: done, pending, problems. Keep names, counts and dishes exactly as said. Leave a list empty rather than inventing items.`,
+    [text(transcript)]);
+
+/** A plating card in the staff member's language, keeping numbers, counts and clock positions exact. */
+export const translateCard = (ctx: Ctx, card: { title: string; steps: string[]; watch: string[] }, language: string) =>
+  structured(MODELS.spark, ctx, 'card', CardTranslation,
+    `Translate this kitchen plating card into ${language}, in the script native speakers use, in simple words a line cook reads at a glance. Keep every number, count and clock position exactly. Keep dish names as they are commonly said in that language.`,
+    [text(JSON.stringify(card))]);
+
+/** Ask Nomi: an owner's question answered only from the facts given; predictions and money guesses are refused. */
+export const askNomi = (ctx: Ctx, question: string, facts: { id: string; text: string }[], who = 'a restaurant owner') =>
+  structured(MODELS.wonder, ctx, 'answer', AskAnswer,
+    `${FACTS_ONLY} You are Nomi, answering ${who}, in the language and script the question was asked in. Answer only from these facts, citing their ids as source. If the question needs a forecast, a money estimate or anything the facts do not contain, set refused true and say plainly what you can count instead. Two or three short sentences. Facts: ${JSON.stringify(facts)}`,
+    [text(question)]);
 
 export type Transcript = { transcript: string; audioDurationMs: number; turns: { speaker?: string; text: string }[] };
 
@@ -105,7 +125,7 @@ export async function segment(ctx: Ctx, photo: string, prompt: string) {
 
 // The locked house style: every dish icon uses exactly this prompt so the menu reads as one family.
 export const ICON_STYLE =
-  'Flat sticker illustration of this exact dish seen from directly above on a round white plate. Thick dark ink outline (#1B1B3A), flat colours, no gradients, no text, no shadows, centred on a transparent background. Keep the real components and their positions.';
+  'Flat sticker illustration of this exact dish seen from directly above on a round white plate. Thick dark ink outline (#1B1B3A), flat colours, no gradients, no text, no shadows, centred on a plain flat white background (never a checkerboard). Keep the real components and their positions.';
 
 /** Golden photo → the dish's icon in the house style. */
 export const generateDishIcon = (ctx: Ctx, goldenPhoto: Blob) =>
@@ -115,12 +135,12 @@ export const generateDishIcon = (ctx: Ctx, goldenPhoto: Blob) =>
   });
 
 /** Golden photo + rules → a numbered plating card for staff. */
-export const generateSopCard = (ctx: Ctx, goldenPhoto: Blob, rules: string[]) =>
+export const generateSopCard = (ctx: Ctx, goldenPhoto: Blob, rules: string[], dish: string) =>
   call(MODELS.image, ctx, async () => {
     const res = await metaClient().images.edit({
       model: MODELS.image,
       image: new File([goldenPhoto], 'golden.png'),
-      prompt: `Clean kitchen plating card. Keep the dish photo, add small numbered markers for: ${rules.map((r, i) => `${i + 1}. ${r}`).join(' ')}. Large readable labels.`,
+      prompt: `A kitchen plating card titled "${dish}". Keep the dish photo exactly as it is. Add small numbered markers on the plate and a numbered list below with only these rules, word for word: ${rules.map((r, i) => `${i + 1}. ${r}`).join(' ')}. Add no other text, descriptions or claims. Large readable labels, clean flat layout.`,
       size: '1024x1536',
     });
     return { value: res.data?.[0] ?? null };

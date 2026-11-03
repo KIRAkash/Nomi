@@ -5,6 +5,7 @@ import { Button, H2, Sub, color, font, shadow } from '@nomi/ui';
 import { Asset } from 'expo-asset';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { Image } from 'expo-image';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { useIsFocused } from 'expo-router';
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, useSyncExternalStore, type ReactNode, type Ref } from 'react';
 import { ActivityIndicator, Linking, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
@@ -57,7 +58,25 @@ function Viewfinder({ cam, guide, tint, onReady, onError }: {
 
 const subscribe = () => () => {};
 
-async function toDataUrl(uri: string) {
+/**
+ * Phone cameras take 12 MP photos (3–5 MB). SAM 3.1 and the vision worker need nothing like that, and every extra pixel
+ * is upload time and mask decoding, so each photo is scaled to 1280 px on its longest side before it leaves the phone.
+ */
+const MAX_SIDE = 1280;
+async function shrink(uri: string, width: number, height: number): Promise<Photo> {
+  try {
+    const big = Math.max(width, height) > MAX_SIDE;
+    const ctx = ImageManipulator.manipulate(uri);
+    if (big) ctx.resize(width >= height ? { width: MAX_SIDE } : { height: MAX_SIDE });
+    const out = await (await ctx.renderAsync()).saveAsync({ compress: 0.8, format: SaveFormat.JPEG, base64: true });
+    return { uri: out.uri, dataUrl: `data:image/jpeg;base64,${out.base64}`, width: out.width, height: out.height };
+  } catch {
+    return { uri, dataUrl: uri.startsWith('data:') ? uri : await toDataUrl(uri), width, height };
+  }
+}
+
+/** Reads a local file or blob URI (photo, voice note) into a data URL for the API. */
+export async function toDataUrl(uri: string) {
   const blob = await (await fetch(uri)).blob();
   return new Promise<string>((ok, fail) => {
     const r = new FileReader();
@@ -140,10 +159,9 @@ export function LiveCamera({ ref, height = 300, guide = 'plate', still, tint = c
     snap: async () => {
       if (playing) return ready.current ? demoPhoto(current) : null;
       if (!cam.current || !ready.current) return null;
-      const p = await cam.current.takePictureAsync({ quality: 0.7, base64: true, shutterSound: false });
+      const p = await cam.current.takePictureAsync({ quality: 0.8, shutterSound: false });
       if (!p) return null;
-      const dataUrl = p.uri.startsWith('data:') ? p.uri : `data:image/jpeg;base64,${p.base64}`;
-      return { uri: p.uri, dataUrl, width: p.width, height: p.height };
+      return shrink(p.uri, p.width, p.height);
     },
   }), [playing, current]);
 

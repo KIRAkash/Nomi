@@ -7,6 +7,8 @@ import { Text, TextInput, View } from 'react-native';
 
 import { AiTag, Segmented, TopBar } from '@/components/kit';
 import { Compare, partsFromReasons } from '@/components/plate';
+import { draftReply } from '@/lib/api';
+import { RESTAURANT } from '@/lib/brand';
 import { NOTES } from '@/lib/mock';
 import { can, useSession } from '@/lib/session';
 
@@ -21,6 +23,25 @@ export default function NoteDetail() {
   const [text, setText] = useState(n.reply?.text ?? '');
   const [offer, setOffer] = useState<string | null>(n.reply?.offer ?? null);
   const [status, setStatus] = useState(n.status);
+  const [en, setEn] = useState(n.reply?.en ?? '');
+  const [drafting, setDrafting] = useState(false);
+  const [draftMs, setDraftMs] = useState<number | undefined>();
+  // Muse Spark writes a fresh reply in the guest's language from what they actually said; the manager still approves it.
+  const redraft = async () => {
+    setDrafting(true);
+    try {
+      const r = await draftReply(n.original ?? n.translation ?? '', n.language, RESTAURANT.name);
+      setText(r.reply);
+      setEn(r.reply_en);
+      setOffer(r.offer && OFFERS.includes(r.offer) ? r.offer : offer);
+      setDraftMs(r.ms);
+      setEditing(false);
+    } catch {
+      // Keeps the current draft.
+    } finally {
+      setDrafting(false);
+    }
+  };
   const [called, setCalled] = useState(false);
   const urgent = n.severity === 'high';
   const mayReply = can(role, 'approve_reply');
@@ -106,15 +127,15 @@ export default function NoteDetail() {
           <Card style={{ gap: 12 }}>
             <Row style={{ justifyContent: 'space-between' }}>
               <Label>Reply draft</Label>
-              <AiTag model="Muse Spark" />
+              <AiTag model="Muse Spark" ms={draftMs} />
             </Row>
             {n.language !== 'English' && <Segmented value={lang} onChange={setLang} options={[{ value: 'guest', label: n.language }, { value: 'en', label: 'English' }]} />}
             {editing ? (
-              <TextInput accessibilityLabel="Edit reply" multiline value={text} onChangeText={setText}
+              <TextInput accessibilityLabel="Edit reply" multiline value={text} onChangeText={(t) => { setText(t); setEn(''); }}
                 style={{ minHeight: 110, borderRadius: 18, backgroundColor: color.bg, padding: 14, fontFamily: font.body, fontSize: 15, color: color.ink, textAlignVertical: 'top' }} />
             ) : (
               <View style={{ backgroundColor: color.bg, borderRadius: 18, padding: 14 }}>
-                <Text style={{ fontFamily: font.body, fontSize: 15, lineHeight: 22, color: color.ink }}>{lang === 'en' && text === n.reply.text ? n.reply.en : text}</Text>
+                <Text style={{ fontFamily: font.body, fontSize: 15, lineHeight: 22, color: color.ink }}>{lang === 'en' && en ? en : text}</Text>
               </View>
             )}
             <Label>Offer</Label>
@@ -134,6 +155,7 @@ export default function NoteDetail() {
                   <Button small kind="white" title={editing ? 'Done editing' : 'Edit'} style={{ flex: 1 }} onPress={() => setEditing(!editing)} />
                   <Button small kind="white" title="Resolve, no reply" style={{ flex: 1 }} onPress={() => setStatus('resolved')} />
                 </Row>
+                <Button small kind="saffron" title={drafting ? 'Muse Spark is writing…' : 'Write a new draft'} disabled={drafting} onPress={redraft} />
               </>
             ) : (
               <SquishIn>

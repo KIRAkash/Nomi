@@ -1,12 +1,19 @@
 // Staff-app building blocks: the top bar, AI labels with their evidence, scores, small charts and the hold-to-talk button.
 import { Button, Chip, H1, H2, Label, Num, Ripple, Row, Squishy, Sub, color, font, shadow, tone, type Tone } from '@nomi/ui';
+import { Asset } from 'expo-asset';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Modal, Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import Svg, { Circle, Path, Polyline, Rect } from 'react-native-svg';
 
+import { toDataUrl } from '@/components/camera';
+import { RESTAURANT } from '@/lib/brand';
 import type { EvidenceItem, Model } from '@/lib/mock';
 import { ROLE_LABEL, ROLE_PERSON, useSession } from '@/lib/session';
+import { useVoiceNote } from '@/lib/voice';
+
+export type VoiceNote = { audio: string; uri: string; seconds: number };
 
 export function IconButton({ label, onPress, children, bg = color.card }: { label: string; onPress: () => void; children: ReactNode; bg?: string }) {
   return (
@@ -27,9 +34,10 @@ export function TopBar({ title, sub, back = false, right }: { title: string; sub
   return (
     <Row style={{ justifyContent: 'space-between', alignItems: 'center' }}>
       <Row style={{ flex: 1 }}>
-        {back && <IconButton label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}><BackIcon /></IconButton>}
+        {back ? <IconButton label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}><BackIcon /></IconButton>
+          : <Image source={RESTAURANT.logo} accessibilityLabel={`${RESTAURANT.name} logo`} style={{ width: 44, height: 44, borderRadius: 14 }} contentFit="cover" />}
         <View style={{ flex: 1 }}>
-          {sub ? <Sub style={{ fontSize: 13 }} numberOfLines={1}>{sub}</Sub> : null}
+          {sub ? <Sub style={{ fontSize: 13 }} numberOfLines={1}>{back ? sub : `${RESTAURANT.name} · ${sub}`}</Sub> : <Sub style={{ fontSize: 13 }}>{RESTAURANT.name}</Sub>}
           <H1 numberOfLines={2}>{title}</H1>
         </View>
       </Row>
@@ -48,11 +56,20 @@ const SparkleIcon = ({ c, size = 12 }: { c: string; size?: number }) => (
 );
 
 /** Marks anything a model produced. Rule: no unlabelled AI output on any screen. */
-export function AiTag({ model, style }: { model: Model; style?: StyleProp<ViewStyle> }) {
+/** Which model made this. With `ms` it was a live call just now, and says how long it took. */
+export function AiTag({ model, ms, style }: { model: Model; ms?: number; style?: StyleProp<ViewStyle> }) {
+  const live = ms !== undefined;
   return (
-    <View accessibilityLabel={`Made by ${model}`} style={[{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: color.pinkSoft, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 }, style]}>
+    <View accessibilityLabel={live ? `Made live by ${model} in ${(ms / 1000).toFixed(1)} seconds` : `Made by ${model}`}
+      style={[{ flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', backgroundColor: color.pinkSoft, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 10 }, style]}>
       <SparkleIcon c="#7A1F4C" />
       <Text style={{ fontFamily: font.bodyBold, fontSize: 11, color: '#7A1F4C' }}>{model}</Text>
+      {live && (
+        <>
+          <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: color.mint, marginLeft: 2 }} />
+          <Text style={{ fontFamily: font.bodyBold, fontSize: 11, color: '#7A1F4C' }}>live · {(ms / 1000).toFixed(1)} s</Text>
+        </>
+      )}
     </View>
   );
 }
@@ -241,6 +258,23 @@ export function useSteps(n: number, ms = 900) {
   return { step: i, start: () => setI(0), reset: () => setI(-1), done: i >= n, running: i >= 0 && i < n, state: (k: number) => (i > k ? 'done' : i === k ? 'run' : 'wait') as 'wait' | 'run' | 'done' };
 }
 
+/** Seconds since this mounted, ticking once a second. */
+export function useElapsed() {
+  const [start] = useState(() => Date.now());
+  const [now, setNow] = useState(start);
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+  return Math.round((now - start) / 1000);
+}
+
+/** A live model call in progress: what it is doing, a running seconds count and how long it usually takes. */
+export function LiveWait({ text, model, typical }: { text: string; model?: Model; typical: string }) {
+  const secs = useElapsed();
+  return <WorkLine state="run" text={`${text} · ${secs} s (usually ${typical})`} model={model} />;
+}
+
 export const MicIcon = ({ c = '#FFFFFF', size = 38 }: { c?: string; size?: number }) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth={2.4} strokeLinecap="round">
     <Rect x={9} y={3} width={6} height={11} rx={3} />
@@ -250,46 +284,64 @@ export const MicIcon = ({ c = '#FFFFFF', size = 38 }: { c?: string; size?: numbe
 
 /**
  * Hold to talk, made for wet hands: one big target, no typing. A quick tap also works (tap to start, tap again to stop)
- * for anyone who can't press and hold. The demo build times the recording and hands back a prepared transcript; the real
- * build records with expo-audio and sends WAV to Voice Transcribe.
+ * for anyone who can't press and hold. Records with expo-audio and hands the note to the screen, which sends it to
+ * Muse Voice Transcribe through the API.
  */
-export function HoldToTalk({ onDone, label = 'Hold to talk', bg = color.tomato }: { onDone: (seconds: number) => void; label?: string; bg?: string }) {
+export function HoldToTalk({ onDone, label = 'Hold to talk', bg = color.tomato, disabled, sample }: {
+  onDone: (note: VoiceNote) => void; label?: string; bg?: string; disabled?: boolean;
+  /** A bundled voice note (require of an .m4a) for laptops without a mic; it goes through the same live models. */
+  sample?: { file: number; says: string };
+}) {
+  const v = useVoiceNote();
   const started = useRef<number | null>(null);
-  const [rec, setRec] = useState<'off' | 'hold' | 'tap'>('off');
-  const [now, setNow] = useState(0);
-  const [since, setSince] = useState(0);
-  useEffect(() => {
-    if (rec === 'off') return;
-    const id = setInterval(() => setNow(Date.now()), 200);
-    return () => clearInterval(id);
-  }, [rec]);
-  const finish = () => {
-    const secs = Math.max(1, Math.round((Date.now() - (started.current ?? Date.now())) / 1000));
+  const [mode, setMode] = useState<'off' | 'hold' | 'tap'>('off');
+  const [short, setShort] = useState(false);
+  const finish = async () => {
     started.current = null;
-    setRec('off');
-    onDone(secs);
+    setMode('off');
+    const note = await v.stop();
+    setShort(!note);
+    if (note) onDone(note);
   };
-  const secs = rec === 'off' ? 0 : Math.max(0, Math.round((now - since) / 1000));
   return (
-    <View style={{ alignItems: 'center', gap: 10 }}>
-      <Pressable accessibilityRole="button" accessibilityLabel={rec === 'off' ? `${label}, or tap to start` : 'Recording. Tap to stop'}
-        onPressIn={() => {
-          if (started.current === null) { const t = Date.now(); started.current = t; setSince(t); setNow(t); setRec('hold'); }
-          else finish();
+    <View style={{ alignItems: 'center', gap: 10, opacity: disabled ? 0.5 : 1 }}>
+      <Pressable accessibilityRole="button" accessibilityLabel={mode === 'off' ? `${label}, or tap to start` : 'Recording. Tap to stop'} disabled={disabled}
+        onPressIn={async () => {
+          if (started.current !== null) return finish();
+          started.current = Date.now();
+          setShort(false);
+          if (await v.start()) setMode('hold');
+          else started.current = null;
         }}
         onPressOut={() => {
           if (started.current === null) return;
           if (Date.now() - started.current > 500) finish();
-          else setRec('tap');
+          else setMode('tap');
         }}
         style={{ width: 112, height: 112, borderRadius: 40, backgroundColor: bg, alignItems: 'center', justifyContent: 'center' }}>
-        <Ripple active={rec !== 'off'} color={bg} radius={40} />
+        <Ripple active={v.recording} color={bg} radius={40} />
         <MicIcon />
       </Pressable>
-      <H2>{rec === 'off' ? label : `Listening… 0:${String(secs).padStart(2, '0')}`}</H2>
-      {rec === 'tap' && <Sub style={{ fontSize: 13 }}>Tap again when you are done</Sub>}
+      <H2>{v.recording ? `Listening… 0:${String(v.seconds).padStart(2, '0')}` : label}</H2>
+      {mode === 'tap' && <Sub style={{ fontSize: 13 }}>Tap again when you are done</Sub>}
+      {short && <Sub style={{ fontSize: 13 }}>That was too short. Hold and speak, then let go.</Sub>}
+      {v.denied && <Text style={{ fontFamily: font.bodyBold, color: color.tomatoInk, textAlign: 'center' }}>Microphone is off. Allow it in the phone settings.</Text>}
+      {sample && !v.recording && (
+        <Pressable accessibilityRole="button" disabled={disabled} onPress={async () => onDone(await sampleNote(sample.file))}
+          style={{ minHeight: 40, paddingHorizontal: 14, borderRadius: 14, backgroundColor: color.skySoft, justifyContent: 'center' }}>
+          <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk, textAlign: 'center' }}>No mic? Play a sample voice note</Text>
+          <Text style={{ fontFamily: font.body, fontSize: 12, color: color.skyInk, textAlign: 'center' }}>“{sample.says}”</Text>
+        </Pressable>
+      )}
     </View>
   );
+}
+
+async function sampleNote(file: number): Promise<VoiceNote> {
+  const asset = Asset.fromModule(file);
+  await asset.downloadAsync();
+  const uri = asset.localUri ?? asset.uri;
+  return { audio: await toDataUrl(uri), uri, seconds: 0 };
 }
 
 export function SectionTitle({ children, right }: { children: string; right?: ReactNode }) {

@@ -101,6 +101,7 @@ export default function Insights() {
       {view === 'ai' && (
         <>
           <Sub style={{ fontSize: 14 }}>Every model call Nomi made, what it was for and how long it took. Glimmer runs on the laptop in your office, so guest text and empty frames stay on site.</Sub>
+          <Button kind="saffron" title="Under the hood: live calls on this phone" onPress={() => router.push('/models')} />
           <Row gap={8}>
             <View style={{ flex: 1, backgroundColor: color.card, borderRadius: 20, padding: 12 }}><Num style={{ fontSize: 24 }}>{calls}</Num><Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: color.ink2 }}>calls since 21:00</Text></View>
             <View style={{ flex: 1, backgroundColor: color.card, borderRadius: 20, padding: 12 }}><Num style={{ fontSize: 24 }}>{ok}/{calls}</Num><Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: color.ink2 }}>succeeded</Text></View>

@@ -1,5 +1,7 @@
 # Built from the repo root so the API gets its workspace packages: docker build -f apps/api/Dockerfile .
 FROM node:22-slim
+# ffmpeg turns phone voice notes into the WAV that Muse Voice Transcribe accepts.
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 WORKDIR /repo
 COPY package.json package-lock.json ./
 COPY apps/api/package.json apps/api/

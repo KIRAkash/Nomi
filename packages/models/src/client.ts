@@ -72,6 +72,8 @@ export async function structured<S extends z.ZodType>(model: string, ctx: Ctx, n
       model,
       instructions,
       input: [{ role: 'user', content: parts }],
+      // Spark answers someone waiting on a screen: low effort halves the wait with the same output (checked Nov 3).
+      ...(model === MODELS.spark ? { reasoning: { effort: 'low' as const } } : {}),
       text: { format: { type: 'json_schema', name, schema: z.toJSONSchema(schema) as Record<string, unknown>, strict: true } },
     });
     return { value: schema.parse(JSON.parse(res.output_text)), usage: res.usage };

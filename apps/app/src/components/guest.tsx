@@ -1,16 +1,17 @@
 // Pieces shared by the guest screens.
-import { Face, FACE_FILLS, FACE_LABELS, Label, Num, Row, Squishy, Sub, color, font, shadow, usePop } from '@nomi/ui';
+import { Face, FACE_FILLS, FACE_LABELS, Label, Row, Squishy, Sub, color, font, shadow, usePop } from '@nomi/ui';
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 
 import { sendFeedback } from '@/lib/api';
+import { RESTAURANT } from '@/lib/brand';
 import { useGuest } from '@/lib/guest-store';
 
 export function GuestHeader({ back = true }: { back?: boolean }) {
   const { page } = useGuest();
-  const initials = page.restaurant.name.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
   return (
     <Row style={{ justifyContent: 'space-between' }}>
       <Row>
@@ -19,9 +20,8 @@ export function GuestHeader({ back = true }: { back?: boolean }) {
             <Text style={{ fontFamily: font.bodyBold, fontSize: 20, color: color.ink }}>‹</Text>
           </Squishy>
         )}
-        <View style={{ width: 44, height: 44, borderRadius: 16, backgroundColor: color.tomato, alignItems: 'center', justifyContent: 'center' }}>
-          <Num style={{ color: '#FFFFFF', fontSize: 17 }}>{initials}</Num>
-        </View>
+        <Image source={page.restaurant.logo_url ?? RESTAURANT.logo} accessibilityLabel={`${page.restaurant.name} logo`}
+          style={{ width: 48, height: 48, borderRadius: 16, backgroundColor: color.card }} contentFit="cover" />
         <View>
           <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{page.restaurant.name}</Text>
           <Sub style={{ fontSize: 13 }}>{[page.table.label, page.shift].filter(Boolean).join(' · ')}</Sub>

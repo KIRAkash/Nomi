@@ -1,13 +1,16 @@
-// A19 · Ask Nomi: the owner asks NIGHTSHIFT anything in plain words. Answers cite their evidence; asks for predictions
-// are declined with what Nomi can count instead.
+// A19 · Ask Nomi: the owner asks anything in plain words, typed or spoken. Muse Wonder answers live, only from the facts
+// Nomi has seen, counted or heard, and cites them; asks for predictions are declined with what Nomi can count instead.
 import { Button, Row, Screen, SquishIn, Squishy, Sub, color, font, shadow } from '@nomi/ui';
 import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 
-import { AiTag, TopBar, WorkLine } from '@/components/kit';
+import { AiTag, HoldToTalk, TopBar, WorkLine, type VoiceNote } from '@/components/kit';
+import { askNomi, sendVoice } from '@/lib/api';
+import { restaurantFacts } from '@/lib/facts';
 import { ASK_ANSWERS, ASK_SUGGESTIONS } from '@/lib/mock';
 
-type Turn = { q: string; a?: (typeof ASK_ANSWERS)[string] };
+type Answer = { text: string; evidence: string[]; declined?: boolean; ms?: number; heardMs?: number };
+type Turn = { q: string; a?: Answer };
 
 const FALLBACK = {
   text: 'I can only answer from what Nomi has seen, counted or heard: guest notes, plate scores, shelf counts and closing photos. Try asking about a dish, a shift or a table.',
@@ -19,11 +22,28 @@ export default function Ask() {
   const [draft, setDraft] = useState('');
   const thinking = turns.length > 0 && !turns[turns.length - 1].a;
 
-  const ask = (q: string) => {
+  const [listening, setListening] = useState(false);
+  const answer = (a: Answer) => setTurns((t) => t.map((x, i) => (i === t.length - 1 ? { ...x, a } : x)));
+  const ask = async (q: string, heardMs?: number) => {
     if (!q.trim() || thinking) return;
     setDraft('');
     setTurns((t) => [...t, { q }]);
-    setTimeout(() => setTurns((t) => t.map((x, i) => (i === t.length - 1 ? { ...x, a: ASK_ANSWERS[q] ?? FALLBACK } : x))), 1400);
+    try {
+      const r = await askNomi(q, restaurantFacts());
+      answer({ text: r.answer, evidence: [...new Set(r.facts.map((f) => f.source.replace(/^\w+:/, '')))].slice(0, 4), declined: r.refused, ms: r.ms, heardMs });
+    } catch {
+      // Offline: the prepared answers for the suggested questions, so the screen still shows how Nomi answers.
+      answer(ASK_ANSWERS[q] ?? FALLBACK);
+    }
+  };
+  const spoken = async (note: VoiceNote) => {
+    setListening(true);
+    try {
+      const h = await sendVoice(note.audio, 'plain');
+      if (h.transcript) await ask(h.transcript, h.transcribe_ms);
+    } finally {
+      setListening(false);
+    }
   };
 
   return (
@@ -62,7 +82,10 @@ export default function Ask() {
                     ))}
                   </Row>
                 )}
-                <AiTag model="Muse Wonder" />
+                <Row gap={6} style={{ flexWrap: 'wrap' }}>
+                  {t.a.heardMs !== undefined && <AiTag model="Voice Transcribe" ms={t.a.heardMs} />}
+                  <AiTag model="Muse Wonder" ms={t.a.ms} />
+                </Row>
               </View>
             </SquishIn>
           ) : (
@@ -88,6 +111,9 @@ export default function Ask() {
           style={{ flex: 1, minHeight: 56, borderRadius: 22, backgroundColor: color.card, paddingHorizontal: 16, fontFamily: font.body, fontSize: 16, color: color.ink, ...shadow(1) }} />
       </Row>
       {draft.trim().length > 0 && <Button small title="Ask" onPress={() => ask(draft)} />}
+      <View style={{ marginTop: 6 }}>
+        <HoldToTalk label={listening ? 'Listening…' : 'Or hold and ask'} bg={color.sky} onDone={spoken} disabled={listening || thinking} />
+      </View>
     </Screen>
   );
 }

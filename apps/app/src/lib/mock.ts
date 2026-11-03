@@ -42,6 +42,27 @@ export const DISH_STATS: DishStat[] = [
     guestAvg: 4.6, guestCount: 35, topTheme: { label: 'Loved the gravy', n: 9, tone: 'mint' },
   },
   {
+    id: '00000000-0000-0000-0000-0000000d0008', name: 'Tandoori Prawns', category: 'Starters', golden: 'published', goldenVersion: 1,
+    scoreToday: 84, trend: [90, 89, 91, 88, 90, 86, 84], byShift: { Lunch: 90, Dinner: 80 }, plates: 18, flagged: 2,
+    guestAvg: 4.4, guestCount: 17, topTheme: { label: 'Juicy', n: 5, tone: 'mint' },
+    attention: '2 dinner plates went out with 4 prawns, not 5',
+  },
+  {
+    id: '00000000-0000-0000-0000-0000000d0009', name: 'Lamb Shank Rogan Josh', category: 'Mains', golden: 'published', goldenVersion: 1,
+    scoreToday: 86, trend: [91, 92, 90, 89, 92, 88, 86], byShift: { Lunch: 92, Dinner: 82 }, plates: 12, flagged: 1,
+    guestAvg: 4.8, guestCount: 11, topTheme: { label: 'Falls off the bone', n: 4, tone: 'mint' },
+  },
+  {
+    id: '00000000-0000-0000-0000-0000000d0010', name: 'Burrata Mango Chaat', category: 'Starters', golden: 'published', goldenVersion: 1,
+    scoreToday: 95, trend: [93, 94, 96, 95, 94, 96, 95], byShift: { Lunch: 96, Dinner: 94 }, plates: 15, flagged: 0,
+    guestAvg: 4.7, guestCount: 13, topTheme: { label: 'Fresh', n: 6, tone: 'mint' },
+  },
+  {
+    id: '00000000-0000-0000-0000-0000000d0011', name: 'Kesar Pista Kulfi', category: 'Desserts', golden: 'published', goldenVersion: 1,
+    scoreToday: 88, trend: [92, 90, 93, 91, 90, 89, 88], byShift: { Lunch: 93, Dinner: 85 }, plates: 21, flagged: 1,
+    guestAvg: 4.6, guestCount: 18,
+  },
+  {
     id: '00000000-0000-0000-0000-0000000d0003', name: 'Dal Makhani', category: 'Mains', golden: 'published', goldenVersion: 1,
     scoreToday: 94, trend: [93, 92, 95, 94, 93, 95, 94], byShift: { Lunch: 95, Dinner: 93 }, plates: 27, flagged: 0,
     guestAvg: 4.5, guestCount: 19,
@@ -61,7 +82,7 @@ export const DISH_STATS: DishStat[] = [
   },
 ];
 
-export const COVERAGE = { protected: 4, total: 32 };
+export const COVERAGE = { protected: 8, total: 32 };
 
 /** `shot` is the demo photo of this plate (docs/demo-images.md); when it exists, its SAM run replaces the score and reasons. */
 export type Capture = { id: string; dishId: string; shift: Shift; time: string; score: number; reasons: string[]; day: string; shot?: string };
@@ -71,6 +92,9 @@ export const CAPTURES: Capture[] = [
   { id: 'cap-7', shot: 'chicken-biryani/pass-three-pieces', dishId: DISH_STATS[0].id, shift: 'Dinner', time: '20:51', day: 'Fri', score: 66, reasons: ['3 chicken pieces, reference is 4'] },
   { id: 'cap-6', shot: 'chicken-biryani/pass-lemon-off', dishId: DISH_STATS[0].id, shift: 'Dinner', time: '20:05', day: 'Fri', score: 81, reasons: ['Lemon off the rim'] },
   { id: 'cap-5', shot: 'chicken-biryani/pass-good', dishId: DISH_STATS[0].id, shift: 'Lunch', time: '13:22', day: 'Fri', score: 91, reasons: [] },
+  { id: 'cap-12', shot: 'tandoori-prawns/pass-four-prawns', dishId: DISH_STATS[2].id, shift: 'Dinner', time: '21:30', day: 'Fri', score: 74, reasons: ['4 prawns, reference is 5'] },
+  { id: 'cap-11', shot: 'lamb-shank-rogan-josh/pass-no-rice', dishId: DISH_STATS[3].id, shift: 'Dinner', time: '21:12', day: 'Fri', score: 66, reasons: ['Saffron rice missing'] },
+  { id: 'cap-10', shot: 'kesar-pista-kulfi/pass-no-petals', dishId: DISH_STATS[5].id, shift: 'Dinner', time: '22:02', day: 'Fri', score: 82, reasons: ['Rose petals missing'] },
   { id: 'cap-4', shot: 'paneer-tikka/pass-chutney-missing', dishId: DISH_STATS[1].id, shift: 'Dinner', time: '21:05', day: 'Fri', score: 69, reasons: ['Mint chutney missing'] },
 ];
 
@@ -288,6 +312,44 @@ export const SOP_CARDS = [
       { en: 'Onion rings fanned on the right', hi: 'प्याज़ के छल्ले दाईं ओर फैलाकर' },
     ],
   },
+  {
+    dishId: '00000000-0000-0000-0000-0000000d0008', dish: 'Tandoori Prawns', version: 1, approvedBy: 'Chef Imran', approvedAt: 'Sat',
+    rules: [
+      { en: '5 prawns in an arc across the centre, tails pointing out' },
+      { en: 'Sliced red onion with coriander at 9 o\'clock' },
+      { en: 'Mint chutney bowl on the plate at 3 o\'clock' },
+      { en: 'Lemon wedge on the rim at 6 o\'clock' },
+    ],
+  },
+  {
+    dishId: '00000000-0000-0000-0000-0000000d0009', dish: 'Lamb Shank Rogan Josh', version: 1, approvedBy: 'Chef Imran', approvedAt: 'Sat',
+    rules: [
+      { en: 'One lamb shank in the centre, bone pointing to 1 o\'clock' },
+      { en: 'Rogan josh gravy pooled around the shank' },
+      { en: 'Saffron rice mound on the left, at 9 o\'clock' },
+      { en: 'Cream zig-zag over the gravy at 5 o\'clock' },
+      { en: 'Coriander leaves on top of the lamb' },
+    ],
+  },
+  {
+    dishId: '00000000-0000-0000-0000-0000000d0010', dish: 'Burrata Mango Chaat', version: 1, approvedBy: 'Chef Imran', approvedAt: 'Sun',
+    rules: [
+      { en: 'One burrata in the centre, torn open on top' },
+      { en: '8 mango cubes around the burrata' },
+      { en: 'Rocket leaves at 11 o\'clock' },
+      { en: 'Tamarind chutney swirl at 5 o\'clock' },
+      { en: 'Pomegranate seeds over the mango' },
+    ],
+  },
+  {
+    dishId: '00000000-0000-0000-0000-0000000d0011', dish: 'Kesar Pista Kulfi', version: 1, approvedBy: 'Chef Imran', approvedAt: 'Sun',
+    rules: [
+      { en: '3 kulfi slices in a row across the centre' },
+      { en: 'Chopped pistachios over the slices' },
+      { en: 'Rose petals at 2 o\'clock' },
+      { en: 'Falooda nest at 8 o\'clock' },
+    ],
+  },
 ];
 
 /** Tonight's reminders, each built from yesterday's PASS facts. */
@@ -395,4 +457,8 @@ export const PICKS: Record<string, number[]> = {
   [DISH_STATS[4].id]: [4, 5, 4, 4, 4, 4, 5],
   [DISH_STATS[5].id]: [2, 2, 1, 2, 2, 3, 2],
   [DISH_STATS[6].id]: [2, 3, 2, 2, 2, 2, 3],
+  [DISH_STATS[7].id]: [3, 4, 3, 3, 4, 3, 4],
+  [DISH_STATS[8].id]: [1, 2, 2, 1, 2, 2, 3],
+  [DISH_STATS[9].id]: [2, 2, 3, 2, 2, 3, 2],
+  [DISH_STATS[10].id]: [1, 1, 2, 1, 2, 1, 2],
 };

@@ -5,6 +5,7 @@ export type DemoPart = { name: string; prompt: string; colour: string; role: str
 export type DemoShot = { dish: string; shows: string; image: number; sam: Omit<GoldenRead, 'id'> | null };
 
 export const DEMO_SHOTS: Record<string, DemoShot> = {
+  'brand/logo': { dish: "Brand", shows: "The demo restaurant's logo at the top of the guest page and staff screens, as a restaurant gives it at onboarding.", image: require('../../assets/images/demo/brand/logo.jpg'), sam: null },
   'kitchen/calibration-empty-plate': { dish: "Kitchen setup", shows: "Golden Plate step 1, calibrating the pass.", image: require('../../assets/images/demo/kitchen/calibration-empty-plate.jpg'), sam: require('../../assets/images/demo/kitchen/calibration-empty-plate.sam.json') },
   'kitchen/menu-printed': { dish: "Kitchen setup", shows: "Setup, Menu Snap. Muse Wonder reads it; two fields are deliberately hard to read so the review shows amber.", image: require('../../assets/images/demo/kitchen/menu-printed.jpg'), sam: null },
   'chicken-biryani/golden-1': { dish: "Chicken Biryani", shows: "The Golden Plate everywhere: dish detail, plating card, the pass comparison.", image: require('../../assets/images/demo/chicken-biryani/golden-1.jpg'), sam: require('../../assets/images/demo/chicken-biryani/golden-1.sam.json') },
@@ -30,6 +31,14 @@ export const DEMO_SHOTS: Record<string, DemoShot> = {
   'dal-makhani/pass-no-butter': { dish: "Dal Makhani", shows: "The pass, \"Butter cube missing\".", image: require('../../assets/images/demo/dal-makhani/pass-no-butter.jpg'), sam: require('../../assets/images/demo/dal-makhani/pass-no-butter.sam.json') },
   'garlic-naan/golden-1': { dish: "Garlic Naan", shows: "The Garlic Naan draft.", image: require('../../assets/images/demo/garlic-naan/golden-1.jpg'), sam: require('../../assets/images/demo/garlic-naan/golden-1.sam.json') },
   'gulab-jamun/golden-1': { dish: "Gulab Jamun", shows: "Dish card and plating card for Gulab Jamun.", image: require('../../assets/images/demo/gulab-jamun/golden-1.jpg'), sam: require('../../assets/images/demo/gulab-jamun/golden-1.sam.json') },
+  'tandoori-prawns/golden-1': { dish: "Tandoori Prawns", shows: "Golden Plate v1 for Tandoori Prawns.", image: require('../../assets/images/demo/tandoori-prawns/golden-1.jpg'), sam: require('../../assets/images/demo/tandoori-prawns/golden-1.sam.json') },
+  'tandoori-prawns/pass-four-prawns': { dish: "Tandoori Prawns", shows: "The pass, \"4 prawns, 5 expected\".", image: require('../../assets/images/demo/tandoori-prawns/pass-four-prawns.jpg'), sam: require('../../assets/images/demo/tandoori-prawns/pass-four-prawns.sam.json') },
+  'tandoori-prawns/guest-table-4': { dish: "Tandoori Prawns", shows: "\"Show us your plate\" recognition for a fancy starter; a judge's sample guest photo.", image: require('../../assets/images/demo/tandoori-prawns/guest-table-4.jpg'), sam: require('../../assets/images/demo/tandoori-prawns/guest-table-4.sam.json') },
+  'lamb-shank-rogan-josh/golden-1': { dish: "Lamb Shank Rogan Josh", shows: "Golden Plate v1 for Lamb Shank Rogan Josh.", image: require('../../assets/images/demo/lamb-shank-rogan-josh/golden-1.jpg'), sam: require('../../assets/images/demo/lamb-shank-rogan-josh/golden-1.sam.json') },
+  'lamb-shank-rogan-josh/pass-no-rice': { dish: "Lamb Shank Rogan Josh", shows: "The pass, \"Saffron rice missing\".", image: require('../../assets/images/demo/lamb-shank-rogan-josh/pass-no-rice.jpg'), sam: require('../../assets/images/demo/lamb-shank-rogan-josh/pass-no-rice.sam.json') },
+  'burrata-mango-chaat/golden-1': { dish: "Burrata Mango Chaat", shows: "Golden Plate v1 for Burrata Mango Chaat.", image: require('../../assets/images/demo/burrata-mango-chaat/golden-1.jpg'), sam: require('../../assets/images/demo/burrata-mango-chaat/golden-1.sam.json') },
+  'kesar-pista-kulfi/golden-1': { dish: "Kesar Pista Kulfi", shows: "Golden Plate v1 for Kesar Pista Kulfi.", image: require('../../assets/images/demo/kesar-pista-kulfi/golden-1.jpg'), sam: require('../../assets/images/demo/kesar-pista-kulfi/golden-1.sam.json') },
+  'kesar-pista-kulfi/pass-no-petals': { dish: "Kesar Pista Kulfi", shows: "The pass, \"Rose petals missing\".", image: require('../../assets/images/demo/kesar-pista-kulfi/pass-no-petals.jpg'), sam: require('../../assets/images/demo/kesar-pista-kulfi/pass-no-petals.sam.json') },
   'larder/dry-store': { dish: "Larder", shows: "Larder shelf scan: \"1 sack · 4 tins counted\".", image: require('../../assets/images/demo/larder/dry-store.jpg'), sam: require('../../assets/images/demo/larder/dry-store.sam.json') },
   'larder/walk-in': { dish: "Larder", shows: "Larder shelf scan of the walk-in fridge: \"8 packets counted\".", image: require('../../assets/images/demo/larder/walk-in.jpg'), sam: require('../../assets/images/demo/larder/walk-in.sam.json') },
   'closing/walkin-no-lid': { dish: "Closing round", shows: "Closing, walk-in fridge: \"Container without a lid · Top shelf, left\".", image: require('../../assets/images/demo/closing/walkin-no-lid.jpg'), sam: require('../../assets/images/demo/closing/walkin-no-lid.sam.json') },
@@ -226,6 +235,122 @@ export const DISH_PARTS: Record<string, DemoPart[]> = {
       role: "placement"
     }
   ],
+  "Tandoori Prawns": [
+    {
+      name: "Prawns",
+      prompt: "seafood",
+      colour: "#FF7A3D",
+      role: "count"
+    },
+    {
+      name: "Onion salad",
+      prompt: "sliced onions",
+      colour: "#C77DFF",
+      role: "placement"
+    },
+    {
+      name: "Mint chutney",
+      prompt: "green sauce",
+      colour: "#3BB273",
+      role: "side"
+    },
+    {
+      name: "Lemon wedge",
+      prompt: "lemon wedge",
+      colour: "#FFE34D",
+      role: "placement"
+    }
+  ],
+  "Lamb Shank Rogan Josh": [
+    {
+      name: "Lamb shank",
+      prompt: "meat",
+      colour: "#8E3B2F",
+      role: "main"
+    },
+    {
+      name: "Rogan josh sauce",
+      prompt: "sauce",
+      colour: "#D93A2E",
+      role: "main"
+    },
+    {
+      name: "Saffron rice",
+      prompt: "rice",
+      colour: "#FFB627",
+      role: "side"
+    },
+    {
+      name: "Cream drizzle",
+      prompt: "cream drizzle",
+      colour: "#F5F0E6",
+      role: "placement"
+    },
+    {
+      name: "Coriander",
+      prompt: "green herbs",
+      colour: "#3BB273",
+      role: "placement"
+    }
+  ],
+  "Burrata Mango Chaat": [
+    {
+      name: "Burrata",
+      prompt: "white cheese ball",
+      colour: "#F5F0E6",
+      role: "main"
+    },
+    {
+      name: "Mango cubes",
+      prompt: "mango cubes",
+      colour: "#FFB627",
+      role: "count"
+    },
+    {
+      name: "Salad leaves",
+      prompt: "salad leaves",
+      colour: "#3BB273",
+      role: "side"
+    },
+    {
+      name: "Tamarind chutney",
+      prompt: "brown sauce",
+      colour: "#8E5B2F",
+      role: "placement"
+    },
+    {
+      name: "Pomegranate",
+      prompt: "pomegranate seeds",
+      colour: "#D93A2E",
+      role: "placement"
+    }
+  ],
+  "Kesar Pista Kulfi": [
+    {
+      name: "Kulfi slices",
+      prompt: "kulfi",
+      colour: "#F7E3A1",
+      role: "count"
+    },
+    {
+      name: "Pistachios",
+      prompt: "pistachio",
+      colour: "#9BC53D",
+      role: "placement"
+    },
+    {
+      name: "Rose petals",
+      prompt: "rose petals",
+      colour: "#FF7AB6",
+      role: "placement"
+    },
+    {
+      name: "Falooda",
+      prompt: "noodles",
+      colour: "#F5F0E6",
+      role: "side"
+    }
+  ],
   Larder: [
     {
       name: "Rice sacks",
@@ -308,4 +433,19 @@ export const DISH_PARTS: Record<string, DemoPart[]> = {
       role: "count"
     }
   ]
+};
+
+/** Each dish's icon, drawn by Muse Image from its Golden Plate photo. */
+export const DISH_ICONS: Record<string, number> = {
+  "Chicken Biryani": require('../../assets/images/demo/icons/chicken-biryani.png'),
+  "Mutton Biryani": require('../../assets/images/demo/icons/mutton-biryani.png'),
+  "Paneer Tikka": require('../../assets/images/demo/icons/paneer-tikka.png'),
+  "Butter Chicken": require('../../assets/images/demo/icons/butter-chicken.png'),
+  "Dal Makhani": require('../../assets/images/demo/icons/dal-makhani.png'),
+  "Garlic Naan": require('../../assets/images/demo/icons/garlic-naan.png'),
+  "Gulab Jamun": require('../../assets/images/demo/icons/gulab-jamun.png'),
+  "Tandoori Prawns": require('../../assets/images/demo/icons/tandoori-prawns.png'),
+  "Lamb Shank Rogan Josh": require('../../assets/images/demo/icons/lamb-shank-rogan-josh.png'),
+  "Burrata Mango Chaat": require('../../assets/images/demo/icons/burrata-mango-chaat.png'),
+  "Kesar Pista Kulfi": require('../../assets/images/demo/icons/kesar-pista-kulfi.png'),
 };

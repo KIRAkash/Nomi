@@ -1,18 +1,18 @@
 // A7–A11 · Golden Plate: calibrate the pass, take 3 photos through a quality gate, check SAM 3.1 masks (tap to fix),
 // speak the rules, review the SOP card and icon, choose guest questions, publish. Nothing is live until the chef publishes.
-// SAM 3.1 runs on the chef's own photos through the API and vision worker; later steps are still timed mocks.
+// Every step is live: SAM 3.1 on the chef's own photos, Voice Transcribe + Muse Spark for the spoken rules, Muse Image for the
+// card and icon, Muse Spark for guest questions.
 // Offline, the masks step offers a recorded SAM run on a biryani photo (design/media/golden-plate-demo).
-import { Button, Card, Chip, DishArt, H1, H2, Label, Num, Row, Screen, SquishIn, Squishy, Sub, color, font, guessIcon, shadow, usePop } from '@nomi/ui';
+import { Button, Card, Chip, DishArt, H1, H2, Label, Num, Row, Screen, SquishIn, Squishy, Sub, color, font, guessIcon, shadow } from '@nomi/ui';
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
-import Animated from 'react-native-reanimated';
 
 import { LiveCamera, Shutter, checkPhoto, type CameraHandle, type Photo, type PhotoCheck } from '@/components/camera';
-import { AiTag, HoldToTalk, Segmented, TopBar, WorkLine, useSteps } from '@/components/kit';
+import { AiTag, HoldToTalk, LiveWait, Segmented, TopBar, WorkLine, useSteps, type VoiceNote } from '@/components/kit';
 import { MaskLegend, MaskView, ModeSwitch, type SamRead } from '@/components/masks';
-import { readGolden, tapGolden, type GoldenRead } from '@/lib/api';
+import { drawCard, drawIcon, proposeQuestions, readGolden, sendVoice, tapGolden, type GoldenRead, type Heard } from '@/lib/api';
 import { partsFor, shot, slug } from '@/lib/shots';
 import { COMPONENTS, DISH_STATS, GOLDEN_PHOTO, MASK_PHOTO } from '@/lib/mock';
 
@@ -376,49 +376,64 @@ function Masks({ dish, photos, next }: { dish: string; photos: Photo[]; next: (r
 }
 
 // ---------- 4. Voice rules ----------
-const SPOKEN = 'Rice beech mein, chaar chicken piece upar spread karke. Onions do baje ki taraf, chicken ke upar nahi. Nimbu hamesha rim pe, paanch baje. Raita plate ke bahar, left side.';
-const RULES = [
-  'Rice in the centre',
-  '4 chicken pieces, spread on the rice',
-  'Fried onions at 2 o\'clock, never on the chicken',
-  'Lemon on the rim at 5 o\'clock',
-  'Raita bowl outside the plate, on the left',
-];
-function Rules({ meat, next }: { meat: string; next: () => void }) {
-  const [heard, setHeard] = useState(false);
-  const s = useSteps(2, 900);
-  const [kept, setKept] = useState(RULES.map(() => true));
+const SAMPLE_RULES = { file: require('../../../assets/audio/sample-rules.m4a'), says: 'चावल बीच में, चार पीस ऊपर… (Hindi)' };
+/** The chef talks; Muse Voice Transcribe writes it down and Muse Spark turns it into rules Nomi can check, each read back. */
+function Rules({ parts, next }: { parts: string[]; next: (rules: string[]) => void }) {
+  const [busy, setBusy] = useState(false);
+  const [heard, setHeard] = useState<Heard | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const rules = heard?.rules?.rules ?? [];
+  const [kept, setKept] = useState<boolean[]>([]);
+  const listen = async (note: VoiceNote) => {
+    setBusy(true);
+    setError(null);
+    try {
+      const h = await sendVoice(note.audio, 'rules', parts);
+      if (!h.transcript) { setError("Nomi couldn't hear any words. Try again closer to the phone."); return; }
+      setHeard(h);
+      setKept((h.rules?.rules ?? []).map(() => true));
+    } catch (err) {
+      setError(`Couldn't read that: ${(err as Error).message}`);
+    } finally {
+      setBusy(false);
+    }
+  };
+  const keep = rules.filter((_, k) => kept[k]).map((r) => r.text);
   return (
     <View style={{ gap: 14 }}>
       <H1>Say how it should look</H1>
       <Sub>Talk like you would to a new cook. Hindi, English or both.</Sub>
       <Card style={{ paddingVertical: 22 }}>
-        <HoldToTalk label={heard ? 'Hold to say it again' : 'Hold to talk'} onDone={() => { setHeard(true); s.start(); }} />
+        <HoldToTalk label={heard ? 'Hold to say it again' : 'Hold to talk'} onDone={listen} disabled={busy} sample={SAMPLE_RULES} />
       </Card>
-      {heard && (
+      {busy && (
         <Card style={{ gap: 10 }}>
-          <WorkLine state={s.state(0)} text="Writing down what you said" model="Voice Transcribe" />
-          <WorkLine state={s.state(1)} text="Turning it into rules Nomi can check" model="Muse Spark" />
+          <LiveWait text="Writing down what you said, then turning it into rules" model="Voice Transcribe" typical="15–25 s" />
         </Card>
       )}
-      {s.done && (
+      {error && <Text style={{ fontFamily: font.bodyBold, color: color.tomatoInk }}>{error}</Text>}
+      {heard && !busy && (
         <SquishIn style={{ gap: 10 }}>
-          <Card soft style={{ gap: 4 }}>
-            <Label>You said</Label>
-            <Text style={{ fontFamily: font.body, fontSize: 14, color: color.ink, fontStyle: 'italic' }}>“{swap(SPOKEN, meat)}”</Text>
+          <Card soft style={{ gap: 6 }}>
+            <Row style={{ justifyContent: 'space-between' }}><Label>You said</Label><AiTag model="Voice Transcribe" ms={heard.transcribe_ms} /></Row>
+            <Text style={{ fontFamily: font.body, fontSize: 14, color: color.ink, fontStyle: 'italic' }}>“{heard.transcript}”</Text>
           </Card>
-          <Label>Nomi will check · tap to drop one</Label>
-          {RULES.map((r, k) => (
-            <Squishy key={r} accessibilityRole="checkbox" accessibilityState={{ checked: kept[k] }} onPress={() => setKept((x) => x.map((v, j) => (j === k ? !v : v)))}
+          <Row style={{ justifyContent: 'space-between' }}><Label>Nomi will check · tap to drop one</Label><AiTag model="Muse Spark" ms={heard.spark_ms} /></Row>
+          {rules.map((r, k) => (
+            <Squishy key={`${k}-${r.text}`} accessibilityRole="checkbox" accessibilityState={{ checked: kept[k] }} onPress={() => setKept((x) => x.map((v, j) => (j === k ? !v : v)))}
               style={{ flexDirection: 'row', alignItems: 'center', gap: 10, backgroundColor: kept[k] ? color.card : color.bg, borderRadius: 18, padding: 12, ...shadow(1), opacity: kept[k] ? 1 : 0.5 }}>
               <View style={{ width: 26, height: 26, borderRadius: 9, backgroundColor: kept[k] ? color.ink : color.saffronSoft, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: color.saffron, fontFamily: font.bodyBold }}>{kept[k] ? '✓' : ''}</Text>
               </View>
-              <Text style={{ flex: 1, fontFamily: font.bodyBold, fontSize: 14, color: color.ink, textDecorationLine: kept[k] ? 'none' : 'line-through' }}>{swap(r, meat)}</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontFamily: font.bodyBold, fontSize: 14, color: color.ink, textDecorationLine: kept[k] ? 'none' : 'line-through' }}>{r.text}</Text>
+                {r.translated_from && <Text style={{ fontFamily: font.body, fontSize: 12, color: color.ink2 }}>from “{r.translated_from}”</Text>}
+              </View>
             </Squishy>
           ))}
-          <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: color.ink2 }}>Translated from Hinglish. Read back to you before anything is saved.</Text>
-          <Button title={`Keep ${kept.filter(Boolean).length} rules`} onPress={next} />
+          {rules.length === 0 && <Sub>Nomi didn&apos;t hear a rule it can check. Say where each part goes, or how many pieces.</Sub>}
+          <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: color.ink2 }}>Read back to you before anything is saved.</Text>
+          <Button title={`Keep ${keep.length} rule${keep.length === 1 ? '' : 's'}`} disabled={keep.length === 0} onPress={() => next(keep)} />
         </SquishIn>
       )}
     </View>
@@ -426,28 +441,42 @@ function Rules({ meat, next }: { meat: string; next: () => void }) {
 }
 
 // ---------- 5. SOP card and dish icon ----------
-/** The plating card: the chef's own photo with a marker on each part where SAM 3.1 measured it (sample photo otherwise). */
-function CardStep({ dish, photo, read, next }: { dish: string; photo?: string; read?: SamRead | null; next: () => void }) {
-  const s = useSteps(2, 1100);
-  const [v, setV] = useState(1);
-  const pop = usePop(s.done, 1.03);
-  const { start } = s;
-  useEffect(() => { start(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+type Drawn = { image: string | null; ms: number } | 'busy' | { error: string };
+const isDrawn = (d: Drawn): d is { image: string | null; ms: number } => typeof d === 'object' && 'ms' in d;
+
+/** Muse Image draws the plating card and the dish icon from the chef's own photo, live. Meanwhile, and as a fallback, the
+ * card shows the photo with a marker on each part where SAM 3.1 measured it. */
+function CardStep({ dish, photo, read, rules, next }: { dish: string; photo?: Photo; read?: SamRead | null; rules: string[]; next: () => void }) {
+  const [card, setCard] = useState<Drawn>('busy');
+  const [icon, setIcon] = useState<Drawn>('busy');
+  const [round, setRound] = useState(0);
+  useEffect(() => {
+    if (!photo) return;
+    let on = true;
+    const draw = (run: () => Promise<{ image: string | null; ms: number }>, set: (d: Drawn) => void) => {
+      set('busy');
+      run().then((r) => on && set(r)).catch((err: Error) => on && set({ error: err.message }));
+    };
+    if (round === 0) draw(() => drawCard(photo.dataUrl, rules, dish), setCard);
+    draw(() => drawIcon(photo.dataUrl), setIcon);
+    return () => { on = false; };
+  }, [photo, rules, dish, round]);
+  const list = rules.length ? rules : RULES_FALLBACK.map((r) => swap(r, meatOf(dish)));
   return (
     <View style={{ gap: 14 }}>
       <H1>Plating card and icon</H1>
       <Sub>Drawn from your golden photo and rules. Staff see this card; guests see the icon.</Sub>
-      {!s.done ? (
-        <Card style={{ gap: 10 }}>
-          <WorkLine state={s.state(0)} text="Drawing the plating card with numbered steps" model="Muse Image" />
-          <WorkLine state={s.state(1)} text="Drawing the dish icon in the house style" model="Muse Image" />
-        </Card>
-      ) : (
-        <Animated.View style={[{ gap: 14 }, pop]}>
-          <Card style={{ gap: 10, padding: 12 }}>
+      <Card style={{ gap: 10, padding: 12 }}>
+        {photo && isDrawn(card) && card.image ? (
+          <>
+            <Image source={card.image} style={{ width: '100%', aspectRatio: 2 / 3, borderRadius: 20 }} contentFit="contain" />
+            <AiTag model="Muse Image" ms={card.ms} />
+          </>
+        ) : (
+          <>
             {photo && read ? (
               <View style={{ width: '100%', aspectRatio: read.size.w / read.size.h, borderRadius: 20, overflow: 'hidden' }}>
-                <Image source={photo} style={{ width: '100%', height: '100%' }} contentFit="fill" />
+                <Image source={photo.uri} style={{ width: '100%', height: '100%' }} contentFit="fill" />
                 {read.parts.filter((p) => p.found && p.centre).map((p, k) => (
                   <View key={p.name} style={{ position: 'absolute', left: `${(p.centre![0] / read.size.w) * 100}%`, top: `${(p.centre![1] / read.size.h) * 100}%`, transform: [{ translateX: -15 }, { translateY: -15 }], flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                     <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: p.colour, borderWidth: 3, borderColor: color.ink, alignItems: 'center', justifyContent: 'center' }}>
@@ -460,64 +489,80 @@ function CardStep({ dish, photo, read, next }: { dish: string; photo?: string; r
                 ))}
               </View>
             ) : (
-            <View style={{ height: 230, borderRadius: 20, overflow: 'hidden' }}>
-              <Image source={GOLDEN_PHOTO} style={{ width: '100%', height: '100%' }} contentFit="cover" />
-              {[[46, 46], [30, 70], [70, 22], [86, 78], [8, 46]].map(([x, y], k) => (
-                <View key={k} style={{ position: 'absolute', left: `${x}%`, top: `${y}%`, width: 30, height: 30, borderRadius: 15, backgroundColor: color.saffron, borderWidth: 3, borderColor: color.ink, alignItems: 'center', justifyContent: 'center' }}>
-                  <Num style={{ fontSize: 14 }}>{k + 1}</Num>
-                </View>
-              ))}
-            </View>
+              <View style={{ height: 230, borderRadius: 20, overflow: 'hidden' }}>
+                <Image source={GOLDEN_PHOTO} style={{ width: '100%', height: '100%' }} contentFit="cover" />
+              </View>
             )}
-            {RULES.map((r, k) => <Text key={r} style={{ fontFamily: font.bodySemi, fontSize: 14, color: color.ink }}><Text style={{ fontFamily: font.bodyBold }}>{k + 1}.</Text> {swap(r, meatOf(dish))}</Text>)}
-            <AiTag model="Muse Image" />
-          </Card>
-          <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-            <View style={{ transform: [{ rotate: `${(v - 1) * 8}deg` }] }}><DishArt kind={guessIcon(dish)} size={92} /></View>
-            <View style={{ flex: 1, gap: 6 }}>
-              <H2 style={{ fontSize: 17 }}>Dish icon</H2>
-              <Sub style={{ fontSize: 13 }}>Same style as every other dish on your menu.</Sub>
-              <Button small kind="white" title="Draw again" style={{ alignSelf: 'flex-start' }} onPress={() => setV(v + 1)} />
-            </View>
-          </Card>
-          <Button title="Looks right" onPress={next} />
-        </Animated.View>
-      )}
+            {list.map((r, k) => <Text key={r} style={{ fontFamily: font.bodySemi, fontSize: 14, color: color.ink }}><Text style={{ fontFamily: font.bodyBold }}>{k + 1}.</Text> {r}</Text>)}
+            {photo && card === 'busy' && <LiveWait text="Muse Image is drawing the numbered plating card" model="Muse Image" typical="15–25 s" />}
+            {typeof card === 'object' && 'error' in card && <Sub style={{ fontSize: 13 }}>Muse Image couldn&apos;t draw the card right now ({card.error}). This marked photo is used instead.</Sub>}
+          </>
+        )}
+      </Card>
+      <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+        <View style={{ width: 96, height: 96, borderRadius: 26, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: color.bg }}>
+          {isDrawn(icon) && icon.image ? <Image source={icon.image} style={{ width: 96, height: 96 }} contentFit="cover" /> : <DishArt kind={guessIcon(dish)} size={80} />}
+        </View>
+        <View style={{ flex: 1, gap: 6 }}>
+          <H2 style={{ fontSize: 17 }}>Dish icon</H2>
+          {icon === 'busy' && photo ? <LiveWait text="Drawing it in the house style" model="Muse Image" typical="15–25 s" />
+            : isDrawn(icon) ? <AiTag model="Muse Image" ms={icon.ms} />
+            : <Sub style={{ fontSize: 13 }}>Same style as every other dish on your menu.</Sub>}
+          {photo && icon !== 'busy' && <Button small kind="white" title="Draw again" style={{ alignSelf: 'flex-start' }} onPress={() => setRound((r) => r + 1)} />}
+        </View>
+      </Card>
+      <Button title="Looks right" disabled={card === 'busy' && !!photo} onPress={next} />
     </View>
   );
 }
 
 // ---------- 6. Guest questions ----------
-const PROPOSED = [
+type Proposed = { text: string; no: string; checks: string };
+const PROPOSED: Proposed[] = [
   { text: 'Was the portion enough?', no: 'Too little', checks: 'rice 41–43% of plate' },
   { text: 'Enough chicken pieces?', no: 'Fewer', checks: '4 pieces' },
   { text: 'Was it hot?', no: 'Lukewarm', checks: 'temperature' },
   { text: 'Was the raita fresh?', no: 'Not really', checks: 'raita bowl' },
   { text: 'Crispy onions on top?', no: 'Missing', checks: 'onions at 2 o\'clock' },
 ];
-function Questions({ meat, next }: { meat: string; next: () => void }) {
-  const [on, setOn] = useState([true, true, true, false, false]);
+/** Muse Spark proposes questions tied to what this Golden Plate checks; the chef keeps up to 3. */
+function Questions({ dish, parts, rules, read, next }: { dish: string; parts: string[]; rules: string[]; read: SamRead | null; next: (n: number) => void }) {
+  const [qs, setQs] = useState<{ list: Proposed[]; ms?: number } | null>(null);
+  const [on, setOn] = useState<boolean[]>([]);
+  useEffect(() => {
+    let live = true;
+    const counts = Object.fromEntries((read?.parts ?? []).filter((p) => p.count > 1).map((p) => [p.name, p.count]));
+    proposeQuestions({ name: dish, components: parts, rules, counts })
+      .then((r) => ({ list: r.questions.map((q) => ({ text: q.text, no: q.no_label, checks: q.checks })), ms: r.ms }), () => null)
+      .then((got) => {
+        if (!live) return;
+        const shown = got?.list ?? PROPOSED.map((q) => ({ ...q, text: swap(q.text, meatOf(dish)) }));
+        setQs({ list: shown, ms: got?.ms });
+        setOn(shown.map((_, k) => k < 3));
+      });
+    return () => { live = false; };
+  }, [dish, parts, rules, read]);
   const n = on.filter(Boolean).length;
   return (
     <View style={{ gap: 14 }}>
       <H1>What should guests be asked?</H1>
       <Sub>Nomi suggested these from your rules. Keep up to 3. Each answer sits next to that shift’s plates.</Sub>
-      <AiTag model="Muse Spark" />
-      {PROPOSED.map((q, k) => (
+      {!qs ? <LiveWait text="Muse Spark is writing questions from your rules" model="Muse Spark" typical="10 s" /> : <AiTag model="Muse Spark" ms={qs.ms} />}
+      {qs?.list.map((q, k) => (
         <Squishy key={q.text} accessibilityRole="checkbox" accessibilityState={{ checked: on[k], disabled: !on[k] && n >= 3 }}
           onPress={() => setOn((x) => x.map((v, j) => (j === k ? (v ? false : n < 3) : v)))}
           style={{ backgroundColor: on[k] ? color.saffronSoft : color.card, borderRadius: 20, padding: 14, gap: 4, borderWidth: 3, borderColor: on[k] ? color.ink : 'transparent', ...shadow(1), opacity: !on[k] && n >= 3 ? 0.5 : 1 }}>
-          <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{swap(q.text, meat)}</Text>
+          <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{q.text}</Text>
           <Text style={{ fontFamily: font.body, fontSize: 12, color: color.ink2 }}>Yes / {q.no} · checks {q.checks}</Text>
         </Squishy>
       ))}
-      <Button title={`Keep ${n} question${n === 1 ? '' : 's'}`} disabled={n === 0} onPress={next} />
+      {qs && <Button title={`Keep ${n} question${n === 1 ? '' : 's'}`} disabled={n === 0} onPress={() => next(n)} />}
     </View>
   );
 }
 
 // ---------- 7. Publish ----------
-function Publish({ dish, version }: { dish: string; version: number }) {
+function Publish({ dish, version, facts }: { dish: string; version: number; facts: { photos: number; parts: number; found: number; rules: number; questions: number } }) {
   const [live, setLive] = useState(false);
   if (live)
     return (
@@ -526,7 +571,7 @@ function Publish({ dish, version }: { dish: string; version: number }) {
           <DishArt kind={guessIcon(dish)} size={110} />
         </View>
         <H1 style={{ textAlign: 'center' }}>{dish} is protected</H1>
-        <Sub style={{ textAlign: 'center' }}>From the next plate on, the pass checks it against Golden Plate v{version}. Staff got the new card; guests see the icon and your 3 questions.</Sub>
+        <Sub style={{ textAlign: 'center' }}>From the next plate on, the pass checks it against Golden Plate v{version}. Staff got the new card; guests see the icon and your {facts.questions} question{facts.questions === 1 ? '' : 's'}.</Sub>
         <Button title="Back to dishes" style={{ alignSelf: 'stretch' }} onPress={() => router.replace('/dishes')} />
       </SquishIn>
     );
@@ -534,11 +579,11 @@ function Publish({ dish, version }: { dish: string; version: number }) {
     <View style={{ gap: 14 }}>
       <H1>Ready to publish</H1>
       <Card style={{ gap: 10 }}>
-        <Check ok text="3 photos passed the photo check and agree" />
-        <Check ok text="5 parts found, all 80%+ sure after your fix" />
-        <Check ok text="5 rules read back and kept" />
+        <Check ok text={`${facts.photos} photo${facts.photos === 1 ? '' : 's'} passed the photo check`} />
+        <Check ok={facts.found === facts.parts} text={`${facts.found} of ${facts.parts} parts found by SAM 3.1`} />
+        <Check ok={facts.rules > 0} text={`${facts.rules} rule${facts.rules === 1 ? '' : 's'} read back and kept`} />
         <Check ok text="Plating card and icon drawn" />
-        <Check ok text="3 guest questions chosen" />
+        <Check ok={facts.questions > 0} text={`${facts.questions} guest question${facts.questions === 1 ? '' : 's'} chosen`} />
       </Card>
       <Card soft style={{ backgroundColor: color.saffronSoft }}>
         <Text style={{ fontFamily: font.bodyBold, color: color.saffronInk, fontSize: 14 }}>Publishing makes this the standard for every shift. The previous version is kept and you can go back to it.</Text>
@@ -548,6 +593,14 @@ function Publish({ dish, version }: { dish: string; version: number }) {
   );
 }
 
+const RULES_FALLBACK = [
+  'Rice in the centre',
+  '4 chicken pieces, spread on the rice',
+  'Fried onions at 2 o\'clock, never on the chicken',
+  'Lemon on the rim at 5 o\'clock',
+  'Raita bowl outside the plate, on the left',
+];
+
 export default function GoldenPlate() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const dish = DISH_STATS.find((d) => d.id === id) ?? DISH_STATS[0];
@@ -555,6 +608,9 @@ export default function GoldenPlate() {
   const [step, setStep] = useState(dish.golden === 'none' ? 0 : 1);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [read, setRead] = useState<SamRead | null>(null);
+  const [rules, setRules] = useState<string[]>([]);
+  const [asked, setAsked] = useState(3);
+  const parts = useMemo(() => partsFor(dish.name).map((p) => p.name), [dish.name]);
   const next = () => setStep((x) => Math.min(STEPS.length - 1, x + 1));
   return (
     <Screen scroll style={{ paddingBottom: 40 }}>
@@ -564,10 +620,13 @@ export default function GoldenPlate() {
         {step === 0 && <Calibrate next={next} />}
         {step === 1 && <Photos dish={dish.name} initial={photos} next={(p) => { setPhotos(p); next(); }} />}
         {step === 2 && (photos.length ? <Masks dish={dish.name} photos={photos} next={(r) => { setRead(r); next(); }} /> : <SampleMasks meat={meatOf(dish.name)} next={next} />)}
-        {step === 3 && <Rules meat={meatOf(dish.name)} next={next} />}
-        {step === 4 && <CardStep dish={dish.name} photo={photos[0]?.uri} read={read} next={next} />}
-        {step === 5 && <Questions meat={meatOf(dish.name)} next={next} />}
-        {step === 6 && <Publish dish={dish.name} version={version} />}
+        {step === 3 && <Rules parts={parts} next={(r) => { setRules(r); next(); }} />}
+        {step === 4 && <CardStep dish={dish.name} photo={photos[0]} read={read} rules={rules} next={next} />}
+        {step === 5 && <Questions dish={dish.name} parts={parts} rules={rules} read={read} next={(n) => { setAsked(n); next(); }} />}
+        {step === 6 && <Publish dish={dish.name} version={version} facts={{
+          photos: photos.length || 3, parts: read?.parts.length ?? parts.length, found: read?.parts.filter((p) => p.found).length ?? parts.length,
+          rules: rules.length || RULES_FALLBACK.length, questions: asked,
+        }} />}
       </SquishIn>
       {step > 0 && step < 6 && (
         <Pressable accessibilityRole="button" onPress={() => setStep(step - 1)} style={{ alignSelf: 'center', minHeight: 44, justifyContent: 'center', paddingHorizontal: 16 }}>

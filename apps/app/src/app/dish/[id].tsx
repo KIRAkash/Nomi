@@ -2,13 +2,15 @@
 import { Button, Card, Chip, Face, H2, Label, Num, Row, Screen, SquishIn, Sub, color, font } from '@nomi/ui';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useState } from 'react';
-import { Text, View } from 'react-native';
+import { Image } from 'expo-image';
+import { Pressable, Text, View } from 'react-native';
 
 import { DishIcon } from '@/components/dish-icon';
 import { AiTag, Bars, DAYS, Empty, Score, Segmented, Spark, TopBar, Why, scoreTone } from '@/components/kit';
 import { Compare, GoldenPhoto, partsFromReasons } from '@/components/plate';
 import { ANSWER_STATS, CAPTURES, DISH_STATS, NOTES, PICKS, SOP_CARDS } from '@/lib/mock';
 import { can, useSession } from '@/lib/session';
+import { shot } from '@/lib/shots';
 
 export default function DishDetail() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -16,6 +18,9 @@ export default function DishDetail() {
   const d = DISH_STATS.find((x) => x.id === id) ?? DISH_STATS[0];
   const [tab, setTab] = useState<'plates' | 'guests' | 'versions'>('plates');
   const caps = CAPTURES.filter((c) => c.dishId === d.id);
+  // One drag-to-compare at a time: each holds two photos with their masks, and several at once made phones stutter.
+  const [openCap, setOpenCap] = useState<string | null>(null);
+  const shownCap = openCap ?? caps.find((c) => c.reasons.length)?.id ?? null;
   const notes = NOTES.filter((n) => n.faces.some((f) => f.dish === d.name));
   const sop = SOP_CARDS.find((s) => s.dishId === d.id);
   const byQ = ANSWER_STATS[d.id] ?? [];
@@ -108,9 +113,18 @@ export default function DishDetail() {
               <H2 style={{ fontSize: 16 }}>{c.day} {c.shift} · {c.time}</H2>
               <AiTag model="SAM 3.1" />
             </Row>
-            {c.reasons.length ? <Compare score={c.score} reasons={c.reasons} when={c.time} dish={d.name} shotKey={c.shot} {...partsFromReasons(c.reasons)} /> : (
-              <Row><Score value={c.score} size={44} /><Sub style={{ fontSize: 14 }}>Matched the Golden Plate.</Sub></Row>
-            )}
+            {c.reasons.length && shownCap === c.id ? <Compare score={c.score} reasons={c.reasons} when={c.time} dish={d.name} shotKey={c.shot} {...partsFromReasons(c.reasons)} />
+              : c.reasons.length ? (
+                <Pressable accessibilityRole="button" accessibilityLabel={`Compare the ${c.time} plate with the Golden Plate`} onPress={() => setOpenCap(c.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  {shot(c.shot) ? <Image source={shot(c.shot)!.image} style={{ width: 64, height: 64, borderRadius: 16 }} contentFit="cover" /> : <Score value={c.score} size={44} />}
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={{ fontFamily: font.bodyBold, fontSize: 14, color: color.ink }}>Score {c.score} · {c.reasons.join(', ')}</Text>
+                    <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk }}>Compare with the Golden Plate ›</Text>
+                  </View>
+                </Pressable>
+              ) : (
+                <Row><Score value={c.score} size={44} /><Sub style={{ fontSize: 14 }}>Matched the Golden Plate.</Sub></Row>
+              )}
           </Card>
         </SquishIn>
       )) : <Empty title="No plates scored yet" sub="Plates appear here once the pass camera sees this dish." />)}

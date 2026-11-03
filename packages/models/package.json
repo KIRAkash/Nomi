@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit",
     "smoke": "node --env-file=../../.env --experimental-strip-types src/smoke.ts",
     "probe": "node --env-file=../../.env --experimental-strip-types src/probe.ts",
-    "demo:media": "node --env-file=../../.env --experimental-strip-types src/demo-media.ts"
+    "demo:media": "tsx --env-file=../../.env src/demo-media.ts"
   },
   "dependencies": {
     "@nomi/shared": "*",
