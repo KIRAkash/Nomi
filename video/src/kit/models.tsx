@@ -3,7 +3,7 @@
 import { Img, interpolate, staticFile, useCurrentFrame } from 'remotion';
 
 import { c, display, type } from '../theme';
-import { ramp } from './motion';
+import { blur, ramp } from './motion';
 
 export type Model = 'wonder' | 'spark' | 'image' | 'voice' | 'glimmer' | 'sam';
 export const MODELS: { id: Model; name: string; mark: 'muse' | 'meta' }[] = [
@@ -56,7 +56,7 @@ export function ModelLockup({ model, doing, at = 0, out, align = 'left' }: { mod
   const q = out === undefined ? 0 : ramp(frame, out, out + 12);
   const line = ramp(frame, at + 8, at + 30);
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : 'flex-start', gap: 18, opacity: p * (1 - q), filter: `blur(${(1 - p) * 10 + q * 10}px)` }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: align === 'center' ? 'center' : 'flex-start', gap: 18, opacity: p * (1 - q), filter: blur((1 - p) * 10 + q * 10) }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 22, transform: `translateX(${(1 - p) * -30}px)` }}>
         <Mark kind={m.mark} size={64} />
         <span style={{ fontFamily: display, fontSize: type.title, fontWeight: 800, color: c.text, letterSpacing: '-0.035em' }}>{m.name}</span>

@@ -3,7 +3,7 @@
 import { AbsoluteFill, Audio, Img, interpolate, random, Sequence, staticFile, useCurrentFrame } from 'remotion';
 
 import { AT, DRIFTS, DrawnPlate, GOLDEN, GRID, type PlateSpec } from '../kit/drawn';
-import { Stage, Words, inOut, ramp } from '../kit/motion';
+import { blur, Stage, Words, inOut, ramp } from '../kit/motion';
 import { VO_AT, voice } from '../kit/vo';
 import { c, display, type } from '../theme';
 
@@ -54,7 +54,7 @@ export function Problem() {
   return (
     <Stage>
       <Sequence from={VO_AT} layout="none"><Audio src={staticFile(V.file)} /></Sequence>
-      <AbsoluteFill style={{ transform: `scale(${pull - fade * 0.08})`, opacity: 1 - fade * 0.88, filter: `blur(${fade * 6}px)` }}>
+      <AbsoluteFill style={{ transform: `scale(${pull - fade * 0.08})`, opacity: 1 - fade * 0.9 }}>
         {cells.map((cell, i) => {
           if (i === 10) return null;
           const turn = (f - T.grid) * 0.08 * (i % 2 ? 1 : -1);
@@ -69,7 +69,7 @@ export function Problem() {
           );
         })}
         <DrawnPlate spec={GOLDEN} raita={toGrid < 0.5} x={heroX} y={heroY} d={heroD} rot={heroRot}
-          style={{ opacity: arrive, filter: `blur(${(1 - arrive) * 18}px) drop-shadow(0 ${30 - toGrid * 22}px ${60 - toGrid * 40}px rgba(70,50,10,0.24))` }} />
+          style={{ opacity: arrive, filter: [blur((1 - arrive) * 18), `drop-shadow(0 ${30 - toGrid * 22}px ${60 - toGrid * 40}px rgba(70,50,10,0.24))`].filter(Boolean).join(' ') }} />
         <div style={{ position: 'absolute', left: heroX - heroD / 2, top: heroY - heroD / 2, width: heroD, height: heroD, borderRadius: '50%', opacity: 1 - toGrid,
           background: `linear-gradient(110deg, transparent ${sweep * 100 - 14}%, rgba(255,236,190,0.28) ${sweep * 100}%, transparent ${sweep * 100 + 14}%)`, mixBlendMode: 'screen' }} />
       </AbsoluteFill>
@@ -85,7 +85,7 @@ export function Problem() {
         const gone = ramp(f, a + 44 + random(`g${i}`) * 26, a + 76 + random(`g${i}`) * 26, inOut);
         return (
           <div key={i} style={{ position: 'absolute', left: m.x, top: m.y - (f - a) * 0.5, fontFamily: display, fontSize: type.line, fontWeight: 500, color: c.text,
-            opacity: p * (1 - gone) * 0.85, filter: `blur(${(1 - p) * 8 + gone * 14}px)`, letterSpacing: '-0.02em' }}>{m.t}</div>
+            opacity: p * (1 - gone) * 0.85, filter: blur((1 - p) * 8 + gone * 14), letterSpacing: '-0.02em' }}>{m.t}</div>
         );
       })}
       <Words text="Guests notice. Few say so." at={T.guests} out={T.which - 14} size={type.headline} style={{ position: 'absolute', left: 120, right: 120, top: 470, justifyContent: 'center' }} />

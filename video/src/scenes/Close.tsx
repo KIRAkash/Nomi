@@ -5,7 +5,7 @@ import { AbsoluteFill, Audio, Img, OffthreadVideo, Sequence, staticFile, useCurr
 import { CREDITS } from '../credits';
 import { DrawnPlate, GOLDEN } from '../kit/drawn';
 import { MODELS, Mark } from '../kit/models';
-import { Reveal, Stage, Words, inOut, ramp, useSpring } from '../kit/motion';
+import { blur, Reveal, Stage, Words, inOut, ramp, useSpring } from '../kit/motion';
 import { VO_AT, voice } from '../kit/vo';
 import { Sfx } from '../kit/sfx';
 import { brand, c, display, sec, type } from '../theme';
@@ -34,7 +34,7 @@ export function Close() {
 
       {/* the chef's plate, back exactly as designed */}
       <DrawnPlate spec={GOLDEN} raita x={px} y={py} d={d} style={{
-        opacity: plateIn * (1 - toCard), filter: `blur(${(1 - plateIn) * 16}px)`,
+        opacity: plateIn * (1 - toCard), filter: blur((1 - plateIn) * 16),
         transform: `scale(${1.15 - plateIn * 0.15}) rotate(${-90 + f * 0.04}deg)`,
       }} />
       <Words text="Every plate," at={T.plate + 6} out={T.card - 12} size={type.headline} style={{ position: 'absolute', left: 0, right: 0, top: 780, justifyContent: 'center' }} />

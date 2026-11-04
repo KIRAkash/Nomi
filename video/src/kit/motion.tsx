@@ -8,6 +8,10 @@ export const ease = Easing.bezier(0.16, 1, 0.3, 1);
 export const inOut = Easing.bezier(0.65, 0, 0.35, 1);
 
 /** 0→1 between two frames with the house ease; clamps outside. */
+/** A CSS blur filter, or none at all when it would be 0: even blur(0px) keeps a filtered layer, and big ones of those made
+ * Chrome garble frames while rendering. */
+export const blur = (px: number) => (px > 0.05 ? `blur(${px}px)` : undefined);
+
 export const ramp = (f: number, from: number, to: number, e = ease) =>
   interpolate(f, [from, to], [0, 1], { easing: e, extrapolateLeft: 'clamp', extrapolateRight: 'clamp' });
 
@@ -56,7 +60,7 @@ export function Words({ text, at = 0, out, size = type.headline, weight = 800, c
             display: 'inline-block',
             opacity: p * (1 - leave),
             transform: `translateY(${(1 - p) * 0.42 * size - leave * 0.25 * size}px)`,
-            filter: `blur(${(1 - p) * 14 + leave * 16}px)`,
+            filter: blur((1 - p) * 14 + leave * 16),
             color: accent?.includes(w.replace(/[.,]/g, '')) ? c.saffron : undefined,
           }}>{w}</span>
         );
@@ -71,7 +75,7 @@ export function Reveal({ at = 0, out, children, style, rise = 30 }: { at?: numbe
   const p = ramp(frame, at, at + 24);
   const q = out === undefined ? 0 : ramp(frame, out, out + 16, inOut);
   return (
-    <div style={{ opacity: p * (1 - q), transform: `translateY(${(1 - p) * rise}px) scale(${0.98 + 0.02 * p - 0.02 * q})`, filter: `blur(${(1 - p) * 8 + q * 10}px)`, ...style }}>
+    <div style={{ opacity: p * (1 - q), transform: `translateY(${(1 - p) * rise}px) scale(${0.98 + 0.02 * p - 0.02 * q})`, filter: blur((1 - p) * 8 + q * 10), ...style }}>
       {children}
     </div>
   );

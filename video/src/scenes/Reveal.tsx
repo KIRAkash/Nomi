@@ -3,7 +3,7 @@
 import { AbsoluteFill, Audio, Img, interpolate, random, Sequence, staticFile, useCurrentFrame } from 'remotion';
 
 import { ModelRail } from '../kit/models';
-import { Stage, Words, ease, ramp, useSpring } from '../kit/motion';
+import { blur, Stage, Words, ease, ramp, useSpring } from '../kit/motion';
 import { VO_AT, voice } from '../kit/vo';
 import { Sfx } from '../kit/sfx';
 import { brand, c, display, type } from '../theme';
@@ -36,7 +36,7 @@ export function Reveal() {
       <AbsoluteFill style={{ background: `radial-gradient(30% 30% at 50% 45%, rgba(255,214,140,${flash * 0.5}), transparent 70%)` }} />
       <Img src={staticFile('brand/nomi.png')} style={{ position: 'absolute', left: LOGO.x, top: LOGO.y, width: LOGO.size, height: LOGO.size, transform: `translateY(${Math.sin(f / 34) * 7}px) scale(${pop * (1 + Math.sin(f / 40) * 0.015)}) rotate(${(1 - pop) * -30 + Math.sin(f / 52) * 3}deg)` }} />
       <div style={{ position: 'absolute', left: LOGO.x + LOGO.size + 30, top: LOGO.y + 20, fontFamily: brand, fontWeight: 600, fontSize: 230, color: c.text, letterSpacing: '-0.02em', lineHeight: 1,
-        opacity: ramp(f, NAME + 8, NAME + 26), transform: `translateX(${(1 - ramp(f, NAME + 8, NAME + 30)) * -40}px)`, filter: `blur(${(1 - ramp(f, NAME + 8, NAME + 26)) * 12}px)` }}>Nomi</div>
+        opacity: ramp(f, NAME + 8, NAME + 26), transform: `translateX(${(1 - ramp(f, NAME + 8, NAME + 30)) * -40}px)`, filter: blur((1 - ramp(f, NAME + 8, NAME + 26)) * 12) }}>Nomi</div>
       <div style={{ position: 'absolute', left: 0, right: 0, top: 250, textAlign: 'center', fontFamily: display, fontSize: type.title, fontWeight: 700, color: c.sub, letterSpacing: '-0.03em', opacity: lead, transform: `translateY(${(1 - lead) * 20}px)` }}>Presenting</div>
       <Sequence from={VO_AT} layout="none"><Audio src={staticFile(V.file)} /></Sequence>
       <Words text="Every plate, the way the chef meant it." at={V.at(1)} size={type.line} weight={500} color={c.sub} stagger={2} style={{ position: 'absolute', left: 0, right: 0, top: 760, justifyContent: 'center' }} />

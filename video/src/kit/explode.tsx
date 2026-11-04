@@ -3,7 +3,7 @@
 import { Img, useCurrentFrame } from 'remotion';
 
 import { c, display, type } from '../theme';
-import { GRID, layerUrl } from './drawn';
+import { GRID, layerFile } from './drawn';
 import { ramp } from './motion';
 
 export const LAYERS = [
@@ -27,7 +27,7 @@ export function PlateExplode({ d, p, tilt = 58, spin = 0, lift = 0.2, labelsAt, 
   const w = 1000 * k, h = 1000 * k;
   const gap = d * lift;
   const layer = (file: 'plate' | (typeof LAYERS)[number]['file'], z: number) => (
-    <Img src={layerUrl(file)} style={{ position: 'absolute', left: -GRID.cx * k, top: -GRID.cy * k, width: w, height: h, transform: `translateZ(${z}px)`,
+    <Img src={layerFile(file)} style={{ position: 'absolute', left: -GRID.cx * k, top: -GRID.cy * k, width: w, height: h, transform: `translateZ(${z}px)`,
       filter: z > 0 ? `drop-shadow(0 ${8 + z * 0.05}px ${10 + z * 0.08}px rgba(70,50,10,0.24))` : undefined }} />
   );
   return (

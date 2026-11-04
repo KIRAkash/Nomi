@@ -58,14 +58,14 @@ export function Pass() {
           const move = ramp(f, start, start + 30, inOut);
           const drop = fr.keep ? 0 : ramp(f, start + 30, start + 46, inOut);
           const through = fr.keep ? ramp(f, start + 30, start + 56, inOut) : 0;
-          const blur = fr.face ? ramp(f, start + 26, start + 40) : 0;
+          const blur = fr.face ? ramp(f, start + 26, start + 40) : 0; // the pre-blurred face fades in over the sharp one
           return (
             <div key={fr.src} style={{ position: 'absolute', left: interpolate(move, [0, 1], [-60, 150]) + through * 330, top: 40 + drop * 260, width: 300, height: 200,
               opacity: (move > 0 ? 1 : 0) * (1 - drop) * (1 - ramp(f, start + 90, start + 110)), transform: `rotate(${drop * 8}deg)` }}>
               <Img src={staticFile(`media/${fr.src}.jpg`)} style={{ width: 300, height: 200, objectFit: 'cover', borderRadius: 14, boxShadow: '0 20px 40px rgba(70,50,10,0.24)',
                 outline: through > 0 ? `4px solid ${c.mint}` : 'none' }} />
               {/* the face, blurred where it sits in the frame (top right) */}
-              {fr.face && <div style={{ position: 'absolute', left: 150, top: 0, width: 150, height: 66, borderRadius: '0 14px 30px 30px', backdropFilter: `blur(${blur * 14}px)`, WebkitBackdropFilter: `blur(${blur * 14}px)` }} />}
+              {fr.face && <Img src={staticFile('media/frame-face-blurred.jpg')} style={{ position: 'absolute', inset: 0, width: 300, height: 200, objectFit: 'cover', borderRadius: 14, opacity: blur, clipPath: 'inset(0 0 134px 150px round 0 14px 30px 30px)' }} />}
             </div>
           );
         })}

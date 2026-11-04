@@ -7,7 +7,7 @@ import taps from '../../public/clips/menu.taps.json';
 import { clipFrames, type Piece } from '../kit/clip';
 import { DemoScene, PANEL } from '../kit/demo';
 import { ModelLockup } from '../kit/models';
-import { Words, inOut, ramp } from '../kit/motion';
+import { blur, Words, inOut, ramp } from '../kit/motion';
 import { VO_AT, voice } from '../kit/vo';
 import { c, display, sec, type } from '../theme';
 
@@ -52,7 +52,7 @@ export function Menu() {
         return (
           <div key={d.name} style={{ position: 'absolute', left: x + 350, top: 350 + i * 66, width: 400, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
             fontFamily: display, fontSize: type.label, fontWeight: 700, color: d.check ? c.saffron : c.text, letterSpacing: '-0.02em',
-            opacity: p * (1 - toSpark), transform: `translateX(${(1 - p) * -140}px)`, filter: `blur(${(1 - p) * 10}px)` }}>
+            opacity: p * (1 - toSpark), transform: `translateX(${(1 - p) * -140}px)`, filter: blur((1 - p) * 10) }}>
             <span>{d.name}</span><span style={{ fontWeight: 500, color: d.check ? c.saffron : c.sub }}>{d.price}</span>
           </div>
         );
