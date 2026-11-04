@@ -1,0 +1,9 @@
+node_modules/
+record/out/
+record/clips/*.frames/
+out/
+build/
+# The recorder writes here; the clips the film uses are copied to public/clips.
+record/clips/
+# Regenerated in seconds by scripts/music.py.
+public/music.wav

@@ -1,0 +1,271 @@
+{
+ "golden": {
+  "size": [
+   1920,
+   1280
+  ],
+  "plate": {
+   "cx": 982.0,
+   "cy": 650.0,
+   "r": 506.0
+  },
+  "parts": {
+   "rice": {
+    "found": true,
+    "count": 1,
+    "share": 0.274,
+    "centre": [
+     953.0,
+     666.0
+    ]
+   },
+   "chicken": {
+    "found": true,
+    "count": 4,
+    "share": 0.238,
+    "centre": [
+     991.0,
+     660.0
+    ]
+   },
+   "onions": {
+    "found": true,
+    "count": 1,
+    "share": 0.039,
+    "centre": [
+     1152.0,
+     315.0
+    ]
+   },
+   "lemon": {
+    "found": true,
+    "count": 1,
+    "share": 0.028,
+    "centre": [
+     1308.0,
+     911.0
+    ]
+   },
+   "raita": {
+    "found": true,
+    "count": 1,
+    "share": 0,
+    "centre": [
+     227.0,
+     568.0
+    ]
+   }
+  }
+ },
+ "drift-1": {
+  "size": [
+   1920,
+   1280
+  ],
+  "plate": {
+   "cx": 982.0,
+   "cy": 652.0,
+   "r": 505.0
+  },
+  "parts": {
+   "rice": {
+    "found": true,
+    "count": 1,
+    "share": 0.281,
+    "centre": [
+     960.0,
+     674.0
+    ]
+   },
+   "chicken": {
+    "found": true,
+    "count": 4,
+    "share": 0.237,
+    "centre": [
+     990.0,
+     661.0
+    ]
+   },
+   "onions": {
+    "found": true,
+    "count": 1,
+    "share": 0.039,
+    "centre": [
+     1151.0,
+     317.0
+    ]
+   },
+   "lemon": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "raita": {
+    "found": true,
+    "count": 1,
+    "share": 0,
+    "centre": [
+     228.0,
+     571.0
+    ]
+   }
+  }
+ },
+ "drift-2": {
+  "size": [
+   1920,
+   1280
+  ],
+  "plate": {
+   "cx": 982.0,
+   "cy": 652.0,
+   "r": 504.0
+  },
+  "parts": {
+   "rice": {
+    "found": true,
+    "count": 1,
+    "share": 0.305,
+    "centre": [
+     974.0,
+     648.0
+    ]
+   },
+   "chicken": {
+    "found": true,
+    "count": 4,
+    "share": 0.237,
+    "centre": [
+     991.0,
+     662.0
+    ]
+   },
+   "onions": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "lemon": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "raita": {
+    "found": true,
+    "count": 1,
+    "share": 0,
+    "centre": [
+     230.0,
+     571.0
+    ]
+   }
+  }
+ },
+ "drift-3": {
+  "size": [
+   1920,
+   1280
+  ],
+  "plate": {
+   "cx": 982.0,
+   "cy": 652.0,
+   "r": 502.0
+  },
+  "parts": {
+   "rice": {
+    "found": true,
+    "count": 1,
+    "share": 0.139,
+    "centre": [
+     978.0,
+     643.0
+    ]
+   },
+   "chicken": {
+    "found": true,
+    "count": 4,
+    "share": 0.237,
+    "centre": [
+     988.0,
+     643.0
+    ]
+   },
+   "onions": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "lemon": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "raita": {
+    "found": true,
+    "count": 1,
+    "share": 0,
+    "centre": [
+     232.0,
+     572.0
+    ]
+   }
+  }
+ },
+ "drift-4": {
+  "size": [
+   1920,
+   1280
+  ],
+  "plate": {
+   "cx": 982.0,
+   "cy": 653.0,
+   "r": 501.0
+  },
+  "parts": {
+   "rice": {
+    "found": true,
+    "count": 24,
+    "share": 0.186,
+    "centre": [
+     995.0,
+     658.0
+    ]
+   },
+   "chicken": {
+    "found": true,
+    "count": 3,
+    "share": 0.17,
+    "centre": [
+     934.0,
+     557.0
+    ]
+   },
+   "onions": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "lemon": {
+    "found": false,
+    "count": 0,
+    "share": 0,
+    "centre": null
+   },
+   "raita": {
+    "found": true,
+    "count": 1,
+    "share": 0,
+    "centre": [
+     233.0,
+     572.0
+    ]
+   }
+  }
+ }
+}
