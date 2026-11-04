@@ -21,7 +21,7 @@
       "package": "app.nomi.kitchen"
     },
     "web": {
-      "output": "server",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [

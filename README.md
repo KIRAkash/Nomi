@@ -7,6 +7,7 @@ Every plate, the way the chef meant it. One Expo codebase for the Android app an
 ```text
 apps/
   app/             Expo (SDK 58) app: staff tabs + guest route /t/[token]; exports Android and web
+  site/            Landing page (Vite + GSAP): the whole story as pinned scroll scenes, every dish drawn in SVG
   api/             Hono API: guest routes (token-scoped, rate-limited), later staff routes
 packages/
   shared/          Row types and zod schemas for every model output
@@ -42,6 +43,12 @@ Android: `npm run app:android` with a device or emulator connected.
 Photos for judges to scan from a laptop (menu, Golden Plates, off-standard plates, guest photos, shelves) are in
 [demo-assets/](demo-assets/README.md); open `demo-assets/index.html` for a full-screen viewer that says which screen to use.
 **Under the hood** (role picker) lists the six Meta models, where each one runs and every live call the phone made.
+
+Landing page: `npm run site` (http://localhost:5174/site/; its links open the Expo dev server on port 8081).
+
+Hosted web front end: `deploy/gcp.sh web` builds the landing and the Expo web export (pointed at the hosted API) and serves
+both from one nginx service, `nomi-web`: the landing at `/`, the app on its own routes (`/sign-in`, `/setup`,
+`/t/demo-table-7`). Table QR codes on the web point at the host they are shown on, so a phone can scan one from a laptop.
 
 Hosted backend for remote testers: `deploy/gcp.sh` builds the API and vision worker with Cloud Build and runs them on Cloud
 Run (project `genai-hack-project-nexus`, region `asia-south1`; override with `GCP_PROJECT` and `GCP_REGION`). The model key

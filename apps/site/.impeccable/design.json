@@ -1,0 +1,537 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-04T13:04:59.655Z",
+  "title": "Design System: Nomi landing",
+  "extensions": {
+    "colorMeta": {
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#fffbef",
+        "tonalRamp": [
+          "oklch(15% 0.010 91.5)",
+          "oklch(25% 0.016 91.5)",
+          "oklch(35% 0.016 91.5)",
+          "oklch(48% 0.016 91.5)",
+          "oklch(60% 0.016 91.5)",
+          "oklch(72% 0.016 91.5)",
+          "oklch(84% 0.016 91.5)",
+          "oklch(95% 0.010 91.5)"
+        ]
+      },
+      "paper-warm": {
+        "role": "neutral",
+        "displayName": "Paper Warm",
+        "canonical": "#fff0c2",
+        "tonalRamp": [
+          "oklch(15% 0.037 92.1)",
+          "oklch(25% 0.061 92.1)",
+          "oklch(35% 0.061 92.1)",
+          "oklch(48% 0.061 92.1)",
+          "oklch(60% 0.061 92.1)",
+          "oklch(72% 0.061 92.1)",
+          "oklch(84% 0.061 92.1)",
+          "oklch(95% 0.037 92.1)"
+        ]
+      },
+      "white": {
+        "role": "neutral",
+        "displayName": "White",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "oklch(15% 0.000 89.9)",
+          "oklch(25% 0.000 89.9)",
+          "oklch(35% 0.000 89.9)",
+          "oklch(48% 0.000 89.9)",
+          "oklch(60% 0.000 89.9)",
+          "oklch(72% 0.000 89.9)",
+          "oklch(84% 0.000 89.9)",
+          "oklch(95% 0.000 89.9)"
+        ]
+      },
+      "cream": {
+        "role": "neutral",
+        "displayName": "Cream",
+        "canonical": "#fff4d6",
+        "tonalRamp": [
+          "oklch(15% 0.025 90.2)",
+          "oklch(25% 0.041 90.2)",
+          "oklch(35% 0.041 90.2)",
+          "oklch(48% 0.041 90.2)",
+          "oklch(60% 0.041 90.2)",
+          "oklch(72% 0.041 90.2)",
+          "oklch(84% 0.041 90.2)",
+          "oklch(95% 0.025 90.2)"
+        ]
+      },
+      "counter": {
+        "role": "neutral",
+        "displayName": "Counter",
+        "canonical": "#ece4d2",
+        "tonalRamp": [
+          "oklch(15% 0.015 86.9)",
+          "oklch(25% 0.026 86.9)",
+          "oklch(35% 0.026 86.9)",
+          "oklch(48% 0.026 86.9)",
+          "oklch(60% 0.026 86.9)",
+          "oklch(72% 0.026 86.9)",
+          "oklch(84% 0.026 86.9)",
+          "oklch(95% 0.015 86.9)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#1b1b3a",
+        "tonalRamp": [
+          "oklch(15% 0.035 281.1)",
+          "oklch(25% 0.058 281.1)",
+          "oklch(35% 0.058 281.1)",
+          "oklch(48% 0.058 281.1)",
+          "oklch(60% 0.058 281.1)",
+          "oklch(72% 0.058 281.1)",
+          "oklch(84% 0.058 281.1)",
+          "oklch(95% 0.035 281.1)"
+        ]
+      },
+      "ink-sub": {
+        "role": "neutral",
+        "displayName": "Ink Sub",
+        "canonical": "rgba(27, 27, 58, 0.68)",
+        "tonalRamp": [
+          "oklch(15% 0.035 281.1)",
+          "oklch(25% 0.058 281.1)",
+          "oklch(35% 0.058 281.1)",
+          "oklch(48% 0.058 281.1)",
+          "oklch(60% 0.058 281.1)",
+          "oklch(72% 0.058 281.1)",
+          "oklch(84% 0.058 281.1)",
+          "oklch(95% 0.035 281.1)"
+        ]
+      },
+      "ink-faint": {
+        "role": "neutral",
+        "displayName": "Ink Faint",
+        "canonical": "rgba(27, 27, 58, 0.64)",
+        "tonalRamp": [
+          "oklch(15% 0.035 281.1)",
+          "oklch(25% 0.058 281.1)",
+          "oklch(35% 0.058 281.1)",
+          "oklch(48% 0.058 281.1)",
+          "oklch(60% 0.058 281.1)",
+          "oklch(72% 0.058 281.1)",
+          "oklch(84% 0.058 281.1)",
+          "oklch(95% 0.035 281.1)"
+        ]
+      },
+      "ink-line": {
+        "role": "neutral",
+        "displayName": "Ink Line",
+        "canonical": "rgba(27, 27, 58, 0.14)",
+        "tonalRamp": [
+          "oklch(15% 0.035 281.1)",
+          "oklch(25% 0.058 281.1)",
+          "oklch(35% 0.058 281.1)",
+          "oklch(48% 0.058 281.1)",
+          "oklch(60% 0.058 281.1)",
+          "oklch(72% 0.058 281.1)",
+          "oklch(84% 0.058 281.1)",
+          "oklch(95% 0.035 281.1)"
+        ]
+      },
+      "saffron": {
+        "role": "primary",
+        "displayName": "Saffron",
+        "canonical": "#d98e00",
+        "tonalRamp": [
+          "oklch(15% 0.091 72.1)",
+          "oklch(25% 0.151 72.1)",
+          "oklch(35% 0.151 72.1)",
+          "oklch(48% 0.151 72.1)",
+          "oklch(60% 0.151 72.1)",
+          "oklch(72% 0.151 72.1)",
+          "oklch(84% 0.151 72.1)",
+          "oklch(95% 0.091 72.1)"
+        ]
+      },
+      "saffron-soft": {
+        "role": "primary",
+        "displayName": "Saffron Soft",
+        "canonical": "#ffe7b0",
+        "tonalRamp": [
+          "oklch(15% 0.045 87.1)",
+          "oklch(25% 0.075 87.1)",
+          "oklch(35% 0.075 87.1)",
+          "oklch(48% 0.075 87.1)",
+          "oklch(60% 0.075 87.1)",
+          "oklch(72% 0.075 87.1)",
+          "oklch(84% 0.075 87.1)",
+          "oklch(95% 0.045 87.1)"
+        ]
+      },
+      "amber": {
+        "role": "primary",
+        "displayName": "Amber Nudge",
+        "canonical": "#ffb627",
+        "tonalRamp": [
+          "oklch(15% 0.096 77.8)",
+          "oklch(25% 0.160 77.8)",
+          "oklch(35% 0.160 77.8)",
+          "oklch(48% 0.160 77.8)",
+          "oklch(60% 0.160 77.8)",
+          "oklch(72% 0.160 77.8)",
+          "oklch(84% 0.160 77.8)",
+          "oklch(95% 0.096 77.8)"
+        ]
+      },
+      "part-rice-sky": {
+        "role": "tertiary",
+        "displayName": "Rice Sky",
+        "canonical": "#3f8fd6",
+        "tonalRamp": [
+          "oklch(15% 0.080 248.4)",
+          "oklch(25% 0.133 248.4)",
+          "oklch(35% 0.133 248.4)",
+          "oklch(48% 0.133 248.4)",
+          "oklch(60% 0.133 248.4)",
+          "oklch(72% 0.133 248.4)",
+          "oklch(84% 0.133 248.4)",
+          "oklch(95% 0.080 248.4)"
+        ]
+      },
+      "part-chicken-tomato": {
+        "role": "tertiary",
+        "displayName": "Chicken Tomato",
+        "canonical": "#d93a2e",
+        "tonalRamp": [
+          "oklch(15% 0.096 28.9)",
+          "oklch(25% 0.160 28.9)",
+          "oklch(35% 0.160 28.9)",
+          "oklch(48% 0.160 28.9)",
+          "oklch(60% 0.160 28.9)",
+          "oklch(72% 0.160 28.9)",
+          "oklch(84% 0.160 28.9)",
+          "oklch(95% 0.096 28.9)"
+        ]
+      },
+      "part-onions-saffron": {
+        "role": "tertiary",
+        "displayName": "Onion Saffron",
+        "canonical": "#d98e00",
+        "tonalRamp": [
+          "oklch(15% 0.091 72.1)",
+          "oklch(25% 0.151 72.1)",
+          "oklch(35% 0.151 72.1)",
+          "oklch(48% 0.151 72.1)",
+          "oklch(60% 0.151 72.1)",
+          "oklch(72% 0.151 72.1)",
+          "oklch(84% 0.151 72.1)",
+          "oklch(95% 0.091 72.1)"
+        ]
+      },
+      "part-lemon-pink": {
+        "role": "tertiary",
+        "displayName": "Lemon Pink",
+        "canonical": "#e8559a",
+        "tonalRamp": [
+          "oklch(15% 0.096 354.6)",
+          "oklch(25% 0.160 354.6)",
+          "oklch(35% 0.160 354.6)",
+          "oklch(48% 0.160 354.6)",
+          "oklch(60% 0.160 354.6)",
+          "oklch(72% 0.160 354.6)",
+          "oklch(84% 0.160 354.6)",
+          "oklch(95% 0.096 354.6)"
+        ]
+      },
+      "part-raita-mint": {
+        "role": "tertiary",
+        "displayName": "Raita Mint",
+        "canonical": "#2e9a5f",
+        "tonalRamp": [
+          "oklch(15% 0.079 154.9)",
+          "oklch(25% 0.132 154.9)",
+          "oklch(35% 0.132 154.9)",
+          "oklch(48% 0.132 154.9)",
+          "oklch(60% 0.132 154.9)",
+          "oklch(72% 0.132 154.9)",
+          "oklch(84% 0.132 154.9)",
+          "oklch(95% 0.079 154.9)"
+        ]
+      },
+      "mint-soft": {
+        "role": "tertiary",
+        "displayName": "Mint Soft",
+        "canonical": "#ddf5e6",
+        "tonalRamp": [
+          "oklch(15% 0.019 158.3)",
+          "oklch(25% 0.032 158.3)",
+          "oklch(35% 0.032 158.3)",
+          "oklch(48% 0.032 158.3)",
+          "oklch(60% 0.032 158.3)",
+          "oklch(72% 0.032 158.3)",
+          "oklch(84% 0.032 158.3)",
+          "oklch(95% 0.019 158.3)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Hero headline only, three block lines; creed lines share its weight and tracking."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Every scene headline, including swapped lines; balanced wrap."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Closing ways list; models menu runs larger at clamp(1.6rem, 3.4vw, 3rem)."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Scene copy in ink-sub, max 34rem, pretty wrap; page base 17px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Chip text, captions, counts in tabular numerals; sentence case."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "The word nomi, and type inside the drawn app's interface only."
+      }
+    },
+    "shadows": [
+      {
+        "name": "warm-sheet",
+        "value": "0 30px 60px -24px rgba(70, 50, 10, 0.32), 0 8px 18px -8px rgba(70, 50, 10, 0.18)",
+        "purpose": "Every floating white chip, sheet, shot card, voice bubble and the voice card."
+      },
+      {
+        "name": "ink-lift",
+        "value": "0 16px 30px -12px rgba(27, 27, 58, 0.55), inset 0 -4px 0 rgba(0, 0, 0, 0.25)",
+        "purpose": "Ink button at rest; the inset bottom edge is the clay lip."
+      },
+      {
+        "name": "ink-lift-hover",
+        "value": "0 22px 36px -12px rgba(27, 27, 58, 0.6), inset 0 -4px 0 rgba(0, 0, 0, 0.25)",
+        "purpose": "Ink button on hover, with a 2px rise."
+      },
+      {
+        "name": "device",
+        "value": "0 50px 90px -30px rgba(27, 27, 58, 0.55), inset 0 0 0 2px #34345a",
+        "purpose": "The drawn phone."
+      },
+      {
+        "name": "nudge-glow-amber",
+        "value": "0 20px 40px -14px rgba(217, 142, 0, 0.6)",
+        "purpose": "Warning nudge glows in its own colour."
+      },
+      {
+        "name": "nudge-glow-mint",
+        "value": "0 20px 40px -14px rgba(46, 154, 95, 0.45)",
+        "purpose": "Found nudge glows in its own colour."
+      },
+      {
+        "name": "in-screen",
+        "value": "0 10px 22px rgba(27, 27, 58, 0.1)",
+        "purpose": "Cards inside the drawn phone."
+      },
+      {
+        "name": "drawn-lift",
+        "value": "drop-shadow(0 14px 22px rgba(70, 50, 10, 0.18))",
+        "purpose": "SVG nodes and drawn food pieces (SVG feDropShadow 3 6 5 #46320A at 0.32)."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 3px solid #d98e00; outline-offset: 3px; border-radius: 10px",
+        "purpose": "Site-wide :focus-visible."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-expo-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "CSS transitions (buttons, arrow tiles) and GSAP expo.out for the load intro and closing reveals."
+      },
+      {
+        "name": "ease-pop",
+        "value": "back.out(2)",
+        "purpose": "Anything Nomi produces entering: chips, tags, nudges, checks, bubbles (range 1.8 to 2.4)."
+      },
+      {
+        "name": "scene-default",
+        "value": "power2.inOut, 1s",
+        "purpose": "Default for pinned scene timelines."
+      },
+      {
+        "name": "scrub-lag",
+        "value": "scrub: 0.7",
+        "purpose": "Pinned scenes are scrubbed by scroll with 0.7s smoothing, so they reverse on scroll-up; pin length x0.8 below 1024px."
+      },
+      {
+        "name": "headline-swap-out",
+        "value": "y -36px, blur 8px, 0.35s power2.in",
+        "purpose": "Current headline line leaves."
+      },
+      {
+        "name": "headline-swap-in",
+        "value": "y 36px to 0, blur 8px to 0, 0.45s power3.out, starts 0.3s after exit",
+        "purpose": "Next headline line arrives."
+      },
+      {
+        "name": "intro-headline",
+        "value": "yPercent 60, blur 10px, 1.2s expo.out, stagger 0.09s",
+        "purpose": "Hero headline lines on load."
+      },
+      {
+        "name": "sam-trace",
+        "value": "strokeDashoffset to 0, 0.9s power2.inOut, stagger 0.08s; fill to 0.22 opacity over 0.5s",
+        "purpose": "A SAM mask outline drawing itself in its part colour."
+      },
+      {
+        "name": "plate-sway",
+        "value": "rotation 4deg, 7s sine.inOut, yoyo, infinite",
+        "purpose": "Hero plate idle."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "no pins; scenes at progress 1; swapped lines stacked",
+        "purpose": "prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "1023px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Ink Button",
+      "kind": "button",
+      "refersTo": "button-ink",
+      "description": "The one primary action per view: open the live app.",
+      "html": "<a class=\"ds-btn ds-btn-ink\" href=\"#\">Open the live app</a>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 26px;border-radius:20px;font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:-0.01em;text-decoration:none;cursor:pointer;border:0;transition:transform .4s var(--ease),box-shadow .4s var(--ease),background .3s;white-space:nowrap;}.ds-btn-ink{background:var(--ink);color:var(--cream);box-shadow:0 16px 30px -12px rgba(27,27,58,.55),inset 0 -4px 0 rgba(0,0,0,.25);}.ds-btn-ink:hover{transform:translateY(-2px);box-shadow:0 22px 36px -12px rgba(27,27,58,.6),inset 0 -4px 0 rgba(0,0,0,.25);}.ds-btn-ink:active{transform:translateY(0);}.ds-btn:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:10px;}"
+    },
+    {
+      "name": "Line Button",
+      "kind": "button",
+      "refersTo": "button-line",
+      "description": "Secondary action beside the ink button.",
+      "html": "<a class=\"ds-btn ds-btn-line\" href=\"#\">Be the guest at table 7</a>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 26px;border-radius:20px;font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:-0.01em;text-decoration:none;cursor:pointer;border:0;transition:transform .4s var(--ease),box-shadow .4s var(--ease),background .3s;white-space:nowrap;}.ds-btn-line{color:var(--ink);background:rgba(255,255,255,.7);box-shadow:inset 0 0 0 2px var(--ink);}.ds-btn-line:hover{background:var(--white);transform:translateY(-2px);}.ds-btn:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:10px;}"
+    },
+    {
+      "name": "Small Ink Button",
+      "kind": "button",
+      "refersTo": "button-small",
+      "description": "The nav's compact primary action.",
+      "html": "<a class=\"ds-btn ds-btn-ink ds-btn-small\" href=\"#\">Open the live app</a>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-btn{display:inline-flex;align-items:center;justify-content:center;min-height:56px;padding:0 26px;border-radius:20px;font-family:var(--display);font-weight:700;font-size:1rem;letter-spacing:-0.01em;text-decoration:none;cursor:pointer;border:0;transition:transform .4s var(--ease),box-shadow .4s var(--ease),background .3s;white-space:nowrap;}.ds-btn-ink{background:var(--ink);color:var(--cream);box-shadow:0 16px 30px -12px rgba(27,27,58,.55),inset 0 -4px 0 rgba(0,0,0,.25);}.ds-btn-ink:hover{transform:translateY(-2px);}.ds-btn-small{min-height:44px;padding:0 18px;border-radius:16px;font-size:.92rem;}.ds-btn:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:10px;}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Fixed bar: brand coin and Fredoka wordmark, section links, small ink button. Solid paper once scrolled.",
+      "html": "<header class=\"ds-nav\"><a class=\"ds-brand\" href=\"#\"><svg viewBox=\"0 0 40 40\" width=\"36\" height=\"36\" aria-hidden=\"true\"><circle cx=\"20\" cy=\"21.5\" r=\"17\" fill=\"#B77400\"/><circle cx=\"20\" cy=\"19\" r=\"17\" fill=\"#FFB627\"/><circle cx=\"20\" cy=\"19\" r=\"11\" fill=\"#FFD772\"/><circle cx=\"15\" cy=\"14\" r=\"3\" fill=\"#FFF4D6\"/></svg><span>nomi</span></a><nav><a href=\"#\">Golden Plate</a><a href=\"#\">The pass</a><a href=\"#\">The table</a></nav></header>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-nav{display:flex;align-items:center;gap:28px;padding:14px 24px;background:rgba(255,251,239,.94);box-shadow:0 1px 0 var(--line);font-family:var(--display);}.ds-brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink);font-family:var(--brand);font-weight:600;font-size:1.7rem;letter-spacing:-0.01em;line-height:1;}.ds-nav nav{display:flex;gap:4px;margin-left:auto;}.ds-nav nav a{color:var(--sub);text-decoration:none;font-weight:600;font-size:.95rem;padding:10px 14px;border-radius:14px;transition:color .2s,background .2s;}.ds-nav nav a:hover{color:var(--ink);background:rgba(27,27,58,.05);}.ds-nav a:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:10px;}"
+    },
+    {
+      "name": "Part Chip",
+      "kind": "chip",
+      "refersTo": "chip-part",
+      "description": "Names one SAM part in its part colour, with a count.",
+      "html": "<div class=\"ds-chips\"><span class=\"ds-chip\" style=\"--c:#D93A2E\"><i></i>Chicken <small>in 3 of 3</small></span><span class=\"ds-chip\" style=\"--c:#3F8FD6\"><i></i>Rice <small>in 3 of 3</small></span><span class=\"ds-chip\" style=\"--c:#D98E00\"><i></i>Fried onions <small>in 3 of 3</small></span></div>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-chips{display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:24px;background:var(--paper);}.ds-chip{display:inline-grid;grid-template-columns:34px auto auto;align-items:center;gap:12px;padding:10px 16px 10px 12px;border-radius:18px;background:var(--white);box-shadow:var(--shadow);font-family:var(--display);font-weight:700;color:var(--ink);white-space:nowrap;transition:transform .4s var(--ease);}.ds-chip:hover{transform:translateY(-2px);}.ds-chip i{width:34px;height:6px;border-radius:3px;background:var(--c);}.ds-chip small{color:var(--mint);font-weight:700;font-size:.85rem;font-variant-numeric:tabular-nums;}"
+    },
+    {
+      "name": "Watch Sheet",
+      "kind": "card",
+      "refersTo": "card-sheet",
+      "description": "White Clay Tiffin sheet for one fact, with a tabular count and per-plate dots.",
+      "html": "<div class=\"ds-wrap\"><article class=\"ds-sheet\"><div class=\"ds-top\"><b>Chicken Biryani</b><span>6 <small>of 39 plates</small></span></div><p>Rice under the Golden Plate area</p><div class=\"ds-dots\"><i class=\"h\"></i><i class=\"h\"></i><i class=\"h\"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article></div>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-wrap{padding:24px;background:var(--paper);font-family:var(--display);}.ds-sheet{padding:20px 22px;border-radius:26px;background:var(--white);box-shadow:var(--shadow);color:var(--ink);max-width:520px;}.ds-top{display:flex;align-items:baseline;justify-content:space-between;gap:16px;}.ds-top b{font-size:1.15rem;font-weight:800;letter-spacing:-0.02em;}.ds-top span{font-weight:800;font-size:1.5rem;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;}.ds-top small{font-size:.9rem;color:var(--sub);font-weight:700;}.ds-sheet p{color:var(--sub);font-weight:600;margin:2px 0 12px;font-size:.98rem;}.ds-dots{display:flex;gap:4px;}.ds-dots i{width:10px;height:10px;border-radius:4px;background:rgba(27,27,58,.1);}.ds-dots i.h{background:var(--tomato);}"
+    },
+    {
+      "name": "Pass Nudge",
+      "kind": "custom",
+      "refersTo": "nudge-warn",
+      "description": "Quiet verdict pill at the pass: amber when a part is missing, mint when all are found.",
+      "html": "<div class=\"ds-wrap\"><span class=\"ds-nudge\"><b></b>Fried onions: not found</span><span class=\"ds-nudge ds-ok\"><b></b>All parts found</span></div>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-wrap{display:flex;flex-wrap:wrap;gap:16px;padding:24px;background:var(--paper);}.ds-nudge{display:inline-flex;align-items:center;gap:12px;padding:14px 22px 14px 16px;border-radius:22px;background:var(--amber);color:var(--ink);font-family:var(--display);font-weight:750;font-size:1.1rem;box-shadow:0 20px 40px -14px rgba(217,142,0,.6);white-space:nowrap;}.ds-nudge b{width:22px;height:22px;border-radius:50%;background:var(--ink);-webkit-mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 6v7M12 17v.5' stroke='black' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E\") center/100%;mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 6v7M12 17v.5' stroke='black' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E\") center/100%;}.ds-ok{background:var(--mint-soft);color:#14532d;box-shadow:0 20px 40px -14px rgba(46,154,95,.45);}.ds-ok b{background:var(--mint);-webkit-mask-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\");mask-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7' fill='none' stroke='black' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\");}"
+    },
+    {
+      "name": "Way Row",
+      "kind": "custom",
+      "description": "Closing list row: heavy title, sub line, ink arrow tile that turns saffron and slides on hover.",
+      "html": "<ul class=\"ds-ways\"><li><a href=\"#\"><b>Open the staff app</b><span>Any 10-digit number, then the code on screen.</span><i></i></a></li></ul>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-ways{list-style:none;margin:0;padding:0 24px;border-top:2px solid var(--ink);font-family:var(--display);background:var(--paper);}.ds-ways a{display:grid;grid-template-columns:1fr 44px;gap:4px 18px;padding:22px 4px;border-bottom:1px solid var(--line);color:var(--ink);text-decoration:none;}.ds-ways b{font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;transition:color .3s;}.ds-ways span{grid-column:1;color:var(--sub);font-weight:600;}.ds-ways i{position:relative;grid-row:1/span 2;grid-column:2;align-self:center;width:44px;height:44px;border-radius:16px;background:var(--ink);transition:transform .4s var(--ease),background .3s;}.ds-ways i::after{content:'';position:absolute;inset:0;background:var(--cream);-webkit-mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12h11M13 7l5 5-5 5' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") center/60% no-repeat;mask:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6 12h11M13 7l5 5-5 5' fill='none' stroke='black' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\") center/60% no-repeat;}.ds-ways a:hover i{transform:translateX(6px);background:var(--saffron);}.ds-ways a:hover b{color:var(--saffron);}.ds-ways a:focus-visible{outline:3px solid var(--saffron);outline-offset:3px;border-radius:10px;}"
+    },
+    {
+      "name": "Headline",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Scene headline: heavy ink Inter Tight with one saffron phrase.",
+      "html": "<div class=\"ds-wrap\"><h2 class=\"ds-h\">SAM 3.1 finds <em>every part</em>.</h2></div>",
+      "css": ":host{--paper:#fffbef;--white:#ffffff;--cream:#fff4d6;--ink:#1b1b3a;--sub:rgba(27,27,58,.68);--line:rgba(27,27,58,.14);--saffron:#d98e00;--amber:#ffb627;--mint:#2e9a5f;--mint-soft:#ddf5e6;--tomato:#d93a2e;--sky:#3f8fd6;--pink:#e8559a;--shadow:0 30px 60px -24px rgba(70,50,10,.32),0 8px 18px -8px rgba(70,50,10,.18);--display:'Inter Tight Variable','Inter Tight',system-ui,sans-serif;--brand:'Fredoka',system-ui,sans-serif;--ease:cubic-bezier(0.16,1,0.3,1);} .ds-wrap{padding:32px;background:radial-gradient(120% 90% at 0% 0%,#fff0c2 0%,rgba(255,240,194,.55) 30%,rgba(255,255,255,0) 64%),#fff;}.ds-h{margin:0;font-family:var(--display);font-size:3rem;line-height:1.02;font-weight:800;letter-spacing:-0.035em;color:var(--ink);}.ds-h em{font-style:normal;color:var(--saffron);}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Paper Stage",
+    "overview": "The landing is the pitch film's stage, made scrollable. A warm butter light (paper-warm) bleeds from the top-left corner into white, a fine still grain sits over everything, and on that paper one drawn Chicken Biryani plays the protagonist from the first viewport to the last. Heavy, tightly tracked ink type carries the story; one saffron word in each headline carries the point. Everything Nomi itself produces (mask outlines, part chips, nudges, the drawn phone) wears Clay Tiffin: puffy rounded white sheets, warm brown soft shadows, and the five SAM part colours.\n\nDensity is low and theatrical: each idea gets a full pinned viewport, copy in a narrow left column (0.8fr) and the drawn stage on the right (1.2fr). The scroll is the playhead: every scene is a scrubbed timeline, so scrolling back plays it in reverse. Nothing is photographed. The dish, the plate copies, the camera frames, the phone, the QR tent and the brand mark are all drawn in SVG from a seeded random source, so they come out identical on every load. The only rasters are the real Meta and Muse marks.\n\nConfirmed rejections: photographs and screen recordings of dishes or the app (Akash, 2026-11-04), a mascot, humour, and the category's phone-mockup feature grid with a stats bar.",
+    "keyCharacteristics": [
+      "Butter-to-white paper ground under fixed multiply grain.",
+      "Ink Inter Tight at 800 to 850 weight, tracked -0.035em to -0.04em; saffron marks one word per headline.",
+      "Fredoka is the voice of the brand name and of the drawn app, never of the page.",
+      "Five SAM part colours, each bound to one part of the dish everywhere it appears.",
+      "Puffy white chips and sheets with warm brown, diffuse shadows.",
+      "Seeded SVG drawings for every image; pinned, scroll-scrubbed scenes for every idea."
+    ],
+    "rules": [
+      {
+        "name": "The One Word Rule",
+        "body": "Each headline carries exactly one saffron phrase, and it is the phrase the scene proves (\"meant\", \"drifts\", \"every part\", \"out loud\"). Saffron is never a background fill on the page.",
+        "section": "colors"
+      },
+      {
+        "name": "The Part Colour Rule",
+        "body": "Sky is rice, tomato is chicken, saffron is fried onions, pink is lemon, mint is raita, in every scene, chip, mask and tag. A part colour never decorates anything that is not that part, or a fact about it.",
+        "section": "colors"
+      },
+      {
+        "name": "The Heavy Ink Rule",
+        "body": "Headlines are 800 or heavier with -0.03em or tighter tracking. Weight, not size jumps or colour, carries hierarchy; secondary text is quieter by alpha, not by a lighter typeface.",
+        "section": "typography"
+      },
+      {
+        "name": "The Fredoka Is a Name Rule",
+        "body": "Fredoka sets the word `nomi` and the drawn app's own interface. Page headlines, body and labels never use it.",
+        "section": "typography"
+      },
+      {
+        "name": "The Warm Shadow Rule",
+        "body": "Shadows are tinted brown (70, 50, 10) on paper and ink-tinted under ink objects, always large-blur with negative spread. A shadow with no blur, or a neutral grey one, is not part of this world.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do draw every dish, plate copy, device, QR and camera frame in seeded SVG; keep the real Meta and Muse marks as the only rasters.",
+      "Do keep each SAM part in its part colour in every appearance (sky rice, tomato chicken, saffron onions, pink lemon, mint raita).",
+      "Do set headlines in Inter Tight at 800 to 850 with -0.035em to -0.04em tracking, with exactly one saffron phrase.",
+      "Do float Nomi's outputs on white Clay Tiffin sheets (18px chips, 26px cards) with the warm brown two-layer shadow.",
+      "Do tell each idea as a pinned, scroll-scrubbed scene that plays backward on scroll-up, and give the reduced-motion reader the finished frame.",
+      "Do use cream, not pure white, for text and glyphs on ink."
+    ],
+    "donts": [
+      "Don't use photographs or screen recordings of dishes or of the app.",
+      "Don't use Fredoka for page headlines, body or labels.",
+      "Don't use a part colour as decoration, or saffron as a page background.",
+      "Don't use grey or hard-offset shadows.",
+      "Don't add a mascot, a stats bar, or a phone-mockup feature grid."
+    ]
+  }
+}

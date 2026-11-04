@@ -5,6 +5,7 @@ import { ScrollView, Text, View } from 'react-native';
 
 import { AiTag, Segmented, TopBar, WorkLine, useSteps } from '@/components/kit';
 import { QR } from '@/components/qr';
+import { guestUrl } from '@/lib/links';
 import { TABLES } from '@/lib/mock';
 
 const STYLES = [
@@ -21,7 +22,7 @@ function Tent({ table, token, s }: { table: string; token: string; s: (typeof ST
         <Text style={{ fontFamily: font.displayBold, fontSize: 18, color: s.fg }}>Saffron House</Text>
       </Row>
       <Text style={{ fontFamily: font.display, fontSize: 20, color: s.fg, textAlign: 'center' }}>How was your meal?</Text>
-      <View style={{ backgroundColor: '#fff', borderRadius: 18, padding: 8 }}><QR value={`https://nomi.app/t/${token}`} size={130} /></View>
+      <View style={{ backgroundColor: '#fff', borderRadius: 18, padding: 8 }}><QR value={guestUrl(token)} size={130} /></View>
       <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: s.fg, textAlign: 'center' }}>Scan · tap · talk. 10 seconds.{'\n'}स्कैन करें, बोलें। 10 सेकंड।</Text>
       <Text style={{ fontFamily: font.bodySemi, fontSize: 12, color: s.fg, opacity: 0.8 }}>{table}</Text>
     </View>

@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nomi — every plate, the way the chef meant it</title>
+    <meta name="description" content="Nomi checks every plate against the head chef's Golden Plate, hears every guest in their own language, and turns last night into tonight's watch list. Six Meta models, facts only." />
+    <meta name="theme-color" content="#FFF4D6" />
+    <link rel="icon" href="/site/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to the story</a>
+
+    <header class="nav" id="nav">
+      <a class="brand" href="#top" aria-label="Nomi, back to top">
+        <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="21.5" r="17" fill="#B77400"/><circle cx="20" cy="19" r="17" fill="#FFB627"/><circle cx="20" cy="19" r="11" fill="#FFD772"/><circle cx="15" cy="14" r="3" fill="#FFF4D6"/></svg>
+        <span>nomi</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#golden">Golden Plate</a>
+        <a href="#pass">The pass</a>
+        <a href="#table">The table</a>
+        <a href="#morning">The morning</a>
+      </nav>
+      <a class="btn ink small" data-app="/sign-in">Open the live app</a>
+    </header>
+
+    <main id="main">
+      <!-- hero -->
+      <section class="hero" id="top">
+        <div class="hero-copy">
+          <h1 class="hero-title"><span class="ln">Every plate,</span> <span class="ln">the way the chef</span> <span class="ln"><em>meant</em> it.</span></h1>
+          <p class="lede">Nomi checks every plate against the head chef's own Golden Plate, hears every guest in their own language, and turns last night into tonight's watch list.</p>
+          <div class="actions">
+            <a class="btn ink" data-app="/sign-in">Open the live app</a>
+            <a class="btn line" data-app="/t/demo-table-7">Be the guest at table 7</a>
+          </div>
+          <p class="fine">Live on six Meta models. Sign in with any 10-digit number and the code shown on screen.</p>
+        </div>
+        <div class="hero-stage" aria-hidden="true">
+          <div class="dish" id="hero-dish"></div>
+          <div class="sam-tag" id="sam-tag"><span class="sam-dot"></span><span class="sam-model">SAM 3.1</span><span class="sam-part">Chicken</span><span class="sam-count">× 4</span></div>
+        </div>
+        <div class="cue" aria-hidden="true"><span>Scroll</span><i></i></div>
+      </section>
+
+      <!-- the problem -->
+      <section class="scene" id="drift" aria-labelledby="drift-h">
+        <div class="pin">
+          <div class="copy">
+            <h2 id="drift-h" class="swap">
+              <span class="say" data-say="0">A head chef designs a dish <em>once</em>.</span>
+              <span class="say" data-say="1">Then other cooks make it hundreds of times, across shifts, new hires and busy nights.</span>
+              <span class="say" data-say="2">The plate <em>drifts</em>.</span>
+              <span class="say" data-say="3">Guests notice. Few say so, and no one can tell which plate they meant.</span>
+            </h2>
+          </div>
+          <div class="stage drift-stage" aria-hidden="true">
+            <div class="grid" id="drift-grid"></div>
+            <div class="voices" id="voices"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- the Golden Plate -->
+      <section class="scene" id="golden" aria-labelledby="golden-h">
+        <div class="pin">
+          <div class="copy">
+            <h2 id="golden-h" class="swap">
+              <span class="say" data-say="0">Set the standard <em>once</em>.</span>
+              <span class="say" data-say="1">Three photos of the chef's own plate.</span>
+              <span class="say" data-say="2">SAM 3.1 finds <em>every part</em>.</span>
+            </h2>
+            <p class="body">A part counts only if it is found in all three photos, so the Golden Plate is something the kitchen can repeat, not one lucky shot. Anything Nomi is unsure of stays amber until the chef checks it.</p>
+          </div>
+          <div class="stage golden-stage" aria-hidden="true">
+            <div class="shots" id="shots"></div>
+            <div class="explode" id="explode"></div>
+            <ol class="parts" id="parts"></ol>
+          </div>
+        </div>
+      </section>
+
+      <!-- the rules, said out loud -->
+      <section class="said" id="said" aria-labelledby="said-h">
+        <div class="said-copy">
+          <h2 id="said-h">Then the chef says the rules <em>out loud</em>.</h2>
+          <p class="body">Muse Voice writes down what the chef said, in Hindi or English. Muse Spark turns it into checks the pass can measure. Muse Image draws the plating card every cook follows.</p>
+        </div>
+        <div class="said-stage" aria-hidden="true">
+          <div class="wave" id="wave"></div>
+          <p class="heard" id="heard" lang="hi">चावल बीच में रखो, चार पीस ऊपर फैला के…</p>
+          <ul class="checks" id="checks">
+            <li><i style="--c: var(--sky)"></i>Rice in the middle</li>
+            <li><i style="--c: var(--tomato)"></i>Four chicken pieces on top</li>
+            <li><i style="--c: var(--saffron)"></i>Onions at 2 o'clock</li>
+            <li><i style="--c: var(--pink)"></i>Lemon on the rim, 5 o'clock</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- the pass -->
+      <section class="scene" id="pass" aria-labelledby="pass-h">
+        <div class="pin">
+          <div class="copy">
+            <h2 id="pass-h" class="swap">
+              <span class="say" data-say="0">At the pass, a camera checks <em>every plate</em>.</span>
+              <span class="say" data-say="1">Only frames with a plate go out. <em>Faces never leave</em> the kitchen.</span>
+              <span class="say" data-say="2">Fried onions: <em>not found</em>.</span>
+              <span class="say" data-say="3">A quiet nudge, <em>before</em> it leaves.</span>
+            </h2>
+            <p class="body">Glimmer is built to run on the restaurant's own computer and keeps only the frames that show a plate. SAM 3.1 compares the plate with the Golden Plate and names the part that is missing, quietly.</p>
+          </div>
+          <div class="stage pass-stage" aria-hidden="true">
+            <div class="strip" id="strip"></div>
+            <div class="finder" id="finder">
+              <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+              <div class="counter"></div>
+              <div class="pass-plate" id="pass-a"></div>
+              <div class="pass-plate" id="pass-b"></div>
+              <svg class="pass-masks" id="pass-masks" viewBox="0 0 1000 1000"></svg>
+            </div>
+            <div class="nudge" id="nudge"><b></b><span>Fried onions: not found</span></div>
+            <div class="nudge ok" id="ok-a"><b></b><span>Matches the Golden Plate</span></div>
+            <div class="nudge ok" id="ok-b"><b></b><span>Onions added. Plate goes out.</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- the table -->
+      <section class="scene" id="table" aria-labelledby="table-h">
+        <div class="pin">
+          <div class="copy">
+            <h2 id="table-h">At the table, a few taps. <em>Any language.</em></h2>
+            <ol class="steps" id="steps">
+              <li>Scan the table QR, with nothing to install and no sign-in.</li>
+              <li>Show the plate. Muse Spark names the dish.</li>
+              <li>Just talk. Muse Voice writes it down.</li>
+              <li>Tags are read back, so the guest can fix them before staff see it.</li>
+            </ol>
+          </div>
+          <div class="stage table-stage" aria-hidden="true">
+            <div class="phone" id="phone">
+              <div class="screen">
+                <div class="scr" data-scr="0">
+                  <div class="tent"><div class="qr" id="qr"></div><b>Table 7</b><span>Tell the chef how it was</span></div>
+                  <i class="scanline"></i>
+                </div>
+                <div class="scr" data-scr="1">
+                  <div class="shot"><div class="shot-dish" id="guest-dish"></div></div>
+                  <div class="named"><span class="by">Muse Spark</span><b>Chicken Biryani</b></div>
+                </div>
+                <div class="scr" data-scr="2">
+                  <p class="scr-h">Just say it</p>
+                  <div class="wave small" id="guest-wave"></div>
+                  <p class="said-line" lang="hi">बिरयानी बहुत टेस्टी थी, लेकिन पोर्शन थोड़ा कम था और नान ठंडा आया।</p>
+                  <div class="hold">Hold to talk</div>
+                </div>
+                <div class="scr" data-scr="3">
+                  <p class="scr-h">Did we get it right?</p>
+                  <ul class="tags">
+                    <li style="--c: var(--mint)"><span>very tasty biryani</span><i></i></li>
+                    <li style="--c: var(--saffron)"><span>portion a bit small</span><i></i></li>
+                    <li style="--c: var(--sky)"><span>naan came cold</span><i></i></li>
+                  </ul>
+                  <div class="send">Send to the chef</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- the morning -->
+      <section class="scene" id="morning" aria-labelledby="morning-h">
+        <div class="pin">
+          <div class="copy">
+            <h2 id="morning-h" class="swap">
+              <span class="say" data-say="0">Every morning, NIGHTSHIFT <em>reads the night</em>.</span>
+              <span class="say" data-say="1">One plan. Four analysts, in parallel.</span>
+              <span class="say" data-say="2">Tonight's <em>watch list</em>.</span>
+            </h2>
+            <p class="body">Muse Wonder plans a review of last night. Four Muse Spark analysts check guest notes, plates, stock and the closing round, then Wonder links the facts. In the app, every line opens its evidence.</p>
+          </div>
+          <div class="stage morning-stage" aria-hidden="true">
+            <svg class="graph" id="graph" viewBox="0 0 640 520"></svg>
+            <div class="watch" id="watch"></div>
+            <p class="source">Counts from a live run on the demo restaurant, Saffron House.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- the brigade -->
+      <section class="brigade" id="models" aria-labelledby="models-h">
+        <h2 id="models-h">Six Meta models. <em>Each with one station.</em></h2>
+        <ol class="menu" id="menu">
+          <li><span class="mk muse"></span><b>Muse Wonder</b><i></i><span>Reads the menu. Plans the morning review.</span></li>
+          <li><span class="mk muse"></span><b>Muse Spark</b><i></i><span>Names the dish, writes the checks, runs four analysts.</span></li>
+          <li><span class="mk muse"></span><b>Muse Image</b><i></i><span>Draws plating cards, dish icons and table tents.</span></li>
+          <li><span class="mk muse"></span><b>Muse Voice</b><i></i><span>Writes down what chefs and guests say, in their language.</span></li>
+          <li><span class="mk muse"></span><b>Glimmer</b><i></i><span>Keeps only frames with a plate, on site.</span></li>
+          <li><span class="mk meta"></span><b>SAM 3.1</b><i></i><span>Finds and counts every part of the plate.</span></li>
+        </ol>
+      </section>
+
+      <!-- the rules -->
+      <section class="scene creed" id="creed" aria-label="How Nomi behaves">
+        <div class="pin">
+          <p class="creed-line" data-creed>Nomi shows only what it can <em>see, count or hear</em>.</p>
+          <p class="creed-line" data-creed>People approve <em>every action</em>.</p>
+          <p class="creed-line" data-creed>Low confidence is <em>shown, not hidden</em>.</p>
+        </div>
+      </section>
+
+      <!-- close -->
+      <section class="close" id="try" aria-labelledby="try-h">
+        <div class="close-dish" id="close-dish" aria-hidden="true"></div>
+        <h2 id="try-h">Try it on the <em>live</em> app.</h2>
+        <ul class="ways">
+          <li><a data-app="/sign-in"><b>Open the staff app</b><span>Any 10-digit number, then the code on screen. Pick Head Chef, Owner, Manager or Staff.</span><i></i></a></li>
+          <li><a data-app="/t/demo-table-7"><b>Be the guest at table 7</b><span>Show a plate and talk to the chef, the way a diner does after scanning the QR.</span><i></i></a></li>
+          <li><a data-app="/setup"><b>Set up a restaurant</b><span>Snap a menu and watch Muse Wonder read every dish.</span><i></i></a></li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <span class="brand small"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="21.5" r="17" fill="#B77400"/><circle cx="20" cy="19" r="17" fill="#FFB627"/><circle cx="20" cy="19" r="11" fill="#FFD772"/><circle cx="15" cy="14" r="3" fill="#FFF4D6"/></svg><span>nomi</span></span>
+      <p>Built for the Meta Global AI Developer Hackathon, Oct 26 – Nov 4, 2026. One Expo codebase for Android and the web.</p>
+    </footer>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

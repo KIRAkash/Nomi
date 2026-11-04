@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "flat-type-hierarchy",
+        "value": "*",
+        "files": [
+          "apps/site/index.html"
+        ],
+        "createdAt": "2026-11-04T13:01:44.024Z",
+        "reason": "Agent decided: false positive, the detector reads index.html without its Vite-imported stylesheet; shipped sizes are h1 clamp(3rem,5.4vw,5.4rem), h2 clamp(2.1rem,4.6vw,4.1rem), body 17px"
+      }
+    ]
+  }
+}

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Deploys the vision worker and the API to Cloud Run so the APK can reach them from anywhere.
-#   deploy/gcp.sh            deploy both
+# Deploys the vision worker, the API and the web front end to Cloud Run so the APK and browsers can reach them from anywhere.
+#   deploy/gcp.sh            deploy all three
 #   deploy/gcp.sh api        deploy only the API
+#   deploy/gcp.sh web        deploy only the web front end (landing at /, the Expo web app on its routes)
 # Reads MODEL_API_KEY from .env into Secret Manager; nothing secret goes into the image.
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -15,6 +16,32 @@ g() { gcloud --project "$PROJECT" --quiet "$@"; }
 
 g artifacts repositories describe nomi --location "$REGION" >/dev/null 2>&1 ||
   g artifacts repositories create nomi --location "$REGION" --repository-format docker
+
+# The web front end is static: build the landing and the Expo web export against the live API, then serve both from nginx.
+deploy_web() {
+  local api stage
+  api=$(g run services describe nomi-api --region "$REGION" --format 'value(status.url)')
+  [ -n "$api" ] || { echo "Deploy the API first: deploy/gcp.sh api"; exit 1; }
+  stage=$(mktemp -d)
+  npm run build -w @nomi/site
+  (cd apps/app && rm -rf dist && EXPO_PUBLIC_API_URL="$api" npx expo export --platform web --output-dir dist)
+  cp deploy/web/Dockerfile deploy/web/nginx.conf "$stage/"
+  cp -R apps/app/dist "$stage/app"
+  cp -R apps/site/dist "$stage/site"
+  g builds submit "$stage" --tag "$REPO/web"
+  # Public; nginx starts in well under a second, but one warm instance keeps the first visit instant during judging.
+  g run deploy nomi-web --image "$REPO/web" --region "$REGION" --allow-unauthenticated --port 8080 \
+    --memory 256Mi --cpu 1 --min-instances 1 --max-instances 4
+  rm -rf "$stage"
+  echo "Web: $(g run services describe nomi-web --region "$REGION" --format 'value(status.url)')"
+}
+
+if [ "$only" = web ]; then
+  g artifacts repositories describe nomi --location "$REGION" >/dev/null 2>&1 ||
+    g artifacts repositories create nomi --location "$REGION" --repository-format docker
+  deploy_web
+  exit 0
+fi
 
 key=$(grep -E '^MODEL_API_KEY=' .env | cut -d= -f2-)
 [ -n "$key" ] || { echo "MODEL_API_KEY is empty in .env"; exit 1; }
@@ -46,3 +73,4 @@ g run deploy nomi-api --image "$REPO/api" --region "$REGION" --allow-unauthentic
   --set-secrets "MODEL_API_KEY=$SECRET:latest"
 
 echo "API: $(g run services describe nomi-api --region "$REGION" --format 'value(status.url)')"
+[ "$only" = api ] || deploy_web

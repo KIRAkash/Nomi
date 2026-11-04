@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 
 import { QR } from '@/components/qr';
+import { guestUrl } from '@/lib/links';
 import { Segmented, Sheet, TopBar } from '@/components/kit';
 import { TABLES, TEAM } from '@/lib/mock';
 
@@ -76,17 +77,17 @@ export default function Team() {
             {tables.map((t) => (
               <Squishy key={t.label} accessibilityRole="button" accessibilityLabel={`${t.label}, ${notes(t.notes)} this week`} onPress={() => setTable(t)} containerStyle={{ width: '31%' }}
                 style={{ backgroundColor: color.card, borderRadius: 20, padding: 10, alignItems: 'center', gap: 4, ...shadow(1) }}>
-                <QR value={`https://nomi.app/t/${t.token}`} size={64} />
+                <QR value={guestUrl(t.token)} size={64} />
                 <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.ink }}>{t.label}</Text>
                 <Text style={{ fontFamily: font.bodySemi, fontSize: 11, color: color.ink2 }}>{notes(t.notes)}</Text>
               </Squishy>
             ))}
           </View>
           <Button kind="saffron" title="Print table tents in Studio" onPress={() => router.push('/studio')} />
-          <Sheet open={!!table} onClose={() => setTable(null)} title={table?.label ?? ''} sub={`nomi.app/t/${table?.token}`}>
+          <Sheet open={!!table} onClose={() => setTable(null)} title={table?.label ?? ''} sub={table ? guestUrl(table.token).replace(/^https?:\/\//, '') : ''}>
             {table && (
               <View style={{ alignItems: 'center', gap: 12 }}>
-                <QR value={`https://nomi.app/t/${table.token}`} size={200} />
+                <QR value={guestUrl(table.token)} size={200} />
                 <H2 style={{ fontSize: 16 }}>{notes(table.notes)} this week</H2>
                 <Button small kind="white" title="Rotate this QR" onPress={() => rotate(table.label)} />
                 <Sub style={{ fontSize: 12, textAlign: 'center' }}>Rotating makes the old printed code stop working. Print the new tent before you rotate.</Sub>

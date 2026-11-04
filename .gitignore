@@ -12,3 +12,7 @@ __pycache__/
 android/
 ios/
 supabase/.temp/
+
+# design review captures
+apps/site/.impeccable/review/
+.impeccable/hook.cache.json
