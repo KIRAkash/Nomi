@@ -250,7 +250,7 @@ export default function Pass() {
   );
 
   return (
-    <Screen dark scroll style={{ paddingBottom: 120 }}>
+    <Screen wide dark scroll style={{ paddingBottom: 120 }}>
       <View style={{ gap: 6 }}>
         <Text style={{ fontFamily: font.body, fontSize: 13, color: color.saffronSoft }}>Friday dinner · Pass tablet</Text>
         <H1 style={{ color: color.bg }}>The pass</H1>

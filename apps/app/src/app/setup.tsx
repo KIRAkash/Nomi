@@ -207,7 +207,7 @@ export default function Setup() {
   const [dishes, setDishes] = useState<MenuRow[]>(MENU_SNAP);
   const next = () => setStep((x) => x + 1);
   return (
-    <Screen scroll style={{ paddingBottom: 40 }}>
+    <Screen wide scroll style={{ paddingBottom: 40 }}>
       <TopBar back sub={`Step ${Math.min(step + 1, 3)} of 3`} title="Set up Nomi" right={<View />} />
       <View style={{ flexDirection: 'row', gap: 4 }}>
         {[0, 1, 2].map((i) => <View key={i} style={{ flex: 1, height: 8, borderRadius: 4, backgroundColor: i <= step ? color.ink : color.saffronSoft }} />)}

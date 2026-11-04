@@ -669,7 +669,7 @@ export default function GoldenPlate() {
   const parts = useMemo(() => partsFor(dish.name).map((p) => p.name), [dish.name]);
   const next = () => setStep((x) => Math.min(STEPS.length - 1, x + 1));
   return (
-    <Screen scroll style={{ paddingBottom: 40 }}>
+    <Screen wide scroll style={{ paddingBottom: 40 }}>
       <TopBar back sub={`Golden Plate v${version}`} title={dish.name} right={<View />} />
       <Progress step={step} />
       <SquishIn key={step}>

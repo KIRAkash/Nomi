@@ -209,15 +209,17 @@ h2 {
   line-height: 1;
 }
 .brand-mark {
-  width: 36px;
-  height: 36px;
+  /* the Golden Plate mark from design/logo, the same as the app icon */
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 .brand.small {
   font-size: 1.3rem;
 }
 .brand.small .brand-mark {
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
 }
 
 /* ---------------------------------------------------------------- hero */
@@ -262,6 +264,11 @@ h2 {
   margin-top: 18px;
   color: var(--faint);
   font-size: 0.9rem;
+}
+.fine a {
+  color: var(--ink);
+  font-weight: 700;
+  text-underline-offset: 3px;
 }
 .hero-stage {
   position: relative;

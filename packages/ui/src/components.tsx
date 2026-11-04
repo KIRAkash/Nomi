@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View, type PressableProps, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View, type PressableProps, type StyleProp, type TextProps, type TextStyle, type ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -17,8 +17,12 @@ export const Sub = make(type.sub);
 export const Label = make(type.label);
 export const Num = make(type.num);
 
-export function Screen({ children, scroll = false, dark = false, style }: { children: ReactNode; scroll?: boolean; dark?: boolean; style?: StyleProp<ViewStyle> }) {
-  const inner = [s.screenInner, style];
+/**
+ * A screen. On the web its content sits in a centred phone-width column, so a desktop browser doesn't stretch every card
+ * and button edge to edge; `wide` is for the screens that lay themselves out for a tablet.
+ */
+export function Screen({ children, scroll = false, dark = false, wide = false, style }: { children: ReactNode; scroll?: boolean; dark?: boolean; wide?: boolean; style?: StyleProp<ViewStyle> }) {
+  const inner = [s.screenInner, Platform.OS === 'web' && !wide && s.column, style];
   return (
     <SafeAreaView style={[s.screen, dark && { backgroundColor: color.ink }]} edges={['top', 'left', 'right']}>
       {scroll ? <ScrollView contentContainerStyle={inner} showsVerticalScrollIndicator={false}>{children}</ScrollView> : <View style={[inner, { flex: 1 }]}>{children}</View>}
@@ -82,6 +86,7 @@ export function Chip({ label, tone: t = 'white', style }: { label: string; tone?
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: color.bg },
   screenInner: { paddingHorizontal: space.l, paddingTop: space.m, paddingBottom: space.l, gap: space.m },
+  column: { width: '100%', maxWidth: 640, alignSelf: 'center' },
   card: { backgroundColor: color.card, borderRadius: radius.card, padding: 16, ...shadow(1) },
   soft: { borderRadius: 22, padding: 14 },
   button: { minHeight: 60, paddingHorizontal: 20, borderRadius: radius.button, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
