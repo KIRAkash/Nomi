@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 38px; }
+  .head p { max-width: 400px; }
+  .strip { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+  .phone { height: 420px; border-radius: 30px; border: 7px solid #0d0d22; background-size: 100% auto; background-repeat: no-repeat;
+           background-color: #fff4d6; box-shadow: 0 0 0 1px rgba(255, 244, 214, 0.14), 0 24px 40px rgba(0, 0, 0, 0.35); }
+  .cap { margin-top: 16px; }
+  .cap h3 { font-size: 18px; color: #fff4d6; margin-bottom: 4px; }
+  .cap p { font-size: 14.5px; line-height: 1.4; }
+</style>
+</head>
+<body>
+<div class="card ink">
+  <div class="head">
+    <div>
+      <h2>Built for a kitchen,<br>a table and a morning.</h2>
+    </div>
+    <p>Recorded from the running app. Hold to talk instead of typing, big targets for wet hands, and every AI result tagged with the model that made it.</p>
+  </div>
+  <div class="strip">
+    <div>
+      <div class="phone" style="background-image: url(shots/guest-said.jpg)"></div>
+      <div class="cap"><h3>Guest voice note</h3><p>Hindi in, tags read back. The guest removes any that are wrong.</p></div>
+    </div>
+    <div>
+      <div class="phone" style="background-image: url(shots/reply.jpg)"></div>
+      <div class="cap"><h3>Reply draft</h3><p>Written in the guest's own language. Sent only after a manager approves.</p></div>
+    </div>
+    <div>
+      <div class="phone" style="background-image: url(shots/cards.jpg)"></div>
+      <div class="cap"><h3>Plating cards</h3><p>The chef's spoken rules as numbered steps, translated for the line.</p></div>
+    </div>
+    <div>
+      <div class="phone" style="background-image: url(shots/larder.jpg)"></div>
+      <div class="cap"><h3>Larder</h3><p>SAM 3.1 counts whole items on the shelf. The reorder list waits for approval.</p></div>
+    </div>
+    <div>
+      <div class="phone" style="background-image: url(shots/ask.jpg)"></div>
+      <div class="cap"><h3>Ask Nomi</h3><p>Answers from the restaurant's own data, and says no to forecasts.</p></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

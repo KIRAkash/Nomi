@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 64px; }
+  .head p { max-width: 430px; }
+  .d { position: relative; width: 1072px; height: 520px; }
+  .d svg { position: absolute; inset: 0; }
+  .b { position: absolute; background: #fff; border-radius: 22px; padding: 14px 18px;
+       box-shadow: 0 1px 0 var(--ink-line), 0 14px 30px rgba(27, 27, 58, 0.07); }
+  .b h3 { font-size: 18px; margin-bottom: 3px; }
+  .b p { font-size: 13.5px; line-height: 1.4; }
+  .b code, .band code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 12.5px; font-weight: 600; color: var(--saffron-text); }
+  .col { position: absolute; top: -30px; font-size: 12.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .hub { background: var(--ink); color: #fff4d6; }
+  .hub p { color: rgba(255, 244, 214, 0.74); }
+  .hub code { color: var(--amber); }
+  .routes { display: flex; flex-direction: column; gap: 7px; margin-top: 14px; }
+  .routes div { background: rgba(255, 244, 214, 0.08); border-radius: 12px; padding: 8px 11px; font-size: 13px; line-height: 1.35; color: rgba(255, 244, 214, 0.8); }
+  .routes b { color: #fff4d6; font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13px; margin-right: 6px; }
+  .tag { display: inline-block; margin-top: 7px; font-size: 11.5px; font-weight: 800; padding: 3px 8px; border-radius: 8px; }
+  .t-mi { background: var(--mint-soft); color: var(--mint-ink); }
+  .t-sa { background: var(--saffron-soft); color: #6e4a00; }
+  .t-sk { background: var(--sky-soft); color: var(--sky-ink); }
+  .band { position: absolute; left: 0; right: 0; top: 456px; height: 64px; border-radius: 20px; border: 2px dashed rgba(27, 27, 58, 0.18);
+          display: flex; align-items: center; gap: 28px; padding: 0 22px; font-size: 14px; color: var(--ink-sub); }
+  .band b { color: var(--ink); font-weight: 800; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div>
+      <h2>One app, one API,<br>every model behind a router.</h2>
+    </div>
+    <p>Hosted on Cloud Run in <code style="font-family: ui-monospace, Menlo, monospace; font-size: 15px">asia-south1</code>. With no database configured, demo table tokens serve the seed restaurant, so the whole thing runs for remote testers.</p>
+  </div>
+
+  <div class="d">
+    <svg width="1072" height="456" viewBox="0 0 1072 456" fill="none" stroke-width="2.5" stroke-linecap="round">
+      <g stroke="rgba(27,27,58,.28)">
+        <path d="M262 46 C 320 46, 320 120, 372 120"/>
+        <path d="M262 166 C 320 166, 320 190, 372 190"/>
+        <path d="M262 286 C 320 286, 320 260, 372 260"/>
+      </g>
+      <g stroke="#d98e00">
+        <path d="M652 120 C 700 120, 700 44, 752 44"/>
+        <path d="M652 170 C 700 170, 700 154, 752 154"/>
+        <path d="M652 220 C 700 220, 700 266, 752 266"/>
+        <path d="M652 270 C 700 270, 700 372, 752 372" stroke-dasharray="2 7"/>
+      </g>
+      <g fill="#d98e00" stroke="none">
+        <circle cx="752" cy="44" r="5"/><circle cx="752" cy="154" r="5"/><circle cx="752" cy="266" r="5"/><circle cx="752" cy="372" r="5"/>
+      </g>
+    </svg>
+
+    <div class="col" style="left: 0">Where people are</div>
+    <div class="b" style="left: 0; top: 0; width: 262px; height: 92px">
+      <h3>Guest's own phone</h3>
+      <p>Web page from the table QR, <code>/t/&lt;token&gt;</code>. No app, no sign-in.</p>
+    </div>
+    <div class="b" style="left: 0; top: 120px; width: 262px; height: 92px">
+      <h3>Android app</h3>
+      <p>Chef, owner, manager and staff. APK built in the cloud with EAS.</p>
+    </div>
+    <div class="b" style="left: 0; top: 240px; width: 262px; height: 92px">
+      <h3>Web app + landing</h3>
+      <p>Pass tablet or laptop. nginx serves the landing at <code>/</code> and the app beside it.</p>
+    </div>
+    <div style="position: absolute; left: 0; top: 352px; width: 262px; font-size: 13.5px; line-height: 1.45; color: var(--ink-sub)">
+      <b style="color: var(--ink)">apps/app</b> · Expo SDK 58, Expo Router, Reanimated. One codebase exports Android and web.
+    </div>
+
+    <div class="col" style="left: 372px">apps/api</div>
+    <div class="b hub" style="left: 372px; top: 0; width: 280px; height: 380px">
+      <h3>Hono API</h3>
+      <p>TypeScript on Cloud Run. Public, rate limited per device.</p>
+      <div class="routes">
+        <div><b>/t</b>Guest routes, scoped to one table token</div>
+        <div><b>/golden</b>Photos, masks and rules for a Golden Plate</div>
+        <div><b>/voice</b>Voice notes to text and tags</div>
+        <div><b>/staff</b>Pass checks, NIGHTSHIFT briefing, watch list</div>
+      </div>
+      <p style="margin-top: 14px; font-size: 13px">Each pipeline stage streams to the screen as it runs.</p>
+    </div>
+
+    <div class="col" style="left: 752px">Behind the API</div>
+    <div class="b" style="left: 752px; top: 0; width: 320px; height: 88px">
+      <h3>Meta Model API</h3>
+      <p>Muse Wonder, Spark, Image, Voice Transcribe and SAM 3.1, through <code>packages/models</code>.</p>
+    </div>
+    <div class="b" style="left: 752px; top: 102px; width: 320px; height: 104px">
+      <h3>Vision worker</h3>
+      <p>Python FastAPI + NumPy. Decodes SAM masks into plate signatures and scores. Accepts the API only.</p>
+    </div>
+    <div class="b" style="left: 752px; top: 222px; width: 320px; height: 88px">
+      <h3>Supabase</h3>
+      <p>Postgres with row-level security, migrations and a demo seed. Optional for the hosted demo.</p>
+    </div>
+    <div class="b" style="left: 752px; top: 328px; width: 320px; height: 88px; background: var(--cream)">
+      <h3>Glimmer, on site</h3>
+      <p>Runs on the restaurant's machine. Filters pass frames and redacts phone numbers first.</p>
+    </div>
+
+    <div class="band">
+      <span><b>Shared packages</b></span>
+      <span><code>packages/shared</code> row types + zod schemas</span>
+      <span><code>packages/ui</code> Clay Tiffin tokens, motion, dish art</span>
+      <span><code>supabase/</code> schema + RLS</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

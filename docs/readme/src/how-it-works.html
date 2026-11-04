@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 36px; }
+  .head p { max-width: 430px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 36px 32px; }
+  /* A crop of a real app frame: --sw is the frame width, --x/--y/--cw the crop's left, top and width, all in frame px. */
+  .shot { width: 520px; height: 260px; border-radius: 22px; background-repeat: no-repeat;
+          background-size: calc(var(--sw) * 520px / var(--cw)) auto;
+          background-position: calc(var(--x) * -520px / var(--cw)) calc(var(--y) * -520px / var(--cw));
+          box-shadow: 0 18px 40px rgba(27, 27, 58, 0.16), 0 0 0 1px rgba(27, 27, 58, 0.08); }
+  .phones { display: flex; justify-content: center; align-items: start; gap: 22px; padding-top: 22px; overflow: hidden;
+            background: linear-gradient(180deg, #fff4d6, #ffe7b0); }
+  .phones div { width: 190px; height: 280px; border-radius: 26px 26px 0 0; background-size: 190px auto; background-repeat: no-repeat;
+                border: 6px solid var(--ink); border-bottom: 0; }
+  .step { display: grid; grid-template-columns: 54px 1fr; gap: 0 16px; margin-top: 22px; }
+  .n { width: 54px; height: 54px; border-radius: 18px; background: var(--ink); color: var(--amber); display: flex; align-items: center;
+       justify-content: center; font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 24px; }
+  .who { font-size: 14px; font-weight: 750; color: var(--saffron-text); margin: 4px 0 6px; }
+  .step p { font-size: 16.5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div>
+      <h2>One plate, four moments.</h2>
+    </div>
+    <p>The chef's own photo of the dish done right is the standard. Everything after it is measured against that, never against a guess.</p>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="shot" style="--sw: 1280; --x: 0; --y: 130; --cw: 1280; background-image: url(shots/golden-masks.jpg)"></div>
+      <div class="step">
+        <div class="n">1</div>
+        <div>
+          <h3>Set the Golden Plate</h3>
+          <div class="who">Head chef · once per dish</div>
+          <p>Three photos of the dish plated right. SAM 3.1 finds every part in all three, then the chef says the rules out loud.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="shot" style="--sw: 1280; --x: 0; --y: 0; --cw: 1280; background-image: url(shots/pass.jpg)"></div>
+      <div class="step">
+        <div class="n">2</div>
+        <div>
+          <h3>Check it at the pass</h3>
+          <div class="who">Pass tablet · every plate</div>
+          <p>A camera over the pass compares each plate with the Golden Plate before it leaves. Missing onions get a quiet nudge, not an alarm.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="shot phones" style="--sw: 1; --x: 0; --y: 0; --cw: 1">
+        <div style="background-image: url(shots/guest-plate.jpg)"></div>
+        <div style="background-image: url(shots/guest-voice.jpg)"></div>
+      </div>
+      <div class="step">
+        <div class="n">3</div>
+        <div>
+          <h3>Hear the guest</h3>
+          <div class="who">Table QR · about ten seconds</div>
+          <p>No app, no sign-in. Show the plate, tap a face, say anything in any language. Nomi reads back what it heard.</p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="shot" style="--sw: 1280; --x: 0; --y: 80; --cw: 1280; background-image: url(shots/briefing.jpg)"></div>
+      <div class="step">
+        <div class="n">4</div>
+        <div>
+          <h3>Brief the owner</h3>
+          <div class="who">NIGHTSHIFT · every morning</div>
+          <p>Analysts read the night's facts and write a briefing with evidence, plus a watch list for tonight's service.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

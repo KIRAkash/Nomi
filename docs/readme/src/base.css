@@ -1,0 +1,126 @@
+/* The README images: the landing's light "Paper" world (DESIGN.md) with the app's Clay Tiffin colours for parts and chips.
+   Each page holds one .card; render.mjs screenshots it with a transparent page so the rounded corners sit on any theme. */
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('../../../node_modules/@fontsource-variable/inter-tight/files/inter-tight-latin-wght-normal.woff2') format('woff2');
+  font-weight: 100 900;
+}
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../../node_modules/@fontsource/fredoka/files/fredoka-latin-600-normal.woff2') format('woff2');
+  font-weight: 600;
+}
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../../../node_modules/@fontsource/fredoka/files/fredoka-latin-700-normal.woff2') format('woff2');
+  font-weight: 700;
+}
+
+:root {
+  --paper: #fffbef;
+  --paper-warm: #fff0c2;
+  --cream: #fff4d6;
+  --ink: #1b1b3a;
+  --ink-sub: rgba(27, 27, 58, 0.68);
+  --ink-faint: rgba(27, 27, 58, 0.64);
+  --ink-line: rgba(27, 27, 58, 0.12);
+  --saffron: #d98e00;
+  --saffron-text: #8f5800; /* saffron dark enough for small text on paper (5.2:1) */
+  --saffron-display: #c27b00; /* saffron for display type (3.5:1) */
+  --amber: #ffb627;
+  --saffron-soft: #ffe7b0;
+  --rice: #3f8fd6;
+  --chicken: #d93a2e;
+  --onions: #d98e00;
+  --lemon: #e8559a;
+  --raita: #2e9a5f;
+  --mint-soft: #ddf5e6;
+  --mint-ink: #14532d;
+  --tomato-soft: #fde2df;
+  --tomato-ink: #8f1d1d;
+  --sky-soft: #ddeefb;
+  --sky-ink: #1d4e7a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: transparent; }
+body {
+  font-family: 'Inter Tight', system-ui, sans-serif;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'tnum';
+}
+
+.card {
+  width: 1200px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, var(--paper-warm) 0%, rgba(255, 240, 194, 0) 62%),
+    #ffffff;
+  padding: 56px 64px;
+}
+.card.ink {
+  background: var(--ink);
+  color: #fff4d6;
+}
+
+h1 {
+  font-weight: 850;
+  font-size: 64px;
+  line-height: 0.96;
+  letter-spacing: -0.04em;
+}
+h2 {
+  font-weight: 820;
+  font-size: 46px;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+h3 {
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+p { font-size: 17px; line-height: 1.5; color: var(--ink-sub); }
+.ink p { color: rgba(255, 244, 214, 0.74); }
+.lede { font-size: 20px; line-height: 1.45; max-width: 620px; }
+
+.wordmark {
+  font-family: 'Fredoka', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+  font-weight: 750;
+  padding: 7px 12px;
+  border-radius: 14px;
+  white-space: nowrap;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: 0 1px 0 var(--ink-line), 0 6px 14px rgba(27, 27, 58, 0.06);
+}
+.chip.sa { background: var(--saffron-soft); color: #6e4a00; box-shadow: none; }
+.chip.mi { background: var(--mint-soft); color: var(--mint-ink); box-shadow: none; }
+.chip.to { background: var(--tomato-soft); color: var(--tomato-ink); box-shadow: none; }
+.chip.sk { background: var(--sky-soft); color: var(--sky-ink); box-shadow: none; }
+.chip.ink { background: var(--ink); color: #fff4d6; box-shadow: none; }
+.dot { width: 11px; height: 11px; border-radius: 4px; flex-shrink: 0; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+
+/* A dish photo with SAM 3.1 part layers tinted on top. The layers are full-frame RGBA cutouts aligned to the dish. */
+.plate { position: relative; overflow: hidden; }
+.plate > img, .plate > i { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.plate > i {
+  display: block;
+  -webkit-mask-size: cover;
+  -webkit-mask-position: center;
+  mix-blend-mode: color;
+}

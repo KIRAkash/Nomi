@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  h2 { margin-bottom: 34px; }
+  .body { display: grid; grid-template-columns: 320px 320px 1fr; gap: 22px; align-items: stretch; }
+  /* dish.png is 1920x1280 with the plate centred at (982, 650), r 506; the tile shows the plate square at 0.302x */
+  .tile { position: relative; width: 320px; height: 320px; border-radius: 26px; overflow: hidden; background: #1c1c1f;
+          box-shadow: 0 18px 40px rgba(0, 0, 0, 0.16); }
+  .tile .plate { position: absolute; left: -137px; top: -36px; width: 580px; height: 387px; overflow: visible; }
+  .tile .plate > i { -webkit-mask-size: 100% 100%; }
+  .tile .chip { position: absolute; left: 14px; bottom: 14px; }
+  .ring { position: absolute; width: 64px; height: 64px; margin: -32px 0 0 -32px; border-radius: 50%;
+          border: 3px dashed var(--amber); background: rgba(255, 182, 39, 0.16); }
+  .list { background: #fff; border-radius: 26px; padding: 22px 24px; box-shadow: 0 1px 0 var(--ink-line), 0 18px 40px rgba(27, 27, 58, 0.08); }
+  .list .h { font-size: 13px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 10px; }
+  .li { display: grid; grid-template-columns: 26px 1fr auto; align-items: center; gap: 10px; padding: 7px 0; border-top: 1px solid var(--ink-line); }
+  .li:first-of-type { border-top: 0; }
+  .li b { font-size: 16.5px; font-weight: 780; }
+  .li small { display: block; font-size: 13.5px; color: var(--ink-sub); font-weight: 500; margin-top: 1px; }
+  .ok, .no { width: 26px; height: 26px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 15px; }
+  .ok { background: var(--mint-soft); color: var(--mint-ink); }
+  .no { background: var(--saffron-soft); color: #6e4a00; }
+  .rules { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-top: 30px; padding-top: 28px; border-top: 1px solid var(--ink-line); }
+  .rules h3 { font-size: 20px; margin-bottom: 6px; }
+  .rules p { font-size: 15.5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h2>Nomi says only what it can see, count or hear.</h2>
+
+  <div class="body">
+    <div class="tile">
+      <div class="plate">
+        <img src="../../../video/public/plates/golden/dish.png" alt="">
+        <i style="background: var(--rice); -webkit-mask-image: url(../../../video/public/plates/golden/rice.png)"></i>
+        <i style="background: var(--chicken); -webkit-mask-image: url(../../../video/public/plates/golden/chicken.png)"></i>
+        <i style="background: var(--onions); -webkit-mask-image: url(../../../video/public/plates/golden/onions.png)"></i>
+        <i style="background: var(--lemon); -webkit-mask-image: url(../../../video/public/plates/golden/lemon.png)"></i>
+      </div>
+      <span class="chip">Golden Plate</span>
+    </div>
+
+    <div class="tile">
+      <div class="plate"><img src="../../../video/public/plates/drift-2/dish.png" alt=""></div>
+      <div class="ring" style="left: 211px; top: 59px"></div>
+      <div class="ring" style="left: 258px; top: 239px"></div>
+      <span class="chip sa">This plate · at the pass</span>
+    </div>
+
+    <div class="list">
+      <div class="h">SAM 3.1 against the Golden Plate</div>
+      <div class="li"><span class="ok">✓</span><div><b>Rice</b><small>31% of plate · Golden Plate 27%</small></div></div>
+      <div class="li"><span class="ok">✓</span><div><b>Chicken pieces</b><small>4 counted · Golden Plate 4</small></div></div>
+      <div class="li"><span class="no">!</span><div><b>Fried onions</b><small>Not found · expected at 1 o'clock</small></div></div>
+      <div class="li"><span class="no">!</span><div><b>Lemon wedge</b><small>Not found · expected at 4 o'clock</small></div></div>
+      <div class="li"><span class="ok">✓</span><div><b>Raita bowl</b><small>Found · outside the plate, 9 o'clock</small></div></div>
+    </div>
+  </div>
+
+  <div class="rules">
+    <div>
+      <h3>No guesses</h3>
+      <p>Counts, plate shares and clock positions from masks. Never weights, rupees or forecasts; links are labelled "likely cause".</p>
+    </div>
+    <div>
+      <h3>People approve</h3>
+      <p>Replies, orders, SOP changes and Golden Plates stay drafts until a named person approves them.</p>
+    </div>
+    <div>
+      <h3>Unsure shows up</h3>
+      <p>Anything below the confidence bar turns amber with "Check this". It is never kept quietly.</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>

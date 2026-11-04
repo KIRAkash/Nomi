@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .head { display: flex; align-items: end; justify-content: space-between; gap: 40px; margin-bottom: 34px; }
+  .head p { max-width: 430px; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .m { background: #fff; border-radius: 26px; padding: 22px 22px 20px; display: flex; flex-direction: column; gap: 12px;
+       box-shadow: 0 1px 0 var(--ink-line), 0 16px 34px rgba(27, 27, 58, 0.07); }
+  .top { display: flex; align-items: center; gap: 12px; }
+  .top img { width: 38px; height: 38px; object-fit: contain; }
+  .top h3 { font-size: 21px; }
+  .top .chip { margin-left: auto; font-size: 12.5px; padding: 5px 10px; }
+  .m p { font-size: 15.5px; line-height: 1.45; flex-grow: 1; }
+  .uses { display: flex; flex-wrap: wrap; gap: 6px; }
+  .uses span { font-size: 13px; font-weight: 700; padding: 5px 10px; border-radius: 11px; background: var(--cream); color: #4a3a12; }
+  .foot { margin-top: 24px; font-size: 15px; color: var(--ink-sub); }
+  .foot code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 14px; background: var(--cream); padding: 3px 8px; border-radius: 8px; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="head">
+    <div>
+      <h2>Six Meta models,<br>one job each.</h2>
+    </div>
+    <p>Every result in the app carries the name of the model that made it, and every output that drives a screen is checked against a zod schema first.</p>
+  </div>
+  <div class="grid">
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/meta.svg" alt=""><h3>SAM 3.1</h3><span class="chip mi">Live</span></div>
+      <p>Finds every part of a plate, a shelf or a counter, pixel by pixel. Nomi measures shares, counts and clock positions from its masks.</p>
+      <div class="uses"><span>Golden Plate masks</span><span>Pass score</span><span>Larder counts</span></div>
+    </div>
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/muse.png" alt=""><h3>Muse Spark</h3><span class="chip mi">Live</span></div>
+      <p>Reads photos and words: names the dish in a guest photo, tags feedback, turns a chef's words into rules, drafts replies.</p>
+      <div class="uses"><span>Guest dish check</span><span>Spoken rules</span><span>NIGHTSHIFT analysts</span></div>
+    </div>
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/muse.png" alt=""><h3>Muse Wonder</h3><span class="chip mi">Live</span></div>
+      <p>The deeper reasoner. Reads a whole printed menu, plans the morning review, and answers only from what Nomi saw, counted or heard.</p>
+      <div class="uses"><span>Menu Snap</span><span>NIGHTSHIFT plan</span><span>Ask Nomi</span></div>
+    </div>
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/muse.png" alt=""><h3>Muse Image</h3><span class="chip mi">Live</span></div>
+      <p>Draws from the chef's own Golden Plate photo: the numbered plating card staff follow and the dish icon guests tap.</p>
+      <div class="uses"><span>Plating cards</span><span>Dish icons</span><span>Table tents</span></div>
+    </div>
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/muse.png" alt=""><h3>Voice Transcribe</h3><span class="chip mi">Live</span></div>
+      <p>Writes down Hindi, Hinglish, English and more, so nobody in a kitchen has to type with wet hands.</p>
+      <div class="uses"><span>Guest voice notes</span><span>Shift handover</span><span>Ask by voice</span></div>
+    </div>
+    <div class="m">
+      <div class="top"><img src="../../../video/public/brand/muse.png" alt=""><h3>Glimmer</h3><span class="chip sa">On site</span></div>
+      <p>A small model on the restaurant's own machine. Keeps only pass frames with a plate in them and strips phone numbers before anything leaves.</p>
+      <div class="uses"><span>Pass frame filter</span><span>Privacy redaction</span></div>
+    </div>
+  </div>
+  <div class="foot">Every call goes through <code>packages/models</code>, which retries, logs latency and validates the output.</div>
+</div>
+</body>
+</html>

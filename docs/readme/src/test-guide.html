@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .card { display: grid; grid-template-columns: 500px 1fr; gap: 52px; align-items: center; }
+  h2 { margin-bottom: 28px; }
+
+  /* the scene: a laptop showing a demo photo, a phone held over it taking the shot */
+  .scene { position: relative; height: 520px; }
+  .laptop { position: absolute; left: 0; top: 56px; width: 440px; }
+  .screen { height: 280px; border-radius: 18px 18px 6px 6px; border: 12px solid #0d0d22; border-bottom-width: 16px; overflow: hidden;
+            background: #111 url(../../../demo-assets/golden-plates/chicken-biryani.jpg) center / cover; }
+  .base { height: 16px; margin: 0 -26px; border-radius: 0 0 16px 16px; background: linear-gradient(#c9c3b6, #a9a295); }
+  .base::after { content: ''; display: block; width: 90px; height: 6px; margin: 0 auto; border-radius: 0 0 6px 6px; background: #8f887c; }
+  .label { position: absolute; z-index: 2; }
+  .phone { position: absolute; right: 10px; top: 150px; height: 380px; width: 210px; border-radius: 34px; border: 8px solid #0d0d22;
+           background: #fff4d6; overflow: hidden; transform: rotate(6deg); box-shadow: 0 30px 50px rgba(27, 27, 58, 0.3); }
+  .phone .bar { padding: 14px 14px 8px; }
+  .phone .bar small { display: block; font-size: 12px; font-weight: 700; color: var(--ink-sub); }
+  .phone .bar b { font-family: 'Fredoka', sans-serif; font-weight: 600; font-size: 17px; }
+  .vf { position: relative; height: 190px; margin: 0 10px; border-radius: 20px; overflow: hidden;
+        background: #111 url(../../../demo-assets/golden-plates/chicken-biryani.jpg) center / 190% auto; }
+  .vf::after { content: ''; position: absolute; left: 22px; right: 22px; top: 14px; bottom: 14px; border-radius: 50%; border: 3px dashed var(--amber); }
+  .shutter { width: 58px; height: 58px; margin: 16px auto 8px; border-radius: 50%; background: var(--amber); border: 5px solid #fff; outline: 3px solid var(--ink); }
+  .phone .hint { text-align: center; font-size: 12px; font-weight: 800; }
+  .verdict { position: absolute; left: 30px; top: 420px; background: var(--mint-soft); color: var(--mint-ink); border-radius: 18px; padding: 12px 16px;
+             font-weight: 800; font-size: 16px; box-shadow: 0 14px 30px rgba(27, 27, 58, 0.16); display: flex; align-items: center; gap: 10px; }
+  .verdict i { width: 24px; height: 24px; border-radius: 50%; background: var(--raita); color: #fff; font-style: normal; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+  .steps { display: flex; flex-direction: column; gap: 14px; }
+  .s { display: grid; grid-template-columns: 44px 1fr; gap: 16px; align-items: start; background: #fff; border-radius: 22px; padding: 16px 18px;
+       box-shadow: 0 1px 0 var(--ink-line), 0 12px 26px rgba(27, 27, 58, 0.06); }
+  .n { width: 44px; height: 44px; border-radius: 15px; background: var(--ink); color: var(--amber); display: flex; align-items: center; justify-content: center;
+       font-family: 'Fredoka', sans-serif; font-weight: 700; font-size: 20px; }
+  .s h3 { font-size: 19px; margin-bottom: 4px; }
+  .s p { font-size: 15px; line-height: 1.45; }
+  .s code { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 13.5px; font-weight: 600; background: var(--cream); padding: 1px 6px; border-radius: 6px; color: var(--ink); }
+  .link { font-weight: 800; color: var(--ink); }
+  .tip { margin-top: 4px; font-size: 14px; color: var(--ink-sub); padding-left: 4px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="scene">
+    <div class="laptop">
+      <div class="screen"></div>
+      <div class="base"></div>
+    </div>
+    <span class="chip label" style="left: 0; top: 0">Screen 1 · laptop with a demo photo</span>
+    <span class="chip ink label" style="right: 0; top: 108px">Screen 2 · your phone</span>
+    <div class="phone">
+      <div class="bar"><small>Kitchen staff · Chicken Biryani</small><b>Check my plate</b></div>
+      <div class="vf"></div>
+      <div class="shutter"></div>
+      <div class="hint">Tap to take the photo</div>
+    </div>
+    <div class="verdict"><i>✓</i>Ready to go</div>
+  </div>
+
+  <div>
+    <h2>Judges: test the Golden Plate in two minutes.</h2>
+    <div class="steps">
+      <div class="s"><div class="n">1</div><div>
+        <h3>Show a plate on a laptop</h3>
+        <p>Open <code>demo-assets/golden-plates/chicken-biryani.jpg</code> on GitHub and click it to view it full size.</p>
+      </div></div>
+      <div class="s"><div class="n">2</div><div>
+        <h3>Open Nomi on your phone</h3>
+        <p>Web: <span class="link">bit.ly/try-nomi</span> · Android APK: <span class="link">bit.ly/try-nomi-apk</span>. Sign in with any 10-digit number and the code shown on screen.</p>
+      </div></div>
+      <div class="s"><div class="n">3</div><div>
+        <h3>Pick Kitchen staff → Check my plate</h3>
+        <p>Choose Chicken Biryani, hold the phone over the laptop as if it were the plate, and take the photo.</p>
+      </div></div>
+      <div class="s"><div class="n">4</div><div>
+        <h3>Read the verdict, then break it</h3>
+        <p>"Ready to go". Then show the plate in <code>off-standard/</code> with the onions missing: "Fix before it goes".</p>
+      </div></div>
+    </div>
+    <p class="tip">Screen glare can trip the photo check; tilt the laptop a little.</p>
+  </div>
+</div>
+</body>
+</html>

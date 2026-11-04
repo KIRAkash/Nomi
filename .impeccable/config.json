@@ -11,6 +11,39 @@
         ],
         "createdAt": "2026-11-04T13:01:44.024Z",
         "reason": "Agent decided: false positive, the detector reads index.html without its Vite-imported stylesheet; shipped sizes are h1 clamp(3rem,5.4vw,5.4rem), h2 clamp(2.1rem,4.6vw,4.1rem), body 17px"
+      },
+      {
+        "rule": "overused-font",
+        "value": "inter",
+        "createdAt": "2026-11-04T18:02:32.258Z",
+        "reason": "apps/site/DESIGN.md: Inter Tight is Nomi's display font, chosen by Akash for the landing and film; README images reuse it"
+      },
+      {
+        "rule": "nested-cards",
+        "value": "*",
+        "files": [
+          "docs/readme/src/hero.html"
+        ],
+        "createdAt": "2026-11-04T18:02:32.335Z",
+        "reason": "The parts card over the photo mocks the app's What Nomi sees overlay; intentional"
+      },
+      {
+        "rule": "radial-halo",
+        "value": "*",
+        "files": [
+          "docs/readme/src/*.html"
+        ],
+        "createdAt": "2026-11-04T18:02:38.601Z",
+        "reason": "apps/site/DESIGN.md Paper Warm: the light-ground #fff0c2 radial from the top-left; the README pages are light, the detector reads their transparent body as dark"
+      },
+      {
+        "rule": "dark-glow",
+        "value": "*",
+        "files": [
+          "docs/readme/src/*.html"
+        ],
+        "createdAt": "2026-11-04T18:02:38.635Z",
+        "reason": "Ink-tinted neutral elevation shadows are the Clay Tiffin system (design/clay-tiffin.css --shadow); flagged only because the README pages have a transparent body"
       }
     ]
   }

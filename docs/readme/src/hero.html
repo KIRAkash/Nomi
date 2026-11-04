@@ -1,0 +1,69 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="base.css">
+<style>
+  .card { height: 620px; display: grid; grid-template-columns: 1fr 540px; gap: 36px; align-items: center; padding: 56px 56px 56px 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; margin-bottom: 40px; }
+  .brand img { width: 92px; height: 92px; margin: -14px -8px -14px -14px; }
+  .brand .wordmark { font-size: 60px; line-height: 1; }
+  h1 { font-size: 64px; margin-bottom: 22px; }
+  h1 em { font-style: normal; color: var(--saffron-display); }
+  .lede { margin-bottom: 30px; }
+  .row { gap: 8px; }
+
+  .view { position: relative; width: 540px; height: 470px; border-radius: 30px; overflow: hidden; background: #1c1c1f;
+          box-shadow: 0 30px 60px rgba(27, 27, 58, 0.22), 0 0 0 1px rgba(27, 27, 58, 0.08); }
+  .view .plate { position: absolute; left: -34px; top: -20px; width: 730px; height: 487px; overflow: visible; }
+  .view .plate > i { -webkit-mask-size: 100% 100%; clip-path: inset(0 0 0 368px); }
+  .scan { position: absolute; top: 0; bottom: 0; left: 342px; width: 3px; background: var(--amber); }
+  .tag { position: absolute; top: 18px; left: 18px; }
+  .tag.r { left: auto; right: 18px; }
+  .parts { position: absolute; left: 16px; bottom: 16px; width: 228px; background: rgba(255, 255, 255, 0.96); border-radius: 22px;
+           padding: 14px 16px; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.28); }
+  .parts .h { font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 8px; }
+  .part { display: flex; align-items: center; gap: 9px; font-size: 14.5px; font-weight: 750; padding: 3px 0; }
+  .part span { margin-left: auto; font-weight: 600; color: var(--ink-sub); font-size: 13.5px; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div>
+    <div class="brand">
+      <img src="../../../design/logo/export/plate-clay.png" alt="">
+      <span class="wordmark">nomi</span>
+    </div>
+    <h1>Every plate,<br><em>the way the chef meant it.</em></h1>
+    <p class="lede">The head chef sets a Golden Plate once. Nomi checks every plate at the pass against it, hears guests in about ten seconds, and writes the owner a morning briefing from what it saw, counted or heard.</p>
+    <div class="row">
+      <span class="chip ink">Android + web, one codebase</span>
+      <span class="chip sa">Six Meta models</span>
+      <span class="chip">Facts only</span>
+    </div>
+  </div>
+
+  <div class="view">
+    <div class="plate">
+      <img src="../../../video/public/plates/golden/dish.png" alt="">
+      <i style="background: var(--rice); -webkit-mask-image: url(../../../video/public/plates/golden/rice.png)"></i>
+      <i style="background: var(--chicken); -webkit-mask-image: url(../../../video/public/plates/golden/chicken.png)"></i>
+      <i style="background: var(--onions); -webkit-mask-image: url(../../../video/public/plates/golden/onions.png)"></i>
+      <i style="background: var(--lemon); -webkit-mask-image: url(../../../video/public/plates/golden/lemon.png)"></i>
+      <i style="background: var(--raita); -webkit-mask-image: url(../../../video/public/plates/golden/raita.png)"></i>
+    </div>
+    <div class="scan"></div>
+    <span class="chip tag">Golden Plate · Chicken Biryani</span>
+    <span class="chip sa tag r">SAM 3.1 masks</span>
+    <div class="parts">
+      <div class="h">What Nomi sees</div>
+      <div class="part"><i class="dot" style="background: var(--rice)"></i>Rice<span>27% of plate</span></div>
+      <div class="part"><i class="dot" style="background: var(--chicken)"></i>Chicken pieces<span>× 4</span></div>
+      <div class="part"><i class="dot" style="background: var(--onions)"></i>Fried onions<span>1 o'clock</span></div>
+      <div class="part"><i class="dot" style="background: var(--lemon)"></i>Lemon wedge<span>4 o'clock</span></div>
+      <div class="part"><i class="dot" style="background: var(--raita)"></i>Raita bowl<span>9 o'clock</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
