@@ -49,13 +49,8 @@ export function Close() {
         <Reveal at={T.card + 8} style={{ position: 'absolute', left: 170, top: 470 }}>
           <span style={{ fontFamily: display, fontSize: type.title, fontWeight: 800, color: c.text, letterSpacing: '-0.035em' }}>On the web and Android.</span>
         </Reveal>
-        <Reveal at={T.card + 12} style={{ position: 'absolute', left: 170, top: 590, display: 'flex', flexDirection: 'column', gap: 14 }}>
-          {[['Web', CREDITS.web], ['Android', CREDITS.apk]].map(([k, v]) => (
-            <div key={k} style={{ display: 'flex', alignItems: 'baseline', gap: 20 }}>
-              <span style={{ width: 170, fontFamily: display, fontSize: type.label + 4, fontWeight: 600, color: c.sub }}>{k}</span>
-              <span style={{ fontFamily: display, fontSize: type.label + 10, fontWeight: 800, color: k === 'Web' ? c.saffron : c.text, letterSpacing: '-0.02em' }}>{v}</span>
-            </div>
-          ))}
+        <Reveal at={T.card + 12} style={{ position: 'absolute', left: 170, top: 590 }}>
+          <span style={{ fontFamily: display, fontSize: type.line, fontWeight: 800, color: c.saffron, letterSpacing: '-0.02em' }}>{CREDITS.web}</span>
         </Reveal>
 
         <Reveal at={T.card + 10} style={{ position: 'absolute', right: 80, top: 200, width: 690, display: 'flex', flexDirection: 'column', gap: 30 }}>
