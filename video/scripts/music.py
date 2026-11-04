@@ -13,7 +13,7 @@ BPM = 112
 BEAT = 60 / BPM
 BAR = BEAT * 4
 # Scene starts in the film (seconds). Regenerate when the timeline changes.
-REVEAL, DEMO, CLOSE, CARD, END = 15.97, 24.34, 165.48, 176.15, 179.33
+REVEAL, DEMO, CLOSE, CARD, END = 15.97, 24.34, 165.48, 175.95, 179.7
 
 rng = np.random.default_rng(5)
 n = int((END + 3) * SR)

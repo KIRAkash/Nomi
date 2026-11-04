@@ -4,7 +4,7 @@ import { Audio, Composition, interpolate, Series, staticFile } from 'remotion';
 import { ASK, Ask } from './scenes/Ask';
 import { BRIEFING, Briefing } from './scenes/Briefing';
 import { CARDS, Cards } from './scenes/Cards';
-import { CLOSE, Close } from './scenes/Close';
+import { CLOSE, Close, ME_AT } from './scenes/Close';
 import { GOLDEN, Golden } from './scenes/Golden';
 import { GUEST, Guest } from './scenes/Guest';
 import { HANDOVER, Handover } from './scenes/Handover';
@@ -39,7 +39,10 @@ const SCENES = [
 // The score sits under the voice, and comes up where there is none: the reveal and the end card.
 const TOTAL = SCENES.reduce((n, s) => n + s.frames, 0);
 const REVEAL_AT = PROBLEM, DEMO_AT = PROBLEM + REVEAL;
-const music = (f: number) => interpolate(f, [0, 20, REVEAL_AT - 6, REVEAL_AT + 9, DEMO_AT - 14, DEMO_AT + 6, TOTAL - 110, TOTAL - 92, TOTAL - 24, TOTAL], [0, 0.3, 0.3, 0.45, 0.45, 0.24, 0.24, 0.55, 0.55, 0], { extrapolateRight: 'clamp' });
+// Akash's clip on the end card, from the film's start; the score dips under his voice.
+const ME = TOTAL - CLOSE + ME_AT, CARD_AT = ME - 34;
+const music = (f: number) => interpolate(f, [0, 20, REVEAL_AT - 6, REVEAL_AT + 9, DEMO_AT - 14, DEMO_AT + 6, CARD_AT - 18, CARD_AT, ME - 8, ME, TOTAL - 6, TOTAL],
+  [0, 0.3, 0.3, 0.45, 0.45, 0.24, 0.24, 0.5, 0.5, 0.1, 0.1, 0], { extrapolateRight: 'clamp' });
 
 function Film() {
   return (

@@ -4,7 +4,7 @@ import { Audio, Sequence, staticFile } from 'remotion';
 
 import { pieceFrames, type Piece, type TapLog } from './clip';
 
-const LEVEL = { tap: 0.3, pop: 0.22, reveal: 0.55, card: 0.5 } as const;
+const LEVEL = { tap: 0.3, pop: 0.22, reveal: 0.55, card: 0.32 } as const;
 
 export function Sfx({ name, at, volume }: { name: keyof typeof LEVEL; at: number; volume?: number }) {
   return (
