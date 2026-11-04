@@ -40,7 +40,8 @@ export function metaClient() {
   return meta;
 }
 export function glimmerClient() {
-  if (!glimmer) glimmer = new OpenAI({ apiKey: 'local', baseURL: env('GLIMMER_BASE_URL') ?? 'http://localhost:8000/v1', timeout: 20_000 });
+  // On site and on the same network: no retries, so a stopped Glimmer is reported at once.
+  if (!glimmer) glimmer = new OpenAI({ apiKey: 'local', baseURL: env('GLIMMER_BASE_URL') ?? 'http://localhost:8000/v1', timeout: 20_000, maxRetries: 0 });
   return glimmer;
 }
 
@@ -66,16 +67,18 @@ export const text = (t: string): Part => ({ type: 'input_text', text: t });
 export const image = (url: string): Part => ({ type: 'input_image', image_url: url, detail: 'auto' });
 
 /** A Responses call whose output must match schema; anything else throws, so no unchecked model output reaches a screen. */
-export async function structured<S extends z.ZodType>(model: string, ctx: Ctx, name: string, schema: S, instructions: string, parts: Part[]): Promise<z.infer<S>> {
+export async function structured<S extends z.ZodType>(model: string, ctx: Ctx, name: string, schema: S, instructions: string, parts: Part[],
+  opts: { effort?: 'low' | 'medium' | 'high'; timeout?: number } = {}): Promise<z.infer<S>> {
+  // Spark answers someone waiting on a screen: low effort halves the wait with the same output (checked Nov 3).
+  const effort = opts.effort ?? (model === MODELS.spark ? 'low' : undefined);
   return call(model, ctx, async () => {
     const res = await metaClient().responses.create({
       model,
       instructions,
       input: [{ role: 'user', content: parts }],
-      // Spark answers someone waiting on a screen: low effort halves the wait with the same output (checked Nov 3).
-      ...(model === MODELS.spark ? { reasoning: { effort: 'low' as const } } : {}),
+      ...(effort ? { reasoning: { effort } } : {}),
       text: { format: { type: 'json_schema', name, schema: z.toJSONSchema(schema) as Record<string, unknown>, strict: true } },
-    });
+    }, opts.timeout ? { timeout: opts.timeout } : undefined);
     return { value: schema.parse(JSON.parse(res.output_text)), usage: res.usage };
   });
 }

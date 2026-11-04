@@ -1,5 +1,5 @@
 import {
-  DEMO_GUEST_PAGE, type AskAnswer, type CardTranslation, type ComponentProposal, type DishRecognition, type FeedbackTags, type GuestFeedbackInput,
+  DEMO_GUEST_PAGE, NightshiftResult, PassCheck, type AskAnswer, type CardTranslation, type ComponentProposal, type DishRecognition, type FeedbackTags, type GuestFeedbackInput,
   type GuestPage, type GuestQuestionProposal, type HandoverSummary, type MenuExtraction, type PlatingRules, type ReplyDraft,
 } from '@nomi/shared';
 
@@ -80,3 +80,66 @@ export const askNomi = (question: string, facts: { id: string; text: string }[],
 export const drawIcon = (photo: string) => post<{ image: string | null }>('/staff/icon', { photo });
 /** Muse Image draws a numbered plating card from the Golden Plate photo and rules. */
 export const drawCard = (photo: string, rules: string[], dish: string) => post<{ image: string | null }>('/staff/card', { photo, rules, dish });
+
+/** One line of a staged call: a stage starting or ending, or a partial result such as a part SAM 3.1 just found. */
+export type StageEvent = { type: string; id?: string; state?: 'run' | 'done' | 'skip' | 'fail'; text?: string; ms?: number; [k: string]: unknown };
+
+/**
+ * Posts and reads the reply line by line as the API streams it, so each stage shows as it happens. Where the platform's
+ * fetch cannot stream (Android), the lines arrive together at the end. The final result is checked with its zod schema.
+ */
+async function staged<T>(path: string, body: unknown, onEvent: (e: StageEvent) => void, parse: (r: unknown) => T): Promise<T & Timed> {
+  const t0 = Date.now();
+  const res = await fetch(`${API}${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) })
+    .catch((err: Error) => { recordCall(path, Date.now() - t0, false); throw err; });
+  if (!res.ok) {
+    recordCall(path, Date.now() - t0, false);
+    const b = await res.json().catch(() => null) as { error?: string } | null;
+    throw new Error(res.status === 429 ? 'Too many tries for now. Wait a few minutes.' : b?.error ?? `${path} ${res.status}`);
+  }
+  let out: (T & Timed) | null = null;
+  let failed: string | null = null;
+  const line = (l: string) => {
+    if (!l.trim()) return;
+    const e = JSON.parse(l) as StageEvent;
+    if (e.type === 'result') out = { ...parse(e.result), ms: e.ms ?? Date.now() - t0 };
+    else if (e.type === 'error') failed = String(e.error);
+    else onEvent(e);
+  };
+  const reader = res.body?.getReader?.();
+  if (reader) {
+    const dec = new TextDecoder();
+    let buf = '';
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop() ?? '';
+      lines.forEach(line);
+    }
+    line(buf);
+  } else (await res.text()).split('\n').forEach(line);
+  recordCall(path, Date.now() - t0, !!out);
+  if (!out) throw new Error(failed ?? 'The check stopped before it finished');
+  return out;
+}
+
+/** A frame Glimmer or SAM 3.1 found no plate in: it is dropped and never scored. */
+export type Dropped = { dropped: true; reason: string; glimmer: PassCheck['glimmer'] };
+/** Glimmer on site, the dish from the ticket (or Muse Spark), then SAM 3.1, then the vision worker against the dish's Golden Plate; stages arrive through onEvent. */
+export const checkPass = (frame: string, dishId: string | null, onEvent: (e: StageEvent) => void) =>
+  staged<PassCheck | Dropped>('/staff/pass', { frame, dish_id: dishId }, onEvent,
+    (r) => ((r as Dropped).dropped ? (r as Dropped) : PassCheck.parse(r)));
+
+export type NightInput = {
+  night: string;
+  plates: { id: string; dish: string; shift: 'Lunch' | 'Dinner'; time: string; score: number; misses: { part: string; kind: 'missing' | 'count' | 'area' | 'position'; dir: 'less' | 'more' | null }[] }[];
+  notes: { id: string; text: string; photo: boolean }[];
+  stock: { id: string; text: string }[];
+  closing: { id: string; text: string }[];
+  cards: Record<string, string[]>;
+};
+/** NIGHTSHIFT: Muse Wonder plans, four Muse Spark analysts read in parallel, Muse Wonder merges; stages arrive through onEvent. */
+export const runNightshift = (input: NightInput, onEvent: (e: StageEvent) => void) =>
+  staged('/staff/nightshift', input, onEvent, (r) => NightshiftResult.parse(r));

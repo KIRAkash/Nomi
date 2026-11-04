@@ -233,15 +233,18 @@ export function Empty({ title, sub, art }: { title: string; sub: string; art?: R
 }
 
 /** A labelled step that a model is working on: spinner dot while running, tick when done. */
-export function WorkLine({ state, text, model, dark = false }: { state: 'wait' | 'run' | 'done'; text: string; model?: Model; dark?: boolean }) {
+/** One step of a model chain. "skip" (amber) means it could not run and the line says what happened instead; "fail" is tomato. */
+export function WorkLine({ state, text, model, dark = false, ms }: { state: 'wait' | 'run' | 'done' | 'skip' | 'fail'; text: string; model?: Model; dark?: boolean; ms?: number }) {
+  const bg = state === 'done' ? color.mint : state === 'run' || state === 'skip' ? color.saffron : state === 'fail' ? color.tomato : color.saffronSoft;
   return (
     <Row style={{ opacity: state === 'wait' ? 0.45 : 1 }}>
-      <View style={{ width: 26, height: 26, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: state === 'done' ? color.mint : state === 'run' ? color.saffron : color.saffronSoft }}>
+      <View style={{ width: 26, height: 26, borderRadius: 9, alignItems: 'center', justifyContent: 'center', backgroundColor: bg }}>
         {state === 'done' ? <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth={3.4} strokeLinecap="round" strokeLinejoin="round"><Path d="M5 12l5 5 9-10" /></Svg>
+          : state === 'skip' || state === 'fail' ? <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: state === 'fail' ? '#fff' : color.ink }}>!</Text>
           : <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: color.ink }} />}
       </View>
       <Text style={{ flex: 1, fontFamily: state === 'run' ? font.bodyBold : font.bodySemi, fontSize: 14, color: dark ? color.bg : color.ink }}>{text}</Text>
-      {model && <AiTag model={model} />}
+      {model && <AiTag model={model} ms={state === 'done' ? ms : undefined} />}
     </Row>
   );
 }
@@ -326,7 +329,7 @@ export function HoldToTalk({ onDone, label = 'Hold to talk', bg = color.tomato, 
       {mode === 'tap' && <Sub style={{ fontSize: 13 }}>Tap again when you are done</Sub>}
       {short && <Sub style={{ fontSize: 13 }}>That was too short. Hold and speak, then let go.</Sub>}
       {v.denied && <Text style={{ fontFamily: font.bodyBold, color: color.tomatoInk, textAlign: 'center' }}>Microphone is off. Allow it in the phone settings.</Text>}
-      {sample && !v.recording && (
+      {sample && !v.recording && !recording() && (
         <Pressable accessibilityRole="button" disabled={disabled} onPress={async () => onDone(await sampleNote(sample.file))}
           style={{ minHeight: 40, paddingHorizontal: 14, borderRadius: 14, backgroundColor: color.skySoft, justifyContent: 'center' }}>
           <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.skyInk, textAlign: 'center' }}>No mic? Play a sample voice note</Text>
@@ -336,6 +339,15 @@ export function HoldToTalk({ onDone, label = 'Hold to talk', bg = color.tomato, 
     </View>
   );
 }
+
+/** Set by the pitch video's recorder (video/record), which plays real audio into the mic: hides the no-mic fallback. */
+const recording = () => {
+  try {
+    return globalThis.localStorage?.getItem('nomi.recording') === '1';
+  } catch {
+    return false;
+  }
+};
 
 async function sampleNote(file: number): Promise<VoiceNote> {
   const asset = Asset.fromModule(file);

@@ -130,3 +130,94 @@ def score_plate(golden: Sequence[ComponentSignature], seen: Dict[str, Measure]) 
             penalty += min(25, abs(pct) * 0.8)
             reasons.append(f"{g.name} share {abs(pct)}% {'above' if pct > 0 else 'under'} golden")
     return Score(max(0, round(100 - penalty)), reasons)
+
+
+def place(angle_deg: float, radius: float) -> str:
+    """Plain words for a position on the plate, the same words the Golden Plate masks step uses."""
+    if radius < 0.3:
+        return "centre"
+    if radius > 1.0:
+        return f"outside the plate, {clock(angle_deg)}"
+    if radius > 0.75:
+        return f"rim, {clock(angle_deg)}"
+    return clock(angle_deg)
+
+
+def read_measure(part: Dict, plate: Dict) -> Measure:
+    """A part as the SAM read reports it (found, count, share of the plate, centre in pixels) → a Measure on that plate."""
+    if not part.get("found") or not part.get("centre"):
+        return Measure(False, 0.0, 0.0, 0.0, 0)
+    dx, dy = part["centre"][0] - plate["cx"], part["centre"][1] - plate["cy"]
+    angle = (math.degrees(math.atan2(dx, -dy)) + 360.0) % 360.0
+    return Measure(True, float(part.get("share", 0.0)), angle, min(math.hypot(dx, dy) / plate["r"], 1.5), int(part.get("count", 0)))
+
+
+def golden_signature(reads: Sequence[Dict]) -> List[ComponentSignature]:
+    """The Golden Plate signature from the chef's saved photo reads: each part averaged, its spread becoming its tolerance."""
+    names = list(dict.fromkeys(p["name"] for r in reads for p in r["parts"]))
+    return [signature(n, [read_measure(p, r["plate"]) for r in reads for p in r["parts"] if p["name"] == n]) for n in names]
+
+
+AREA_CHECK_MIN_SHARE = 0.04  # garnish smaller than this varies too much between plates to compare by area
+
+
+@dataclass
+class PassRow:
+    name: str
+    role: str
+    found: bool
+    count: int
+    golden_count: Optional[int]
+    share: float
+    golden_share: float
+    area_vs_golden: Optional[int]
+    where: Optional[str]
+    golden_where: Optional[str]
+    ok: bool
+    reason: Optional[str]
+    kind: Optional[str]
+    penalty: float = 0.0
+    reasons: List[str] = field(default_factory=list)
+
+
+def pass_checks(golden: Sequence[ComponentSignature], seen: Dict[str, Measure], roles: Dict[str, str]) -> List[PassRow]:
+    """One row per Golden Plate part: found or not, pieces against the reference, position for placed garnish, plate area
+    against the Golden Plate. Area from a 2D mask is a drift signal, never a weight or volume."""
+    rows: List[PassRow] = []
+    for g in golden:
+        if not g.present:
+            continue
+        role = roles.get(g.name, "main")
+        m = seen.get(g.name) or Measure(False, 0.0, 0.0, 0.0, 0)
+        gw = place(g.angle_deg, g.radius)
+        row = PassRow(g.name, role, m.present, m.count or 0, g.count if role == "count" else None, round(m.area_share, 3),
+                      round(g.area_share, 3), None, place(m.angle_deg, m.radius) if m.present else None, gw, True, None, None)
+        rows.append(row)
+
+        def miss(kind: str, reason: str, penalty: float):
+            row.ok = False
+            row.penalty += penalty
+            row.reasons.append(reason)
+            if row.kind is None:
+                row.kind, row.reason = kind, reason
+
+        if not m.present:
+            miss("missing", f"{g.name}: not found", 30)
+            continue
+        if role == "count" and g.count and (m.count or 0) < g.count:
+            miss("count", f"{g.name}: {m.count} of {g.count}", 10 * (g.count - (m.count or 0)))
+        if role == "placement" and g.radius >= 0.3:
+            off = angle_diff(m.angle_deg, g.angle_deg) > g.tolerance.get("angle_deg", 30)
+            drift = abs(m.radius - g.radius) > g.tolerance.get("radius", 0.12)
+            if off or drift:
+                miss("position", f"{g.name}: {row.where}, Golden Plate has it at {gw}", 12)
+        if g.area_share > AREA_CHECK_MIN_SHARE:
+            pct = round(100 * (m.area_share - g.area_share) / g.area_share)
+            row.area_vs_golden = pct
+            if abs(m.area_share - g.area_share) > g.tolerance.get("area_share", 0.1 * g.area_share):
+                miss("area", f"{g.name}: {abs(pct)}% {'more' if pct > 0 else 'less'} plate area than the Golden Plate", min(25, abs(pct) * 0.8))
+    return rows
+
+
+def pass_score(rows: Sequence[PassRow]) -> int:
+    return max(0, round(100 - sum(r.penalty for r in rows)))

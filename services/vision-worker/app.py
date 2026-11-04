@@ -2,15 +2,19 @@
 to 0/1 arrays (run-length or PNG decoding lives in decode.py once the SAM 3.1 encoding is confirmed)."""
 from __future__ import annotations
 
+import base64
+import io
 from dataclasses import asdict
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 from fastapi import FastAPI
+from PIL import Image, ImageFilter
 from pydantic import BaseModel
 
 import sam
-from signature import ComponentSignature, Plate, clock, measure, photos_agree, score_plate, signature
+from signature import (ComponentSignature, Plate, clock, golden_signature as signature_from_reads, measure, pass_checks, pass_score, photos_agree, read_measure,
+                       score_plate, signature)
 
 app = FastAPI(title="nomi vision worker")
 
@@ -148,6 +152,66 @@ def sam_read(body: ReadIn):
         "plate": {"cx": round(plate.cx), "cy": round(plate.cy), "r": round(plate.radius_px), "path": rim.path} if plate else None,
         "parts": parts,
     }
+
+
+class GoldenRead(BaseModel):
+    plate: Dict  # {cx, cy, r} in that photo's pixels
+    parts: List[Dict]  # {name, found, count, share, centre} as /sam/read returned them
+
+
+class PassIn(BaseModel):
+    golden: List[GoldenRead]  # the dish's saved Golden Plate photo reads
+    roles: Dict[str, str]  # part name → main, count, placement or side
+    plate_output: str  # raw SAM output for "plate" on the pass frame
+    parts: List[SamPart]
+
+
+@app.post("/pass/check")
+def pass_check(body: PassIn):
+    """Reads the pass frame like a Golden Plate photo, builds the dish's signature from its golden reads, and checks each
+    part against it: found or not, pieces, position, plate area against the Golden Plate."""
+    read = sam_read(ReadIn(plate_output=body.plate_output, parts=body.parts))
+    if not read.get("ok"):
+        return {"ok": False, "error": read.get("error", "nothing found")}
+    seen = {p["name"]: read_measure(p, read["plate"]) for p in read["parts"]}
+    sig = signature_from_reads([g.model_dump() for g in body.golden])
+    rows = pass_checks(sig, seen, body.roles)
+    colours = {p.name: p.colour for p in body.parts}
+    components = [{**{k: v for k, v in asdict(r).items() if k not in ("penalty", "reasons")}, "colour": colours.get(r.name, "#FFB627")} for r in rows]
+    return {
+        "ok": True,
+        "score": pass_score(rows),
+        "components": components,
+        "reasons": [x for r in rows for x in r.reasons],
+        "read": {k: read[k] for k in ("size", "plate", "parts")},
+    }
+
+
+class BlurIn(BaseModel):
+    frame: str  # data URL
+    boxes: List[Tuple[float, float, float, float]]  # x1, y1, x2, y2 in 0–1 of the frame
+
+
+def blur_boxes(img: Image.Image, boxes, pad: float = 0.15) -> Image.Image:
+    """Blurs each box (grown by `pad` of its size) so no face leaves the restaurant."""
+    out = img.convert("RGB")
+    w, h = out.size
+    for x1, y1, x2, y2 in boxes:
+        bw, bh = (x2 - x1) * pad, (y2 - y1) * pad
+        box = (max(0, int((x1 - bw) * w)), max(0, int((y1 - bh) * h)), min(w, int((x2 + bw) * w)), min(h, int((y2 + bh) * h)))
+        if box[2] <= box[0] or box[3] <= box[1]:
+            continue
+        region = out.crop(box)
+        out.paste(region.filter(ImageFilter.GaussianBlur(max(8, (box[2] - box[0]) // 6))), box)
+    return out
+
+
+@app.post("/frame/blur")
+def frame_blur(body: BlurIn):
+    img = Image.open(io.BytesIO(base64.b64decode(body.frame.split(",", 1)[1])))
+    buf = io.BytesIO()
+    blur_boxes(img, body.boxes).save(buf, format="JPEG", quality=88)
+    return {"frame": "data:image/jpeg;base64," + base64.b64encode(buf.getvalue()).decode()}
 
 
 @app.get("/health")

@@ -1,6 +1,7 @@
 // One typed function per row of the spec's model usage map (section 8). Screens never call the API directly.
 import {
-  AskAnswer, CardTranslation, ClosingCheck, HandoverSummary, ComponentProposal, DishRecognition, FeedbackTags, GuestQuestionProposal, MenuExtraction, PlatingRules, ReplyDraft,
+  AnalystReport, AskAnswer, Briefing, CardTranslation, ClosingCheck, HandoverSummary, ComponentProposal, DishRecognition, FeedbackTags, GuestQuestionProposal, MenuExtraction,
+  NightshiftPlan, PassFrame, PlatingRules, ReplyDraft, WatchReminders,
 } from '@nomi/shared';
 import { BASE_URL, MODELS, call, glimmerClient, image, metaClient, structured, text, type Ctx } from './client';
 
@@ -146,15 +147,20 @@ export const generateSopCard = (ctx: Ctx, goldenPhoto: Blob, rules: string[], di
     return { value: res.data?.[0] ?? null };
   });
 
-/** Local Glimmer: keep a pass frame only if a plate is in it. */
-export const frameHasPlate = (ctx: Ctx, frame: string) =>
+/** Local Glimmer: keep a pass frame only if a plate is in it, and say where any face is so it can be blurred on site. */
+export const checkPassFrame = (ctx: Ctx, frame: string) =>
   call(MODELS.glimmer, ctx, async () => {
     const res = await glimmerClient().chat.completions.create({
       model: MODELS.glimmer,
-      messages: [{ role: 'user', content: [{ type: 'text', text: 'Is there a plated dish fully inside this frame? Answer yes or no.' }, { type: 'image_url', image_url: { url: frame } }] }],
-      max_tokens: 3,
+      messages: [{ role: 'user', content: [
+        { type: 'text', text: 'This is a frame from a camera over a restaurant pass counter. Answer only with JSON: {"plate": true if a plated dish is fully inside the frame, "faces": [[x1, y1, x2, y2] for every visible human face, as fractions 0 to 1 of the frame]}.' },
+        { type: 'image_url', image_url: { url: frame } },
+      ] }],
+      max_tokens: 120,
+      response_format: { type: 'json_object' },
     });
-    return { value: /yes/i.test(res.choices[0]?.message.content ?? ''), usage: null };
+    const out = res.choices[0]?.message.content ?? '';
+    return { value: PassFrame.parse(JSON.parse(out.slice(out.indexOf('{'), out.lastIndexOf('}') + 1))), usage: null };
   });
 
 /** Local Glimmer: strip phone numbers and emails from guest text before it leaves the restaurant. */
@@ -166,3 +172,42 @@ export const redact = (ctx: Ctx, guestText: string) =>
     });
     return { value: res.choices[0]?.message.content ?? guestText, usage: null };
   });
+
+// NIGHTSHIFT, after closing: Muse Wonder plans the review, four Muse Spark analysts read their own facts in parallel,
+// Muse Wonder links what they found. Every fact keeps its id so the briefing can show its evidence.
+export type NightFact = { id: string; text: string };
+const ANALYST_BRIEF = {
+  feedback: 'guest notes, ratings and one-tap answers',
+  plate: 'PASS camera checks of plates against each dish\'s Golden Plate',
+  stock: 'shelf counts from larder photos against each item\'s minimum',
+  closing: 'closing-round photos: counts and visible flags',
+} as const;
+export type AnalystName = keyof typeof ANALYST_BRIEF;
+
+/** Muse Wonder decides what each analyst should look for tonight. */
+export const planNightshift = (ctx: Ctx, night: string, sizes: Record<AnalystName, number>, headlines: NightFact[]) =>
+  structured(MODELS.wonder, ctx, 'plan', NightshiftPlan,
+    `${FACTS_ONLY} You plan the overnight review of one restaurant night (${night}). Four analysts each read one kind of fact: ${Object.entries(ANALYST_BRIEF).map(([k, v]) => `${k} (${sizes[k as AnalystName]} facts: ${v})`).join('; ')}. Give each analyst exactly one short question to answer from its facts, aimed at what looks most worth checking in the headlines. One entry per analyst.`,
+    [text(JSON.stringify(headlines))],
+    // Low effort: a full-effort plan took 29 s for four one-line questions (checked Nov 3).
+    { effort: 'low' });
+
+/** One Muse Spark analyst: findings from its own facts only, each citing the fact ids it rests on. */
+export const runAnalyst = (ctx: Ctx, analyst: AnalystName, question: string, facts: NightFact[]) =>
+  structured(MODELS.spark, ctx, `${analyst}_findings`, AnalystReport,
+    `${FACTS_ONLY} You are the ${analyst} analyst for a restaurant's overnight review. You read ${ANALYST_BRIEF[analyst]}. Question for tonight: ${question} Write up to 4 findings. Each is one short sentence a manager reads at a glance, stating counts exactly as the facts give them ("3 of 5 biryani plates"), and cites every fact id it rests on. Good things count too. No causes, no advice, no guesses.`,
+    [text(JSON.stringify(facts))]);
+
+/** Muse Wonder links findings across analysts into at most 3 issues, a likely cause each, and actions a human approves. */
+export const mergeBriefing = (ctx: Ctx, findings: { analyst: AnalystName; fact: string; evidence_ids: string[] }[], facts: NightFact[]) =>
+  structured(MODELS.wonder, ctx, 'briefing', Briefing,
+    `${FACTS_ONLY} Write the morning briefing for the restaurant's owner and head chef from these analyst findings. Group findings from different analysts that concern the same dish or problem into at most 3 issues, most important first; copy the up to 4 most telling findings word for word with their analyst and evidence ids. likely_cause links facts from different analysts in one plain sentence (the screen labels it "Likely cause", so do not say it); null when the facts do not connect. Propose at most 2 actions per issue, each one a human approves: update_sop (a line on a plating card), adjust_order (what to order and how many, from counted stock against its minimum), reply_guest (reply to the guests who wrote). No money, no forecasts. Wins are findings that went well. Facts for reference: ${JSON.stringify(facts)}`,
+    [text(JSON.stringify(findings))],
+    // Low effort and a longer timeout: at full effort the merge ran past the 60 s default and retried (checked Nov 3).
+    { effort: 'low', timeout: 120_000 });
+
+/** Muse Spark writes one short pre-service reminder per watch item; the counts in each item were computed, not generated. */
+export const writeReminders = (ctx: Ctx, items: { id: string; dish: string; fact: string }[], cards: Record<string, string[]>) =>
+  structured(MODELS.spark, ctx, 'reminders', WatchReminders,
+    `${FACTS_ONLY} For each item, write one reminder for the kitchen before service, at most 8 words, taken from the dish's plating card rules where one fits (for example "Fried onions at 1 o'clock, every plate"). Never repeat the count, never blame anyone. Plating card rules per dish: ${JSON.stringify(cards)}`,
+    [text(JSON.stringify(items))]);

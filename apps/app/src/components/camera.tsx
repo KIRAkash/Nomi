@@ -9,8 +9,8 @@ import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
 import { useIsFocused } from 'expo-router';
 import { useCallback, useEffect, useImperativeHandle, useRef, useState, useSyncExternalStore, type ReactNode, type Ref } from 'react';
 import { ActivityIndicator, Linking, Modal, Platform, Pressable, ScrollView, Text, View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
-import Svg, { Circle, Rect } from 'react-native-svg';
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
 import { DEMO_SHOTS } from '@/lib/demo-media';
 import { useSession } from '@/lib/session';
@@ -40,6 +40,26 @@ function GuideMarks({ guide, tint }: { guide: Guide; tint: string }) {
   );
 }
 
+/** Top-left of every live view: a camera icon and a blinking red dot, so it is always clear the camera is on. */
+function LiveBadge() {
+  const reduce = useReducedMotion();
+  const blink = useSharedValue(1);
+  useEffect(() => {
+    if (!reduce) blink.value = withRepeat(withTiming(0.2, { duration: 700 }), -1, true);
+  }, [blink, reduce]);
+  const dot = useAnimatedStyle(() => ({ opacity: blink.value }));
+  return (
+    <View pointerEvents="none" accessibilityLabel="Camera is on" style={{ position: 'absolute', top: 12, left: 12, flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: 'rgba(27,27,58,0.72)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 6 }}>
+      <Svg width={18} height={14} viewBox="0 0 18 14">
+        <Path d="M6 1.5 7.2 0h3.6L12 1.5h3A2.5 2.5 0 0 1 17.5 4v7.5A2.5 2.5 0 0 1 15 14H3A2.5 2.5 0 0 1 .5 11.5V4A2.5 2.5 0 0 1 3 1.5Z" fill={color.bg} />
+        <Circle cx={9} cy={7.6} r={3.4} fill="rgba(27,27,58,0.9)" />
+        <Circle cx={9} cy={7.6} r={2} fill={color.bg} />
+      </Svg>
+      <Animated.View style={[{ width: 9, height: 9, borderRadius: 5, backgroundColor: color.tomato }, dot]} />
+    </View>
+  );
+}
+
 /** The camera preview itself. Remounts fresh each time it appears, so "ready" can never be stale. */
 function Viewfinder({ cam, guide, tint, onReady, onError }: {
   cam: Ref<CameraView>; guide: Guide; tint: string; onReady: (ready: boolean) => void; onError: (message: string) => void;
@@ -51,7 +71,7 @@ function Viewfinder({ cam, guide, tint, onReady, onError }: {
       <CameraView ref={cam} facing="back" style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
         onCameraReady={() => { setReady(true); onReady(true); }}
         onMountError={(e) => onError(e.message || 'The camera could not start. Close other apps using it and try again.')} />
-      {ready ? <GuideMarks guide={guide} tint={tint} /> : <ActivityIndicator color={color.saffronSoft} style={{ position: 'absolute' }} />}
+      {ready ? <><GuideMarks guide={guide} tint={tint} /><LiveBadge /></> : <ActivityIndicator color={color.saffronSoft} style={{ position: 'absolute' }} />}
     </>
   );
 }
@@ -111,6 +131,7 @@ function DemoFeed({ keys, current, onPick, guide, tint, onReady }: {
         <Image source={DEMO_SHOTS[current].image} style={{ width: '100%', height: '100%' }} contentFit="cover" accessibilityLabel={`Demo camera: ${DEMO_SHOTS[current].shows}`} />
       </Animated.View>
       <GuideMarks guide={guide} tint={tint} />
+      <LiveBadge />
       <View style={{ position: 'absolute', top: 12, right: 12, backgroundColor: 'rgba(27,27,58,0.8)', borderRadius: 12, paddingHorizontal: 10, paddingVertical: 6 }}>
         <Text style={{ fontFamily: font.bodyBold, fontSize: 12, color: color.saffron }}>Demo camera</Text>
       </View>

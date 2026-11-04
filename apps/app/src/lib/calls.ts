@@ -18,6 +18,8 @@ const ROUTES: [RegExp, Model[], string][] = [
   [/^\/staff\/ask/, ['Muse Wonder'], 'Answered a question from the facts'],
   [/^\/staff\/icon/, ['Muse Image'], 'Drew a dish icon from the Golden Plate'],
   [/^\/staff\/card/, ['Muse Image'], 'Drew a numbered plating card'],
+  [/^\/staff\/pass/, ['SAM 3.1'], 'Checked a pass plate against its Golden Plate'],
+  [/^\/staff\/nightshift/, ['Muse Wonder', 'Muse Spark'], 'Ran NIGHTSHIFT: plan, 4 analysts, briefing'],
 ];
 
 let calls: LiveCall[] = [];

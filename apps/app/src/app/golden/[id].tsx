@@ -7,7 +7,7 @@ import { Button, Card, Chip, DishArt, H1, H2, Label, Num, Row, Screen, SquishIn,
 import { Image } from 'expo-image';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, useWindowDimensions } from 'react-native';
 
 import { LiveCamera, Shutter, checkPhoto, type CameraHandle, type Photo, type PhotoCheck } from '@/components/camera';
 import { AiTag, HoldToTalk, LiveWait, Segmented, TopBar, WorkLine, useSteps, type VoiceNote } from '@/components/kit';
@@ -112,22 +112,24 @@ function Photos({ dish, initial, next }: { dish: string; initial: Photo[]; next:
   };
   const redo = (k: number) => setShots((xs) => xs.map((x, j) => (j === k ? EMPTY : x)));
 
-  return (
-    <View style={{ gap: 14 }}>
-      <H1>Plate it perfectly, 3 times</H1>
-      <Sub>Same plate, same spot. Three photos let Nomi learn what “right” looks like and how much it can vary.</Sub>
-      {!all && <LiveCamera ref={cam} height={280} guide="plate" onReady={setReady} demo={[1, 2, 3].map((n) => `${slug(dish)}/golden-${n}`)} />}
-      <Row gap={8}>
-        {shots.map((x, k) => (
-          <Squishy key={k} accessibilityRole="button" accessibilityLabel={x.uri ? `Photo ${k + 1}, tap to retake` : `Photo ${k + 1}, not taken yet`} disabled={!x.uri || checking} onPress={() => redo(k)}
-            containerStyle={{ flex: 1 }}
-            style={{ aspectRatio: 1, borderRadius: 20, overflow: 'hidden', backgroundColor: x.state === 'retake' ? color.saffronSoft : color.card, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: x.state === 'ok' ? color.mint : x.state === 'retake' ? color.saffron : k === i ? color.ink : 'transparent', ...shadow(1) }}>
-            {x.uri ? <Image source={x.uri} style={{ position: 'absolute', inset: 0, opacity: x.state === 'ok' ? 1 : 0.45 }} contentFit="cover" /> : null}
-            {x.state === 'empty' && <Num style={{ fontSize: 26, color: color.ink2 }}>{k + 1}</Num>}
-            {x.state === 'retake' && <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.saffronInk, textAlign: 'center', padding: 6 }}>{why(x.check)}. Retake</Text>}
-          </Squishy>
-        ))}
-      </Row>
+  // A tablet at the pass gets the camera large on the left, the way a camera app fills the screen; a phone stacks.
+  const wide = useWindowDimensions().width >= 900;
+  const camera = !all && <LiveCamera ref={cam} height={wide ? '100%' : 280} guide="plate" onReady={setReady} demo={[1, 2, 3].map((n) => `${slug(dish)}/golden-${n}`)} />;
+  const thumbs = (
+    <Row gap={8}>
+      {shots.map((x, k) => (
+        <Squishy key={k} accessibilityRole="button" accessibilityLabel={x.uri ? `Photo ${k + 1}, tap to retake` : `Photo ${k + 1}, not taken yet`} disabled={!x.uri || checking} onPress={() => redo(k)}
+          containerStyle={{ flex: 1 }}
+          style={{ aspectRatio: wide ? 16 / 9 : 1, borderRadius: 20, overflow: 'hidden', backgroundColor: x.state === 'retake' ? color.saffronSoft : color.card, alignItems: 'center', justifyContent: 'center', borderWidth: 3, borderColor: x.state === 'ok' ? color.mint : x.state === 'retake' ? color.saffron : k === i ? color.ink : 'transparent', ...shadow(1) }}>
+          {x.uri ? <Image source={x.uri} style={{ position: 'absolute', inset: 0, opacity: x.state === 'ok' ? 1 : 0.45 }} contentFit="cover" /> : null}
+          {x.state === 'empty' && <Num style={{ fontSize: 26, color: color.ink2 }}>{k + 1}</Num>}
+          {x.state === 'retake' && <Text style={{ fontFamily: font.bodyBold, fontSize: 13, color: color.saffronInk, textAlign: 'center', padding: 6 }}>{why(x.check)}. Retake</Text>}
+        </Squishy>
+      ))}
+    </Row>
+  );
+  const status = (
+    <>
       <Card style={{ gap: 8 }}>
         <Row style={{ justifyContent: 'space-between' }}>
           <Label>Photo check</Label>
@@ -148,6 +150,35 @@ function Photos({ dish, initial, next }: { dish: string; initial: Photo[]; next:
       {all ? <Button title="Next: find the parts" onPress={() => next(shots.map((x) => x.photo!))} />
         : checking ? <Button kind="saffron" title="Checking the photo…" disabled onPress={() => {}} />
         : <Shutter onPress={take} disabled={!ready} label={shots[i]?.state === 'retake' ? `Retake photo ${i + 1}` : `Take photo ${i + 1}`} />}
+    </>
+  );
+
+  const intro = (
+    <>
+      <H1>Plate it perfectly, 3 times</H1>
+      <Sub>Same plate, same spot. Three photos let Nomi learn what “right” looks like and how much it can vary.</Sub>
+    </>
+  );
+  if (wide) return (
+    <View style={{ gap: 14 }}>
+      {intro}
+      <View style={{ flexDirection: 'row', gap: 20, alignItems: 'flex-start' }}>
+        <View style={{ flex: 1.7, aspectRatio: 16 / 9 }}>
+          {camera || (last?.uri && <Image source={last.uri} style={{ width: '100%', height: '100%', borderRadius: 26 }} contentFit="cover" accessibilityLabel="The last photo taken" />)}
+        </View>
+        <View style={{ flex: 1, gap: 14 }}>
+          {thumbs}
+          {status}
+        </View>
+      </View>
+    </View>
+  );
+  return (
+    <View style={{ gap: 14 }}>
+      {intro}
+      {camera}
+      {thumbs}
+      {status}
     </View>
   );
 }
@@ -215,6 +246,7 @@ function partStatus(name: string, role: string, reads: SamRead[], dropped: boole
 }
 
 function Masks({ dish, photos, next }: { dish: string; photos: Photo[]; next: (read: SamRead | null) => void }) {
+  const wide = useWindowDimensions().width >= 900;
   const parts = partsFor(dish);
   const [reads, setReads] = useState<(GoldenRead | (SamRead & { id: null }))[] | null>(null);
   const [recorded, setRecorded] = useState(false);
@@ -295,11 +327,14 @@ function Masks({ dish, photos, next }: { dish: string; photos: Photo[]; next: (r
     setFixing(name);
   };
 
-  return (
-    <View style={{ gap: 14 }}>
+  const intro = (
+    <>
       <H1>What Nomi sees</H1>
       <Sub>SAM 3.1 looks for each part of the dish in all {photos.length} of your photos. Check each colour sits on the right thing.</Sub>
-
+    </>
+  );
+  const photoSide = (
+    <>
       {reads && (
         <Segmented value={String(view)} onChange={(v) => { setView(Number(v)); }} options={photos.map((_, k) => ({ value: String(k), label: `Photo ${k + 1}` }))} />
       )}
@@ -325,7 +360,10 @@ function Masks({ dish, photos, next }: { dish: string; photos: Photo[]; next: (r
         </Row>
       )}
       {shown && mode !== 'photo' && !fixing && <MaskLegend read={shown} focus={focus} onFocus={setFocus} />}
-
+    </>
+  );
+  const listSide = (
+    <>
       {error && (
         <Card style={{ gap: 10, backgroundColor: color.saffronSoft }}>
           <Text style={{ fontFamily: font.bodyBold, color: color.saffronInk, fontSize: 15 }}>{error} Your photos are kept on this phone.</Text>
@@ -371,6 +409,24 @@ function Masks({ dish, photos, next }: { dish: string; photos: Photo[]; next: (r
       )}
       {reads && open > 0 && <Sub style={{ fontSize: 13, textAlign: 'center' }}>{open === 1 ? 'One part needs' : `${open} parts need`} a look. Nomi only uses parts it can find in every photo.</Sub>}
       {reads && open === 0 && <Button title="Next: speak the rules" onPress={() => next(reads[0])} />}
+    </>
+  );
+
+  // On a tablet the photo stays large on the left and the parts list sits beside it, both in view.
+  if (wide) return (
+    <View style={{ gap: 14 }}>
+      {intro}
+      <View style={{ flexDirection: 'row', gap: 20, alignItems: 'flex-start' }}>
+        <View style={{ flex: 1.7, gap: 14 }}>{photoSide}</View>
+        <View style={{ flex: 1, gap: 14 }}>{listSide}</View>
+      </View>
+    </View>
+  );
+  return (
+    <View style={{ gap: 14 }}>
+      {intro}
+      {photoSide}
+      {listSide}
     </View>
   );
 }

@@ -38,6 +38,8 @@ function ShelfScan() {
 }
 
 const SHELF_PARTS = (DISH_PARTS.Larder ?? []).map(({ name, prompt, colour }) => ({ name, prompt, colour }));
+/** Which shelf part each stock item is counted as. */
+const COUNTED_AS: Record<string, string> = { s1: 'Rice sacks', s2: 'Oil tins', s5: 'Atta bags' };
 
 export default function Larder() {
   const [ordered, setOrdered] = useState(false);
@@ -59,7 +61,13 @@ export default function Larder() {
   const real = scan.done && saved.some(Boolean);
   const totals = real ? saved.flatMap((r) => r?.parts ?? []).reduce<Record<string, number>>((t, p) => ({ ...t, [p.name]: (t[p.name] ?? 0) + p.count }), {}) : {};
   const [shooting, setShooting] = useState(false);
-  const low = STOCK.filter((s) => s.counts[s.counts.length - 1] < s.min);
+  // Tonight's number for each item comes from the shelf just counted when SAM saw it there; an item not in the photos keeps
+  // its last scan, since a shelf photo that misses the rice doesn't mean there is none.
+  const stock = STOCK.map((s) => {
+    const n = totals[COUNTED_AS[s.id] ?? ''];
+    return n ? { ...s, counts: [...s.counts.slice(0, -1), n], now: true } : { ...s, now: false };
+  });
+  const low = stock.filter((s) => s.counts[s.counts.length - 1] < s.min);
 
   return (
     <Screen scroll style={{ paddingBottom: 120 }}>
@@ -96,7 +104,7 @@ export default function Larder() {
             {low.map((s) => (
               <Row key={s.id} style={{ justifyContent: 'space-between' }}>
                 <Text style={{ fontFamily: font.bodyBold, fontSize: 15, color: color.ink }}>{s.name}</Text>
-                <Text style={{ fontFamily: font.bodySemi, fontSize: 14, color: color.saffronInk }}>{plural(s.counts[s.counts.length - 1], s.unit)} · min {s.min} → order {s.min - s.counts[s.counts.length - 1]}</Text>
+                <Text style={{ fontFamily: font.bodySemi, fontSize: 14, color: color.saffronInk }}>{plural(s.counts[s.counts.length - 1], s.unit)}{s.now ? ' counted now' : ''} · min {s.min} → order {s.min - s.counts[s.counts.length - 1]}</Text>
               </Row>
             ))}
             {ordered ? <Chip tone="mint" label="Approved by Arjun · sent to Sri Lakshmi Traders" /> : <Button small title="Approve and send order" onPress={() => setOrdered(true)} />}
@@ -105,7 +113,7 @@ export default function Larder() {
       )}
 
       <Label>Whole items at close · last 7 nights</Label>
-      {STOCK.map((s, i) => {
+      {stock.map((s, i) => {
         const now = s.counts[s.counts.length - 1];
         const under = now < s.min;
         return (

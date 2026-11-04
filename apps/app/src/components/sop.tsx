@@ -1,5 +1,6 @@
 // The plating card staff follow, in English or the reader's language (translated by Muse Spark from the approved text only).
-import { Card, Chip, H2, Num, Row, color, font } from '@nomi/ui';
+import type { WatchItem } from '@nomi/shared';
+import { Button, Card, Chip, H2, Num, Row, color, font } from '@nomi/ui';
 import { Image } from 'expo-image';
 import { Text, View } from 'react-native';
 
@@ -35,20 +36,32 @@ export function SopCard({ card, lang, lines, ms }: { card: SopCardData; lang: 'e
   );
 }
 
-/** Tonight's reminders, each built from yesterday's plate facts. */
-export function WatchList() {
+/**
+ * Tonight's reminders, each built from last night's PASS rows. Live, the counts are computed by the API from the plates
+ * themselves and Muse Spark only words the reminder; before a run, the seed list shows.
+ */
+export function WatchList({ live, running = false, onRun }: { live?: WatchItem[] | null; running?: boolean; onRun?: () => void }) {
+  const items = live
+    ? live.map((w) => ({ dish: w.dish, fix: w.reminder ?? `Check the ${w.part.toLowerCase()} on every plate`, fact: w.fact }))
+    : WATCH_LIST;
   return (
     <Card style={{ backgroundColor: color.ink, gap: 12 }}>
       <Row style={{ justifyContent: 'space-between' }}>
         <Text style={{ fontFamily: font.bodyBold, fontSize: 12, color: color.saffron, letterSpacing: 1.1, textTransform: 'uppercase' }}>Watch tonight</Text>
         <AiTag model="Muse Spark" />
       </Row>
-      {WATCH_LIST.map((w, i) => (
-        <View key={w.dish} style={{ gap: 2 }}>
+      {running && !live ? (
+        <Text style={{ fontFamily: font.bodySemi, fontSize: 14, color: color.saffronSoft }}>Counting last night&apos;s PASS plates…</Text>
+      ) : items.map((w, i) => (
+        <View key={`${w.dish}-${i}`} style={{ gap: 2 }}>
           <Text style={{ fontFamily: font.display, fontSize: 18, color: color.bg }}>{i + 1}. {w.dish}: {w.fix}</Text>
-          <Text style={{ fontFamily: font.body, fontSize: 13, color: color.saffronSoft }}>Yesterday: {w.fact}</Text>
+          <Text style={{ fontFamily: font.body, fontSize: 13, color: color.saffronSoft }}>Last night: {w.fact}</Text>
         </View>
       ))}
+      <Text style={{ fontFamily: font.body, fontSize: 12, color: color.saffronSoft }}>
+        {live ? 'Counts come straight from the PASS checks; Muse Spark words the reminder.' : 'Seed list. Build it from last night\'s plates to count them live.'}
+      </Text>
+      {onRun && <Button small kind="saffron" title={running ? 'Counting…' : live ? 'Count again' : 'Build from last night'} disabled={running} onPress={onRun} />}
     </Card>
   );
 }

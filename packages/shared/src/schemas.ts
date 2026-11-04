@@ -69,21 +69,81 @@ export const ClosingCheck = z.object({
   flags: z.array(z.object({ flag: ClosingFlag, where: z.string(), box: z.tuple([z.number(), z.number(), z.number(), z.number()]).nullable() })),
 });
 
-// NIGHTSHIFT: findings from each analyst, then the briefing (Muse Wonder + Spark sub-agents)
-export const Finding = z.object({
-  analyst: z.enum(['feedback', 'plate', 'stock', 'closing']),
-  fact: z.string().describe('a statement that is directly observed in the evidence'),
-  evidence_ids: z.array(z.string()).min(1),
+// PASS frame gate, on site (local Glimmer): a frame is kept only if a plate is in it; faces are blurred before it leaves
+export const PassFrame = z.object({
+  plate: z.boolean().describe('a plated dish is fully inside the frame'),
+  faces: z.array(z.tuple([z.number(), z.number(), z.number(), z.number()])).describe('each visible face as x1, y1, x2, y2 in 0–1 of the frame'),
 });
+
+// PASS check: SAM 3.1 parts measured by the vision worker against the dish's Golden Plate signature
+export const PassComponent = z.object({
+  name: z.string(),
+  colour: z.string(),
+  role: z.string(),
+  found: z.boolean(),
+  count: z.number().int().min(0),
+  golden_count: z.number().int().nullable(),
+  share: z.number().describe('share of the plate this part covers in the frame, 0–1'),
+  golden_share: z.number(),
+  area_vs_golden: z.number().int().nullable().describe('percent more (+) or less (−) plate area than the Golden Plate; null when not compared'),
+  where: z.string().nullable(),
+  golden_where: z.string().nullable(),
+  ok: z.boolean(),
+  reason: z.string().nullable().describe('the quiet nudge line, e.g. "Fried onions: not found"'),
+  kind: z.enum(['missing', 'count', 'area', 'position']).nullable(),
+});
+export const PassCheck = z.object({
+  dish_id: z.string(),
+  dish: z.string(),
+  golden_version: z.number().int(),
+  score: z.number().int().min(0).max(100),
+  components: z.array(PassComponent),
+  reasons: z.array(z.string()),
+  glimmer: z.object({ ran: z.boolean(), plate: z.boolean().nullable(), faces_blurred: z.number().int().min(0), note: z.string().nullable() }),
+  // The frame as SAM 3.1 read it, for drawing the outlines: same shape as a Golden Plate read.
+  read: z.object({
+    size: z.object({ w: z.number(), h: z.number() }),
+    plate: z.object({ cx: z.number(), cy: z.number(), r: z.number(), path: z.string() }).nullable(),
+    parts: z.array(z.object({
+      name: z.string(), colour: z.string(), found: z.boolean(), count: z.number(), share: z.number(), where: z.string().nullable(),
+      centre: z.tuple([z.number(), z.number()]).nullable(), paths: z.array(z.string()), boxes: z.array(z.array(z.number())),
+    })),
+  }),
+  frame: z.string().nullable().describe('the frame that was sent to SAM 3.1, when faces were blurred in it'),
+});
+
+// NIGHTSHIFT: Muse Wonder plans, four Muse Spark analysts read their facts in parallel, Muse Wonder links them.
+// No min/max items in these: in strict mode the models stall on them (checked Nov 3). The API enforces limits after parsing.
+export const Analyst = z.enum(['feedback', 'plate', 'stock', 'closing']);
+export const NightshiftPlan = z.object({
+  focus: z.array(z.object({ analyst: Analyst, question: z.string().describe('what this analyst should look for in its facts, one short sentence') })),
+});
+export const Finding = z.object({
+  analyst: Analyst,
+  fact: z.string().describe('a statement that is directly observed in the evidence, with its counts'),
+  evidence_ids: z.array(z.string()),
+});
+export const AnalystReport = z.object({ findings: z.array(Finding.omit({ analyst: true })) });
 export const ProposedAction = z.object({
   type: z.enum(['update_sop', 'adjust_order', 'reply_guest']),
   title: z.string(),
   detail: z.string(),
-  evidence_ids: z.array(z.string()).min(1),
+  evidence_ids: z.array(z.string()),
 });
 export const Briefing = z.object({
-  issues: z.array(z.object({ title: z.string(), facts: z.array(Finding), likely_cause: z.string().nullable(), actions: z.array(ProposedAction) })).max(3),
+  issues: z.array(z.object({ title: z.string(), facts: z.array(Finding), likely_cause: z.string().nullable(), actions: z.array(ProposedAction) })),
   wins: z.array(z.object({ title: z.string(), evidence_ids: z.array(z.string()) })),
+});
+// Tonight's watch list: the counts are computed from PASS rows by the API, never by a model; Spark writes the reminder.
+export const WatchReminders = z.object({ reminders: z.array(z.object({ id: z.string(), reminder: z.string() })) });
+export const WatchItem = z.object({ id: z.string(), dish: z.string(), part: z.string(), kind: z.enum(['missing', 'count', 'area', 'position']), n: z.number().int(), of: z.number().int(), fact: z.string(), reminder: z.string().nullable(), plate_ids: z.array(z.string()) });
+export const NightshiftResult = z.object({
+  plan: NightshiftPlan,
+  analysts: z.array(z.object({ analyst: Analyst, findings: z.array(Finding), facts: z.number().int(), ms: z.number() })),
+  briefing: Briefing,
+  watch: z.array(WatchItem),
+  stats: z.object({ notes: z.number().int(), plates: z.number().int(), photos: z.number().int(), stock: z.number().int(), closing: z.number().int() }),
+  evidence: z.record(z.string(), z.string()).describe('fact id → the fact, for every id the briefing cites'),
 });
 
 // Shift handover voice note → done / pending / problems (Muse Voice Transcribe with speakers, then Muse Spark)
@@ -114,6 +174,14 @@ export type FeedbackTags = z.infer<typeof FeedbackTags>;
 export type ReplyDraft = z.infer<typeof ReplyDraft>;
 export type ClosingCheck = z.infer<typeof ClosingCheck>;
 export type Briefing = z.infer<typeof Briefing>;
+export type PassFrame = z.infer<typeof PassFrame>;
+export type PassCheck = z.infer<typeof PassCheck>;
+export type PassComponent = z.infer<typeof PassComponent>;
+export type NightshiftPlan = z.infer<typeof NightshiftPlan>;
+export type Finding = z.infer<typeof Finding>;
+export type AnalystReport = z.infer<typeof AnalystReport>;
+export type WatchItem = z.infer<typeof WatchItem>;
+export type NightshiftResult = z.infer<typeof NightshiftResult>;
 export type HandoverSummary = z.infer<typeof HandoverSummary>;
 export type CardTranslation = z.infer<typeof CardTranslation>;
 export type AskAnswer = z.infer<typeof AskAnswer>;

@@ -7,7 +7,7 @@ import { z } from 'zod';
 
 import { limited } from './limit';
 
-const WORKER = process.env.VISION_WORKER_URL ?? 'http://localhost:8001';
+export const WORKER = process.env.VISION_WORKER_URL ?? 'http://localhost:8001';
 
 type Part = { name: string; prompt: string; colour: string };
 type Read = {
@@ -25,7 +25,7 @@ function keep(id: string, s: Session) {
 }
 
 /** Runs tasks at most `n` at a time, keeping their order. */
-async function pool<T>(tasks: (() => Promise<T>)[], n = 18): Promise<T[]> {
+export async function pool<T>(tasks: (() => Promise<T>)[], n = 18): Promise<T[]> {
   const out: T[] = new Array(tasks.length);
   let next = 0;
   await Promise.all(Array.from({ length: Math.min(n, tasks.length) }, async () => {
@@ -38,7 +38,7 @@ async function pool<T>(tasks: (() => Promise<T>)[], n = 18): Promise<T[]> {
 }
 
 /** On Cloud Run the worker is private: the API signs each call with its own identity token. Locally there is no token. */
-async function workerAuth(): Promise<Record<string, string>> {
+export async function workerAuth(): Promise<Record<string, string>> {
   if (!WORKER.startsWith('https://')) return {};
   const url = `http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/identity?audience=${WORKER}`;
   const res = await fetch(url, { headers: { 'Metadata-Flavor': 'Google' } });

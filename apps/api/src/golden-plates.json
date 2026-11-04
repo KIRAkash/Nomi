@@ -1,0 +1,1012 @@
+{
+ "00000000-0000-0000-0000-0000000d0001": {
+  "name": "Chicken Biryani",
+  "version": 2,
+  "parts": [
+   {
+    "name": "Rice",
+    "prompt": "rice",
+    "colour": "#4D9DE0",
+    "role": "main"
+   },
+   {
+    "name": "Chicken pieces",
+    "prompt": "chicken pieces",
+    "colour": "#D93A2E",
+    "role": "count"
+   },
+   {
+    "name": "Fried onions",
+    "prompt": "fried onions",
+    "colour": "#FFB627",
+    "role": "placement"
+   },
+   {
+    "name": "Lemon wedge",
+    "prompt": "lemon wedge",
+    "colour": "#FF7AB6",
+    "role": "placement"
+   },
+   {
+    "name": "Raita bowl",
+    "prompt": "bowl",
+    "colour": "#3BB273",
+    "role": "side"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 656,
+     "cy": 434,
+     "r": 338
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.266,
+      "centre": [
+       633,
+       446
+      ]
+     },
+     {
+      "name": "Chicken pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.237,
+      "centre": [
+       663,
+       440
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.039,
+      "centre": [
+       770,
+       210
+      ]
+     },
+     {
+      "name": "Lemon wedge",
+      "found": true,
+      "count": 1,
+      "share": 0.028,
+      "centre": [
+       874,
+       607
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       163,
+       382
+      ]
+     }
+    ]
+   },
+   {
+    "plate": {
+     "cx": 658,
+     "cy": 434,
+     "r": 336
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.272,
+      "centre": [
+       632,
+       426
+      ]
+     },
+     {
+      "name": "Chicken pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.238,
+      "centre": [
+       649,
+       440
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.041,
+      "centre": [
+       889,
+       370
+      ]
+     },
+     {
+      "name": "Lemon wedge",
+      "found": true,
+      "count": 1,
+      "share": 0.028,
+      "centre": [
+       664,
+       709
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       164,
+       381
+      ]
+     }
+    ]
+   },
+   {
+    "plate": {
+     "cx": 656,
+     "cy": 471,
+     "r": 338
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.275,
+      "centre": [
+       638,
+       470
+      ]
+     },
+     {
+      "name": "Chicken pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.237,
+      "centre": [
+       663,
+       465
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.027,
+      "centre": [
+       748,
+       218
+      ]
+     },
+     {
+      "name": "Lemon wedge",
+      "found": true,
+      "count": 1,
+      "share": 0.025,
+      "centre": [
+       882,
+       622
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       164,
+       381
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0007": {
+  "name": "Mutton Biryani",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Rice",
+    "prompt": "rice",
+    "colour": "#4D9DE0",
+    "role": "main"
+   },
+   {
+    "name": "Mutton pieces",
+    "prompt": "meat pieces",
+    "colour": "#8C3B2E",
+    "role": "count"
+   },
+   {
+    "name": "Fried onions",
+    "prompt": "fried onions",
+    "colour": "#FFB627",
+    "role": "placement"
+   },
+   {
+    "name": "Boiled egg",
+    "prompt": "boiled egg",
+    "colour": "#FFF1A8",
+    "role": "placement"
+   },
+   {
+    "name": "Raita bowl",
+    "prompt": "bowl",
+    "colour": "#3BB273",
+    "role": "side"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 666,
+     "cy": 432,
+     "r": 348
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.222,
+      "centre": [
+       653,
+       434
+      ]
+     },
+     {
+      "name": "Mutton pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.15,
+      "centre": [
+       669,
+       421
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.037,
+      "centre": [
+       830,
+       264
+      ]
+     },
+     {
+      "name": "Boiled egg",
+      "found": true,
+      "count": 1,
+      "share": 0.029,
+      "centre": [
+       519,
+       554
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       180,
+       542
+      ]
+     }
+    ]
+   },
+   {
+    "plate": {
+     "cx": 664,
+     "cy": 431,
+     "r": 347
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.22,
+      "centre": [
+       652,
+       436
+      ]
+     },
+     {
+      "name": "Mutton pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.156,
+      "centre": [
+       669,
+       416
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.036,
+      "centre": [
+       788,
+       232
+      ]
+     },
+     {
+      "name": "Boiled egg",
+      "found": true,
+      "count": 1,
+      "share": 0.029,
+      "centre": [
+       534,
+       570
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       166,
+       352
+      ]
+     }
+    ]
+   },
+   {
+    "plate": {
+     "cx": 766,
+     "cy": 426,
+     "r": 337
+    },
+    "parts": [
+     {
+      "name": "Rice",
+      "found": true,
+      "count": 1,
+      "share": 0.225,
+      "centre": [
+       753,
+       430
+      ]
+     },
+     {
+      "name": "Mutton pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.157,
+      "centre": [
+       770,
+       415
+      ]
+     },
+     {
+      "name": "Fried onions",
+      "found": true,
+      "count": 1,
+      "share": 0.038,
+      "centre": [
+       929,
+       271
+      ]
+     },
+     {
+      "name": "Boiled egg",
+      "found": true,
+      "count": 1,
+      "share": 0.026,
+      "centre": [
+       610,
+       538
+      ]
+     },
+     {
+      "name": "Raita bowl",
+      "found": true,
+      "count": 1,
+      "share": 0,
+      "centre": [
+       191,
+       392
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0002": {
+  "name": "Paneer Tikka",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Paneer cubes",
+    "prompt": "paneer cubes",
+    "colour": "#F2A65A",
+    "role": "count"
+   },
+   {
+    "name": "Onion rings",
+    "prompt": "onion rings",
+    "colour": "#C77DFF",
+    "role": "placement"
+   },
+   {
+    "name": "Mint chutney",
+    "prompt": "green sauce",
+    "colour": "#3BB273",
+    "role": "side"
+   },
+   {
+    "name": "Lemon wedge",
+    "prompt": "lemon wedge",
+    "colour": "#FF7AB6",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 640,
+     "cy": 424,
+     "r": 382
+    },
+    "parts": [
+     {
+      "name": "Paneer cubes",
+      "found": true,
+      "count": 6,
+      "share": 0.175,
+      "centre": [
+       618,
+       434
+      ]
+     },
+     {
+      "name": "Onion rings",
+      "found": true,
+      "count": 1,
+      "share": 0.075,
+      "centre": [
+       456,
+       245
+      ]
+     },
+     {
+      "name": "Mint chutney",
+      "found": true,
+      "count": 1,
+      "share": 0.058,
+      "centre": [
+       838,
+       387
+      ]
+     },
+     {
+      "name": "Lemon wedge",
+      "found": true,
+      "count": 1,
+      "share": 0.02,
+      "centre": [
+       567,
+       707
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0004": {
+  "name": "Butter Chicken",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Bowl",
+    "prompt": "bowl",
+    "colour": "#4D9DE0",
+    "role": "main"
+   },
+   {
+    "name": "Chicken pieces",
+    "prompt": "chicken pieces",
+    "colour": "#D93A2E",
+    "role": "count"
+   },
+   {
+    "name": "Cream swirl",
+    "prompt": "cream swirl",
+    "colour": "#FFF1A8",
+    "role": "placement"
+   },
+   {
+    "name": "Coriander",
+    "prompt": "coriander leaves",
+    "colour": "#3BB273",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 638,
+     "cy": 436,
+     "r": 304
+    },
+    "parts": [
+     {
+      "name": "Bowl",
+      "found": true,
+      "count": 1,
+      "share": 0.289,
+      "centre": [
+       638,
+       444
+      ]
+     },
+     {
+      "name": "Chicken pieces",
+      "found": true,
+      "count": 5,
+      "share": 0.261,
+      "centre": [
+       642,
+       435
+      ]
+     },
+     {
+      "name": "Cream swirl",
+      "found": true,
+      "count": 1,
+      "share": 0.049,
+      "centre": [
+       639,
+       430
+      ]
+     },
+     {
+      "name": "Coriander",
+      "found": true,
+      "count": 1,
+      "share": 0.008,
+      "centre": [
+       633,
+       166
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0005": {
+  "name": "Garlic Naan",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Naan pieces",
+    "prompt": "flatbread",
+    "colour": "#FFB627",
+    "role": "count"
+   },
+   {
+    "name": "Butter",
+    "prompt": "butter",
+    "colour": "#FFF1A8",
+    "role": "placement"
+   },
+   {
+    "name": "Coriander",
+    "prompt": "coriander leaves",
+    "colour": "#3BB273",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 641,
+     "cy": 428,
+     "r": 350
+    },
+    "parts": [
+     {
+      "name": "Naan pieces",
+      "found": true,
+      "count": 4,
+      "share": 0.475,
+      "centre": [
+       644,
+       421
+      ]
+     },
+     {
+      "name": "Butter",
+      "found": true,
+      "count": 1,
+      "share": 0.01,
+      "centre": [
+       643,
+       420
+      ]
+     },
+     {
+      "name": "Coriander",
+      "found": false,
+      "count": 0,
+      "share": 0,
+      "centre": null
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0008": {
+  "name": "Tandoori Prawns",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Prawns",
+    "prompt": "seafood",
+    "colour": "#FF7A3D",
+    "role": "count"
+   },
+   {
+    "name": "Onion salad",
+    "prompt": "sliced onions",
+    "colour": "#C77DFF",
+    "role": "placement"
+   },
+   {
+    "name": "Mint chutney",
+    "prompt": "green sauce",
+    "colour": "#3BB273",
+    "role": "side"
+   },
+   {
+    "name": "Lemon wedge",
+    "prompt": "lemon wedge",
+    "colour": "#FFE34D",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 640,
+     "cy": 429,
+     "r": 405
+    },
+    "parts": [
+     {
+      "name": "Prawns",
+      "found": true,
+      "count": 5,
+      "share": 0.346,
+      "centre": [
+       633,
+       398
+      ]
+     },
+     {
+      "name": "Onion salad",
+      "found": true,
+      "count": 1,
+      "share": 0.062,
+      "centre": [
+       335,
+       493
+      ]
+     },
+     {
+      "name": "Mint chutney",
+      "found": true,
+      "count": 1,
+      "share": 0.043,
+      "centre": [
+       951,
+       512
+      ]
+     },
+     {
+      "name": "Lemon wedge",
+      "found": true,
+      "count": 1,
+      "share": 0.021,
+      "centre": [
+       638,
+       720
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0009": {
+  "name": "Lamb Shank Rogan Josh",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Lamb shank",
+    "prompt": "meat",
+    "colour": "#8E3B2F",
+    "role": "main"
+   },
+   {
+    "name": "Rogan josh sauce",
+    "prompt": "sauce",
+    "colour": "#D93A2E",
+    "role": "main"
+   },
+   {
+    "name": "Saffron rice",
+    "prompt": "rice",
+    "colour": "#FFB627",
+    "role": "side"
+   },
+   {
+    "name": "Cream drizzle",
+    "prompt": "cream drizzle",
+    "colour": "#F5F0E6",
+    "role": "placement"
+   },
+   {
+    "name": "Coriander",
+    "prompt": "green herbs",
+    "colour": "#3BB273",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 639,
+     "cy": 430,
+     "r": 360
+    },
+    "parts": [
+     {
+      "name": "Lamb shank",
+      "found": true,
+      "count": 1,
+      "share": 0.191,
+      "centre": [
+       659,
+       411
+      ]
+     },
+     {
+      "name": "Rogan josh sauce",
+      "found": true,
+      "count": 1,
+      "share": 0.211,
+      "centre": [
+       694,
+       464
+      ]
+     },
+     {
+      "name": "Saffron rice",
+      "found": true,
+      "count": 1,
+      "share": 0.084,
+      "centre": [
+       428,
+       383
+      ]
+     },
+     {
+      "name": "Cream drizzle",
+      "found": true,
+      "count": 1,
+      "share": 0.034,
+      "centre": [
+       784,
+       531
+      ]
+     },
+     {
+      "name": "Coriander",
+      "found": true,
+      "count": 3,
+      "share": 0.008,
+      "centre": [
+       614,
+       444
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0010": {
+  "name": "Burrata Mango Chaat",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Burrata",
+    "prompt": "white cheese ball",
+    "colour": "#F5F0E6",
+    "role": "main"
+   },
+   {
+    "name": "Mango cubes",
+    "prompt": "mango cubes",
+    "colour": "#FFB627",
+    "role": "count"
+   },
+   {
+    "name": "Salad leaves",
+    "prompt": "salad leaves",
+    "colour": "#3BB273",
+    "role": "side"
+   },
+   {
+    "name": "Tamarind chutney",
+    "prompt": "brown sauce",
+    "colour": "#8E5B2F",
+    "role": "placement"
+   },
+   {
+    "name": "Pomegranate",
+    "prompt": "pomegranate seeds",
+    "colour": "#D93A2E",
+    "role": "placement"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 646,
+     "cy": 430,
+     "r": 359
+    },
+    "parts": [
+     {
+      "name": "Burrata",
+      "found": true,
+      "count": 1,
+      "share": 0.069,
+      "centre": [
+       645,
+       440
+      ]
+     },
+     {
+      "name": "Mango cubes",
+      "found": true,
+      "count": 8,
+      "share": 0.144,
+      "centre": [
+       658,
+       436
+      ]
+     },
+     {
+      "name": "Salad leaves",
+      "found": true,
+      "count": 1,
+      "share": 0.065,
+      "centre": [
+       527,
+       253
+      ]
+     },
+     {
+      "name": "Tamarind chutney",
+      "found": true,
+      "count": 1,
+      "share": 0.031,
+      "centre": [
+       792,
+       631
+      ]
+     },
+     {
+      "name": "Pomegranate",
+      "found": true,
+      "count": 11,
+      "share": 0.018,
+      "centre": [
+       673,
+       482
+      ]
+     }
+    ]
+   }
+  ]
+ },
+ "00000000-0000-0000-0000-0000000d0011": {
+  "name": "Kesar Pista Kulfi",
+  "version": 1,
+  "parts": [
+   {
+    "name": "Kulfi slices",
+    "prompt": "kulfi",
+    "colour": "#F7E3A1",
+    "role": "count"
+   },
+   {
+    "name": "Pistachios",
+    "prompt": "pistachio",
+    "colour": "#9BC53D",
+    "role": "placement"
+   },
+   {
+    "name": "Rose petals",
+    "prompt": "rose petals",
+    "colour": "#FF7AB6",
+    "role": "placement"
+   },
+   {
+    "name": "Falooda",
+    "prompt": "noodles",
+    "colour": "#F5F0E6",
+    "role": "side"
+   }
+  ],
+  "golden": [
+   {
+    "plate": {
+     "cx": 639,
+     "cy": 428,
+     "r": 354
+    },
+    "parts": [
+     {
+      "name": "Kulfi slices",
+      "found": true,
+      "count": 3,
+      "share": 0.233,
+      "centre": [
+       640,
+       422
+      ]
+     },
+     {
+      "name": "Pistachios",
+      "found": true,
+      "count": 28,
+      "share": 0.015,
+      "centre": [
+       670,
+       404
+      ]
+     },
+     {
+      "name": "Rose petals",
+      "found": true,
+      "count": 7,
+      "share": 0.011,
+      "centre": [
+       821,
+       264
+      ]
+     },
+     {
+      "name": "Falooda",
+      "found": true,
+      "count": 1,
+      "share": 0.042,
+      "centre": [
+       455,
+       603
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

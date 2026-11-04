@@ -36,14 +36,14 @@ Every role's journey, every AI feature, and the UI rules the app follows. Writte
 | Golden Plate: calibrate → 3 photos → masks → tap-to-fix → voice rules → SOP card + icon → guest questions → publish | A7–A11 | Photo quality gate (measured on device), SAM 3.1 masks on the chef's own 3 photos with found-in-all-3 and count agreement, tap-to-fix with a box and point prompt, Voice Transcribe + Spark rules read back, Muse Image SOP card and icon, Spark questions | calibrate, photos and masks live; later steps demo |
 | Dish Performance home | A12 | Consistency score from PASS, guest faces, flagged plates | demo |
 | Dish detail timeline | A13 | Guest photo vs Golden Plate, translated comments, version history | demo |
-| PASS camera | A14 | Glimmer frame filter on site, SAM 3.1 + worker score, quiet amber nudge | demo |
-| Kitchen | A23 | **Pre-service watch list** built from yesterday's facts | demo |
+| PASS camera | A14 | Glimmer frame filter on site (faces blurred), dish from the ticket or Muse Spark, SAM 3.1 + worker score against the Golden Plate signature, quiet amber nudge; each stage streams to the screen | live (Glimmer reported as not running when no local server answers) |
+| Kitchen | A23 | **Pre-service watch list** counted from last night's PASS rows by the API; Muse Spark words each reminder | live |
 
 ### Owner
 
 | Step | Screen | AI | Status |
 | --- | --- | --- | --- |
-| Today briefing | A18 | NIGHTSHIFT: Muse Wonder plans, 4 Muse Spark analysts in parallel, evidence chain, proposed actions | demo |
+| Today briefing | A18 | NIGHTSHIFT: Muse Wonder plans, 4 Muse Spark analysts in parallel, evidence chain, proposed actions; each stage streams to the screen | live (seed briefing until "Run Nightshift now") |
 | Ask Nomi | A19 | Answers with evidence chips; declines predictions and says what it can count instead | demo |
 | Insights | — | **Menu Lab** (weekly picks, faces, consistency per dish), shift comparison, **AI activity log** (every model call, purpose, latency) | demo |
 | Studio | A5, A24 | Muse Image table tents with each table's QR | demo |
@@ -52,7 +52,7 @@ Every role's journey, every AI feature, and the UI rules the app follows. Writte
 
 | Step | Screen | AI | Status |
 | --- | --- | --- | --- |
-| Today | A18 | Urgent alerts first, then approvals | demo |
+| Today | A18 | Urgent alerts first, then approvals | live (same NIGHTSHIFT run) |
 | Feedback inbox → detail | A15, A16 | Transcript, translation, tags, guest photo scored vs Golden Plate, reply drafted in the guest's language | demo |
 | Issues | A17 | Clusters with counts per day | demo |
 | Larder | A20 | SAM 3.1 counts whole items only; reorder list waits for approval | demo |
@@ -84,7 +84,7 @@ Every role's journey, every AI feature, and the UI rules the app follows. Writte
 
 ## 4. Still planned (after this pass)
 
-- Real API wiring for staff screens (`/feedback`, `/briefings/latest`, `/actions/:id/approve`) and Supabase Realtime for the inbox.
+- Real API wiring for staff screens (`/feedback`, `/briefings/latest`, `/actions/:id/approve`) and Supabase Realtime for the inbox. NIGHTSHIFT runs live (`POST /staff/nightshift`) but is not yet saved or scheduled after closing.
 - Phone OTP sign-in with Supabase Auth (the demo sign-in accepts any number).
 - Continuous frame capture on the pass (the PASS screen takes one frame per press today), and the photo check on Android (it runs in the browser now).
 - WhatsApp channel for guest replies and the owner briefing.

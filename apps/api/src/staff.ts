@@ -1,13 +1,17 @@
 // Staff-side model calls, each one live: Muse Wonder reads menus and answers Ask Nomi, Muse Spark proposes components,
-// guest questions and replies and translates plating cards, Muse Image draws dish icons and plating cards.
+// guest questions and replies and translates plating cards, Muse Image draws dish icons and plating cards. The pass check
+// and NIGHTSHIFT stream each stage as one JSON line, so screens show what is happening while it happens.
 // Staff routes have no sign-in yet; they will sit behind the staff session once phone sign-in lands.
 import {
   askNomi, draftReply, extractMenu, generateDishIcon, generateSopCard, proposeComponents, proposeGuestQuestions, translateCard,
 } from '@nomi/models';
 import { Hono, type Context } from 'hono';
+import { streamText } from 'hono/streaming';
 import { z } from 'zod';
 
 import { limited } from './limit';
+import { NightInput, runNightshift } from './nightshift';
+import { checkPass, type Emit } from './pass';
 
 const Photo = z.string().startsWith('data:image/').max(8_000_000);
 const ip = (c: Context) => c.req.header('x-forwarded-for')?.split(',')[0] ?? 'local';
@@ -28,6 +32,26 @@ function route<S extends z.ZodType, T>(name: string, max: number, schema: S, run
       console.warn(`${name} failed:`, (err as Error).message);
       return c.json({ error: (err as Error).message.slice(0, 200) }, 502);
     }
+  };
+}
+
+/** route() for multi-stage calls: each stage event is a JSON line, then one "result" (or "error") line with the total time. */
+function staged<S extends z.ZodType, T>(name: string, max: number, schema: S, run: (body: z.infer<S>, emit: Emit) => Promise<T>) {
+  return async (c: Context) => {
+    if (limited(`${name}:${ip(c)}`, max, 60 * 60_000)) return c.json({ error: 'slow down' }, 429);
+    const body = schema.safeParse(await c.req.json());
+    if (!body.success) return c.json({ error: 'bad request' }, 400);
+    const t0 = Date.now();
+    c.header('content-type', 'application/x-ndjson');
+    return streamText(c, async (s) => {
+      const emit: Emit = (e) => s.writeln(JSON.stringify(e)).then(() => undefined);
+      try {
+        await emit({ type: 'result', result: await run(body.data, emit), ms: Date.now() - t0 });
+      } catch (err) {
+        console.warn(`${name} failed:`, (err as Error).message);
+        await emit({ type: 'error', error: (err as Error).message.slice(0, 200) });
+      }
+    });
   };
 }
 
@@ -54,4 +78,7 @@ export const staff = new Hono()
   .post('/card', route('card', 10, z.object({ photo: Photo, rules: z.array(z.string().max(200)).max(8), dish: z.string().max(80) }), async ({ photo, rules, dish }) => {
     const img = await generateSopCard({ purpose: 'sop_card' }, blob(photo), rules, dish);
     return { image: png(img?.b64_json) };
-  }));
+  }))
+  // Each check is up to 7 SAM calls, so one device gets 120 an hour.
+  .post('/pass', staged('pass', 120, z.object({ frame: Photo, dish_id: z.string().max(60).nullable().default(null) }), checkPass))
+  .post('/nightshift', staged('nightshift', 12, NightInput, runNightshift));

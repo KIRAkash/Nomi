@@ -30,7 +30,8 @@ export default function Ask() {
     setTurns((t) => [...t, { q }]);
     try {
       const r = await askNomi(q, restaurantFacts());
-      answer({ text: r.answer, evidence: [...new Set(r.facts.map((f) => f.source.replace(/^\w+:/, '')))].slice(0, 4), declined: r.refused, ms: r.ms, heardMs });
+      // The model cites facts inline as [dish:…]; the chips under the answer already show them, so the markers come out.
+      answer({ text: r.answer.replace(/\s*\[[a-z_]+:[^\]]+\]/gi, ''), evidence: [...new Set(r.facts.map((f) => f.source.replace(/^\w+:/, '')))].slice(0, 4), declined: r.refused, ms: r.ms, heardMs });
     } catch {
       // Offline: the prepared answers for the suggested questions, so the screen still shows how Nomi answers.
       answer(ASK_ANSWERS[q] ?? FALLBACK);

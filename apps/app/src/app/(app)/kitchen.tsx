@@ -1,4 +1,4 @@
-// Kitchen (Head Chef): tonight's watch list built from yesterday's plates, the plating cards, the last handover and the closing round.
+// Kitchen (Head Chef): tonight's watch list counted from last night's PASS plates by NIGHTSHIFT (shared with Today), the plating cards, the last handover and the closing round.
 import { Button, Card, H2, Label, Row, Screen, SquishIn, Sub, color, font } from '@nomi/ui';
 import { router } from 'expo-router';
 import { Text } from 'react-native';
@@ -6,13 +6,15 @@ import { Text } from 'react-native';
 import { AiTag, TopBar } from '@/components/kit';
 import { SopCard, WatchList } from '@/components/sop';
 import { HANDOVERS, SOP_CARDS } from '@/lib/mock';
+import { startNightshift, useNightshift } from '@/lib/nightshift';
 
 export default function Kitchen() {
   const h = HANDOVERS[0];
+  const night = useNightshift();
   return (
     <Screen scroll style={{ paddingBottom: 120 }}>
       <TopBar sub="Before service" title="Kitchen" />
-      <SquishIn><WatchList /></SquishIn>
+      <SquishIn><WatchList live={night.result?.watch} running={night.status === 'running'} onRun={startNightshift} /></SquishIn>
 
       <SquishIn index={1}>
         <Card style={{ gap: 8 }}>
