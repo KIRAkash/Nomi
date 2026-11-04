@@ -7,3 +7,9 @@ const SITE =
   (Platform.OS === 'web' && typeof location !== 'undefined' ? location.origin : 'https://nomi.app');
 
 export const guestUrl = (token: string) => `${SITE}/t/${token}`;
+
+// The public links people are given. The APK's short link isn't made yet: APK_URL is a placeholder until it is, and the
+// sign-in screen says the download is coming instead of opening it.
+export const WEB_URL = 'https://bit.ly/try-nomi';
+export const APK_URL = '#apk-link-coming-soon';
+export const apkReady = !APK_URL.startsWith('#');
